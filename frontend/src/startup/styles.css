@@ -1,0 +1,40 @@
+/* Startup owns its paint layer; business disabled/tabIndex state is never rewritten. */
+body.startup-active > :not(#startup-screen) { pointer-events:none!important; }
+#startup-screen { position:fixed;inset:0;z-index:10000;isolation:isolate;overflow:hidden;width:100%;height:100vh;height:100dvh;background:radial-gradient(ellipse at 50% 12%,#edf5fa 0,transparent 58%),linear-gradient(135deg,#e6eff5,#d5e3ec 70%,#e3edf3);color:#355b75;font-family:inherit;touch-action:none; }
+#startup-screen[hidden] { display:none!important; }
+#startup-frame,#startup-media { position:absolute;inset:0;pointer-events:none!important;overflow:hidden; }
+#startup-frame { visibility:hidden;background:radial-gradient(ellipse at 50% 18%,#f1f7fa88,transparent 65%),linear-gradient(125deg,#d1e0ea,#bdceda 75%,#dae7ef);will-change:clip-path; }
+#startup-cabinet { position:absolute;transform-origin:center;pointer-events:none!important; }
+#startup-cabinet *,#startup-cabinet *::before,#startup-cabinet *::after { pointer-events:none!important;user-select:none!important; }
+#startup-rim { position:absolute;pointer-events:none!important;border:1px solid #ffffffd6;box-shadow:0 9px 35px #5e7f9630,inset 0 1px 1px #fff;opacity:0; }
+#startup-brand { position:absolute;z-index:2;top:15%;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:17px;text-align:center;pointer-events:none!important;will-change:opacity,transform; }
+#startup-brand img { width:68px;height:68px;object-fit:cover;border:1px solid #ffffffd9;border-radius:21px;box-shadow:0 8px 21px #5d7e9529; }
+#startup-brand h1,#startup-brand strong { display:block;margin:0;color:#355b75;font-size:43px;font-weight:800;line-height:1.1;letter-spacing:4px; }
+#startup-brand p,#startup-brand span { display:block;margin:9px 0 0 5px;color:#6d8da3;font-size:15px;line-height:1.4;letter-spacing:7px; }
+#startup-skip { position:absolute;z-index:5;top:max(18px,env(safe-area-inset-top));right:18px;min-height:34px;padding:5px 12px;border:1px solid #bfd3e0;border-radius:19px;background:#f3f9fcbf;color:#66879f;font-size:11px; }
+#startup-status { position:absolute;z-index:3;left:20px;right:20px;bottom:calc(30px + env(safe-area-inset-bottom));margin:0;text-align:center;color:#67869c;font-size:12px;line-height:1.7; }
+#startup-error { position:absolute;z-index:6;left:24px;right:24px;top:55%;max-width:430px;margin:auto;padding:18px;border:1px solid #ffffffd6;border-radius:15px;background:#edf6fbea;box-shadow:0 8px 22px #59788e24;text-align:center; }
+#startup-message { margin:0 0 14px;color:#3f617a;font-size:13px;line-height:1.7;overflow-wrap:anywhere;max-height:110px;overflow:auto; }
+#startup-retry { min-height:40px;padding:8px 18px;border:1px solid #548aa8;border-radius:10px;background:#588eac;color:#fff;font-size:13px; }
+#startup-screen [hidden] { display:none!important; }
+@media(max-width:599px) and (max-height:650px) {
+ #startup-brand { top:9%;gap:11px; }
+ #startup-brand img { width:54px;height:54px;border-radius:17px; }
+ #startup-brand h1,#startup-brand strong { font-size:34px;letter-spacing:3px; }
+ #startup-brand p,#startup-brand span { font-size:12px;margin-top:6px;letter-spacing:6px; }
+}
+@media(max-height:499px) {
+ #startup-brand { top:17px;left:22px;right:75px;flex-direction:row;justify-content:center;gap:12px;text-align:left; }
+ #startup-brand img { width:45px;height:45px;border-radius:14px; }
+ #startup-brand h1,#startup-brand strong { font-size:28px;letter-spacing:3px; }
+ #startup-brand p,#startup-brand span { margin:4px 0 0 2px;font-size:10px;letter-spacing:5px; }
+ #startup-error { top:29%;padding:12px; }
+}
+@media(min-width:600px) and (max-height:600px) {
+ #startup-brand { top:27%;left:6%;right:auto;flex-direction:row;gap:13px;text-align:left; }
+ #startup-brand img { width:55px;height:55px;border-radius:17px; }
+ #startup-brand h1,#startup-brand strong { font-size:33px; }
+ #startup-brand p,#startup-brand span { margin:7px 0 0 2px;font-size:12px; }
+ #startup-error { top:40%;left:26px;right:auto;width:min(390px,calc(100% - 52px)); }
+}
+@media(prefers-reduced-motion:reduce) { #startup-frame,#startup-brand { will-change:auto; } }

@@ -1,0 +1,192 @@
+/* HC-033. Archive view shares the approved card line and four-tab glass bar. */
+body.page-layout[data-view=archives]{grid-template-rows:108px minmax(0,1fr) 73px}
+body.page-layout[data-view=archives] .page-top-space{display:block;min-height:0;pointer-events:none}
+body.page-layout[data-view=archives] #lineup-brand-header{display:none}
+body.page-layout[data-view=archives] .workspace{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:0;min-width:0;min-height:0;padding:8px 18px 10px}
+body.page-layout[data-view=archives] .workspace>.library-panel,body.page-layout[data-view=archives] .training-panel{display:none}
+body.page-layout[data-view=archives] .workspace>.lineups-panel{display:flex;flex-direction:column;grid-column:1;grid-row:1;width:100%;max-width:1040px;min-width:0;min-height:0;justify-self:center;background:transparent;border:0;border-radius:0}
+body.page-layout[data-view=archives] .view-nav{position:relative;right:auto;bottom:auto;width:min(440px,calc(100% - 36px));height:61px;min-height:0;margin:0 auto 12px;padding:4px;align-self:end}
+body.page-layout[data-view=archives] .view-nav button{flex-direction:column;min-height:42px;gap:3px;font-size:10px}
+body.page-layout[data-view=archives] .view-nav .icon{width:22px;height:22px}
+@media(max-width:699px) and (max-height:700px){
+ body.page-layout[data-view=archives]{grid-template-rows:92px minmax(0,1fr) 65px}
+ body.page-layout[data-view=archives] .workspace{padding:4px 16px 8px}
+ body.page-layout[data-view=archives] .view-nav{height:54px;margin-bottom:11px;width:calc(100% - 32px)}
+ body.page-layout[data-view=archives] .view-nav button{min-height:36px}
+}
+@media(min-width:600px) and (max-height:600px){
+ body.page-layout[data-view=archives]{grid-template-rows:68px minmax(0,1fr) 56px}
+ body.page-layout[data-view=archives] .workspace{padding:0 14px 8px}
+ body.page-layout[data-view=archives] .view-nav{height:49px;margin-bottom:7px;width:340px;padding:3px}
+ body.page-layout[data-view=archives] .view-nav button{flex-direction:row;min-height:32px;font-size:10px;gap:4px}
+ body.page-layout[data-view=archives] .view-nav .icon{width:19px;height:19px}
+}
+@media(min-width:900px) and (min-height:601px){
+ body.page-layout[data-view=archives]{grid-template-rows:112px minmax(0,1fr) 73px}
+ body.page-layout[data-view=archives] .workspace{padding:8px 30px 10px}
+}
+
+/* HC-023. The extra body class scopes layout above legacy workspace rules. */
+body.page-layout>#storage-status:not([hidden]){position:fixed;top:4px;left:18px;right:18px;z-index:8;width:max-content;max-width:calc(100% - 36px);margin:0 auto;padding:3px 9px;border:1px solid #d8bca5;border-radius:7px;background:#fff6eefa;color:#875737;box-shadow:0 2px 6px #5b809522;font-size:10px;line-height:14px;white-space:normal;overflow-wrap:anywhere;pointer-events:none}
+.page-top-space,.training-panel{display:none}
+body.page-layout[data-view=play],body.page-layout[data-view=library]{grid-template-rows:108px minmax(0,1fr) 73px}
+body.page-layout[data-view=play] .page-top-space,body.page-layout[data-view=library] .page-top-space{display:block;min-height:0;pointer-events:none}
+body.page-layout[data-view=play] #lineup-brand-header,body.page-layout[data-view=library] #lineup-brand-header{display:none}
+body.page-layout[data-view=play] .workspace,body.page-layout[data-view=library] .workspace{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:0;min-width:0;min-height:0;padding:8px 18px 10px}
+body.page-layout[data-view=play] .workspace>.library-deck-panel,body.page-layout[data-view=library] .training-panel{display:none}
+body.page-layout[data-view=play] .view-nav,body.page-layout[data-view=library] .view-nav{position:relative;right:auto;bottom:auto;width:min(440px,calc(100% - 36px));height:61px;min-height:0;margin:0 auto 12px;padding:4px;align-self:end}
+body.page-layout[data-view=play] .view-nav button,body.page-layout[data-view=library] .view-nav button{flex-direction:column;min-height:42px;gap:3px;font-size:10px}
+body.page-layout[data-view=play] .view-nav .icon,body.page-layout[data-view=library] .view-nav .icon{width:22px;height:22px}
+body.page-layout[data-view=play] .training-panel,body.page-layout[data-view=library] .workspace>.library-deck-panel{width:100%;height:100%;max-width:1040px;min-width:0;min-height:0;justify-self:center;margin:0;padding:14px;border:1px solid #c4d4df;border-radius:19px;background:linear-gradient(140deg,#f7fbfddf,#edf5f9c7);box-shadow:inset 0 1px #fff,0 8px 20px #5b80951a;overflow:hidden}
+body.page-layout[data-view=play] .training-panel{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:36px 34px minmax(0,1fr) 34px auto;gap:9px}
+body.page-layout[data-view=play] .training-panel>.board-section,body.page-layout[data-view=play] .training-panel .board-card{display:contents}
+body.page-layout[data-view=play] .training-panel .board-topbar{display:flex;align-items:center;justify-content:space-between;grid-column:1;grid-row:1;min-width:0;min-height:0;padding:0;gap:8px}
+body.page-layout[data-view=play] .training-panel .board-topbar h1{flex:1;min-width:0;margin:0;font-size:21px;font-weight:650;color:#355d77;letter-spacing:.5px}
+body.page-layout .page-header-controls{display:flex;align-items:center;gap:7px;flex-shrink:0;min-width:0}
+body.page-layout .page-header-controls #mode{width:auto;min-width:0;min-height:31px;margin:0;padding:3px 7px;border:1px solid #bdd1df;border-radius:7px;background:#eaf3f9;color:#6d8ea4;font-size:10px}
+body.page-layout .page-header-controls #open-menu{width:31px;min-width:31px;min-height:31px;height:31px;padding:4px;border:1px solid #c3d7e5;border-radius:8px;background:#eff6facc;color:#7898ad}
+body.page-layout .page-header-controls #open-menu .icon{width:20px;height:20px}
+body.page-layout[data-view=play] .training-panel .template-chooser{display:flex;grid-column:1;grid-row:2;min-width:0;min-height:0;gap:7px;padding:0}
+body.page-layout[data-view=play] .training-panel #template-picker{min-height:31px;padding:4px 7px;border-color:#c5d7e4;border-radius:7px;background:#f5faff;color:#557f99;font-size:11px;font-weight:550}
+body.page-layout[data-view=play] .training-panel #tactic-kind-label{min-height:21px;padding:3px 5px;font-size:9px}
+body.page-layout[data-view=play] .training-panel .toggle-label{min-height:30px;gap:4px;flex-shrink:0;color:#8aa3b5;font-size:9px}
+body.page-layout[data-view=play] .training-panel .switch{width:23px;height:13px}
+body.page-layout[data-view=play] .training-panel .switch:after{top:2px;left:2px;width:9px;height:9px}
+body.page-layout[data-view=play] .training-panel .toggle-label input:checked+.switch:after{transform:translateX(10px)}
+body.page-layout[data-view=play] .training-panel .court-stage{display:grid;grid-column:1;grid-row:3;min-width:0;min-height:0;border:1px solid #ccb18e;border-radius:10px;background:#e8c997;overflow:hidden;box-shadow:inset 0 1px #ffffff77,0 2px 4px #7c755115}
+body.page-layout[data-view=play] .training-panel #court{display:block;width:100%;height:100%;min-width:0;min-height:0;max-width:100%;max-height:100%}
+body.page-layout[data-view=play] .training-panel .board-status{display:none}
+body.page-layout[data-view=play] .training-panel>.steps-panel{display:grid;grid-column:1;grid-row:4;grid-template-columns:minmax(0,1fr) 70px;grid-template-rows:minmax(0,1fr);align-items:center;gap:7px;min-width:0;min-height:0;margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+body.page-layout[data-view=play] .training-panel .steps-heading,body.page-layout[data-view=play] .training-panel .steps-tip{display:none}
+body.page-layout[data-view=play] .training-panel #frame-list{display:grid;grid-column:1;grid-row:1;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:minmax(0,1fr);gap:3px;min-width:0;min-height:0}
+body.page-layout[data-view=play] .training-panel .frame-item{justify-content:center;width:100%;min-width:0;min-height:31px;height:31px;padding:2px;border-radius:7px}
+body.page-layout[data-view=play] .training-panel .frame-number{width:23px;height:23px;min-width:0;font-size:10px}
+body.page-layout[data-view=play] .training-panel .frame-label{display:none}
+body.page-layout[data-view=play] .training-panel .step-pagination{display:flex;grid-column:2;grid-row:1;gap:2px;min-height:0;justify-content:space-between}
+body.page-layout[data-view=play] .training-panel .step-pagination .icon-button{width:22px;min-width:22px;min-height:27px;height:27px;padding:3px;border-radius:6px;background:#e6f0f7}
+body.page-layout[data-view=play] .training-panel .step-pagination .icon{width:14px;height:14px}
+body.page-layout[data-view=play] .training-panel #step-page-count{min-width:0;font-size:9px;white-space:nowrap}
+body.page-layout[data-view=play] .training-panel .playback-bar{display:flex;flex-direction:column;grid-column:1;grid-row:5;min-width:0;min-height:0;gap:5px;margin:0;padding:8px;border:1px solid #c8dce9;border-radius:11px;background:linear-gradient(130deg,#fafdffab,#e9f3f9bd);box-shadow:none}
+body.page-layout[data-view=play] .training-panel .play-note-summary{display:flex;align-items:center;gap:8px;min-width:0;min-height:29px;margin:0;padding:0;border:0}
+body.page-layout[data-view=play] .training-panel .live-step-note{min-height:28px;max-height:32px;margin:0;font-size:10px;line-height:1.6;-webkit-line-clamp:2;color:#7d98ab}
+body.page-layout[data-view=play] .training-panel .note-open-button{min-height:28px;padding:3px 0 3px 5px;margin:0;color:#6a91ab;font-size:10px}
+body.page-layout[data-view=play] .training-panel .playback-main{display:flex;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:5px;min-width:0}
+body.page-layout[data-view=play] .training-panel .playback-controls{flex:0 1 auto;justify-content:center;min-width:0;gap:3px}
+body.page-layout[data-view=play] .training-panel .playback-controls .icon-button{min-width:25px;width:25px;min-height:35px;height:35px;padding:4px}
+body.page-layout[data-view=play] .training-panel .play-button{min-width:100px;min-height:40px;gap:5px;padding:6px 8px;font-size:11px}
+body.page-layout[data-view=play] .training-panel .playback-description{order:0;width:auto;min-width:0;margin:0;text-align:center;font-size:9px;white-space:nowrap}
+body.page-layout[data-view=play] .training-panel .playback-speed{margin:0;flex-shrink:0}
+body.page-layout[data-view=play] .training-panel #speed{width:48px;max-width:48px;min-height:32px;padding:3px;font-size:10px}
+body.page-layout[data-view=play] .training-panel .playback-timeline{display:flex;align-items:center;min-width:0;min-height:26px;gap:6px;margin:0}
+body.page-layout[data-view=play] .training-panel #restart-play{width:25px;min-width:25px;min-height:25px;height:25px;padding:3px}
+body.page-layout[data-view=play] .training-panel #timeline-scrub{height:23px}
+body.page-layout[data-view=play] .training-panel #play-progress{min-width:27px;font-size:9px}
+body.page-layout[data-view=play] .training-panel .loop-label{min-height:25px;font-size:9px}
+body.page-layout[data-view=play] .training-panel .lineup-legend{flex-shrink:0;max-height:70px;margin:0 0 2px;padding:4px 6px;background:#e7f1f7;border-color:#c6dae7}
+body.page-layout[data-view=play] .training-panel .legend-heading{font-size:11px;min-height:20px}
+body.page-layout[data-view=play] .training-panel .legend-rows{margin-top:1px;gap:1px}
+body.page-layout[data-view=play] .training-panel .legend-row{min-height:17px;font-size:11px;line-height:1.4}
+body.page-layout[data-view=library] .workspace>.library-deck-panel{display:grid;grid-column:1;grid-row:1;grid-template-columns:minmax(0,1fr);grid-template-rows:36px 38px minmax(0,1fr) 18px;gap:10px}
+body.page-layout[data-view=library] .library-deck-panel>.panel-heading{display:flex;align-items:center;grid-column:1;grid-row:1;min-width:0;min-height:0;gap:8px}
+body.page-layout[data-view=library] .library-deck-panel>.panel-heading h1{flex:1;min-width:0;margin:0;flex-wrap:nowrap;font-size:21px;font-weight:650;letter-spacing:.5px;color:#355d77}
+body.page-layout[data-view=library] .library-deck-panel .template-count{min-height:19px;padding:2px 5px;font-size:9px;color:#8ba3b5;background:#e5eff5}
+body.page-layout[data-view=library] .library-deck-panel>.kind-tabs{grid-column:1;grid-row:2;flex-direction:row;min-height:0;min-width:0;padding:3px;align-self:stretch;border-radius:10px}
+body.page-layout[data-view=library] .library-deck-panel>.kind-tabs button{min-height:29px;font-size:11px}
+body.page-layout[data-view=library] .library-deck-panel>.library-deck-container{display:block;grid-column:1;grid-row:3;min-width:0;min-height:0;padding:0;overflow:hidden}
+body.page-layout[data-view=library] .library-deck-panel>.library-footer{display:flex;grid-column:1;grid-row:4;justify-content:center;align-items:center;min-height:0;margin:0;color:#a2b5c3;font-size:9px;line-height:18px}
+body.page-layout[data-view=library] .library-deck-panel .library-card-heading{padding:0 12px;gap:9px}
+body.page-layout[data-view=library] .library-deck-panel .library-card-title{font-size:12px;font-weight:600}
+@media(max-width:699px) and (max-height:700px){
+ body.page-layout[data-view=play],body.page-layout[data-view=library]{grid-template-rows:92px minmax(0,1fr) 65px}
+ body.page-layout[data-view=play] .workspace,body.page-layout[data-view=library] .workspace{padding:4px 16px 8px}
+ body.page-layout[data-view=play] .view-nav,body.page-layout[data-view=library] .view-nav{height:54px;margin-bottom:11px;width:calc(100% - 32px)}
+ body.page-layout[data-view=play] .view-nav button,body.page-layout[data-view=library] .view-nav button{min-height:36px}
+ body.page-layout[data-view=play] .training-panel,body.page-layout[data-view=library] .workspace>.library-deck-panel{padding:10px;border-radius:17px}
+ body.page-layout[data-view=play] .training-panel{grid-template-rows:32px 30px minmax(0,1fr) 30px auto;gap:6px}
+ body.page-layout[data-view=play] .training-panel .board-topbar h1,body.page-layout[data-view=library] .library-deck-panel>.panel-heading h1{font-size:19px}
+ body.page-layout[data-view=play] .training-panel #template-picker{min-height:29px;font-size:10px}
+ body.page-layout[data-view=play] .training-panel .template-chooser{gap:5px}
+ body.page-layout[data-view=play] .training-panel #tactic-kind-label{font-size:8px;padding:2px 4px}
+ body.page-layout[data-view=play] .training-panel .toggle-label{font-size:8px;gap:3px}
+ body.page-layout[data-view=play] .training-panel .frame-item{height:28px;min-height:28px}
+ body.page-layout[data-view=play] .training-panel .frame-number{height:22px;width:22px;font-size:9px}
+ body.page-layout[data-view=play] .training-panel .playback-bar{padding:6px;gap:4px}
+ body.page-layout[data-view=play] .training-panel .play-note-summary{min-height:25px}
+ body.page-layout[data-view=play] .training-panel .live-step-note{min-height:20px;max-height:26px;font-size:9px;line-height:1.45;-webkit-line-clamp:2}
+ body.page-layout[data-view=play] .training-panel .note-open-button{min-height:25px;font-size:9px}
+ body.page-layout[data-view=play] .training-panel .play-button{min-height:36px;min-width:91px;padding:5px;font-size:10px}
+ body.page-layout[data-view=play] .training-panel .playback-controls .icon-button{width:22px;min-width:22px;min-height:31px;height:31px;padding:3px}
+ body.page-layout[data-view=play] .training-panel .playback-description{font-size:8px}
+ body.page-layout[data-view=play] .training-panel #speed{width:43px;max-width:43px;min-height:30px;font-size:9px}
+ body.page-layout[data-view=play] .training-panel .lineup-legend{max-height:67px;padding:3px 5px}
+ body.page-layout[data-view=library] .workspace>.library-deck-panel{grid-template-rows:32px 34px minmax(0,1fr);gap:8px}
+ body.page-layout[data-view=library] .library-deck-panel>.library-footer{display:none}
+ body.page-layout[data-view=library] .library-deck-panel>.kind-tabs{padding:2px}
+ body.page-layout[data-view=library] .library-deck-panel>.kind-tabs button{min-height:27px;font-size:10px}
+ body.page-layout[data-view=library] .library-deck-panel .library-card-heading{padding:0 9px;gap:6px}
+ body.page-layout[data-view=library] .library-deck-panel .library-card-title{font-size:11px}
+ body.page-layout[data-view=library] .library-deck-panel .library-deck[data-compact=true] .library-card>.library-card-body{grid-template-columns:minmax(0,.82fr) minmax(0,1fr);grid-template-rows:18px minmax(0,1fr) 35px;gap:5px 8px;padding:0 8px 8px}
+ body.page-layout[data-view=library] .library-deck-panel .library-deck[data-compact=true] .library-card-court{grid-column:1;grid-row:1/-1}
+ body.page-layout[data-view=library] .library-deck-panel .library-deck[data-compact=true] .library-card-meta{grid-column:2;grid-row:1;flex-wrap:wrap;justify-content:start;white-space:normal;gap:2px}
+ body.page-layout[data-view=library] .library-deck-panel .library-deck[data-compact=true] .library-card-category{max-width:100%;font-size:8px}
+ body.page-layout[data-view=library] .library-deck-panel .library-deck[data-compact=true] .library-card-mode{font-size:7px}
+ body.page-layout[data-view=library] .library-deck-panel .library-deck[data-compact=true] .library-card-play{grid-column:2;grid-row:3;min-height:34px;font-size:10px}
+}
+@media(min-width:600px) and (max-height:600px){
+ body.page-layout[data-view=play],body.page-layout[data-view=library]{grid-template-rows:68px minmax(0,1fr) 56px}
+ body.page-layout[data-view=play] .workspace,body.page-layout[data-view=library] .workspace{padding:0 14px 8px}
+ body.page-layout[data-view=play] .view-nav,body.page-layout[data-view=library] .view-nav{height:49px;margin-bottom:7px;width:340px;padding:3px}
+ body.page-layout[data-view=play] .view-nav button,body.page-layout[data-view=library] .view-nav button{flex-direction:row;min-height:32px;font-size:10px;gap:7px}
+ body.page-layout[data-view=play] .view-nav .icon,body.page-layout[data-view=library] .view-nav .icon{width:19px;height:19px}
+ body.page-layout[data-view=play] .training-panel{grid-template-columns:minmax(0,1fr) 280px;grid-template-rows:32px minmax(0,1fr) 31px;gap:5px 12px;padding:8px 10px;border-radius:14px}
+ body.page-layout[data-view=play] .training-panel .board-topbar{grid-column:2;grid-row:1}
+ body.page-layout[data-view=play] .training-panel .board-topbar h1{font-size:19px}
+ body.page-layout[data-view=play] .training-panel .template-chooser{grid-column:1;grid-row:1;gap:5px}
+ body.page-layout[data-view=play] .training-panel #template-picker{min-height:29px;font-size:10px}
+ body.page-layout[data-view=play] .training-panel .court-stage{grid-column:1;grid-row:2/-1}
+ body.page-layout[data-view=play] .training-panel .playback-bar{grid-column:2;grid-row:2;justify-content:center;gap:3px;padding:4px 5px}
+ body.page-layout[data-view=play] .training-panel>.steps-panel{grid-column:2;grid-row:3;grid-template-columns:minmax(0,1fr) 66px;gap:5px}
+ body.page-layout[data-view=play] .training-panel .frame-item{min-height:28px;height:28px}
+ body.page-layout[data-view=play] .training-panel .frame-number{height:22px;width:22px;font-size:9px}
+ body.page-layout[data-view=play] .training-panel .play-note-summary{min-height:24px}
+ body.page-layout[data-view=play] .training-panel .live-step-note{min-height:22px;max-height:24px;line-height:1.3;font-size:9px;-webkit-line-clamp:2}
+ body.page-layout[data-view=play] .training-panel .note-open-button{min-height:24px;font-size:9px}
+ body.page-layout[data-view=play] .training-panel .play-button{min-height:36px;min-width:92px;padding:5px;font-size:10px}
+ body.page-layout[data-view=play] .training-panel .playback-description{font-size:8px}
+ body.page-layout[data-view=play] .training-panel #speed{min-height:30px;width:43px;max-width:43px;font-size:9px}
+ body.page-layout[data-view=play] .training-panel .lineup-legend{max-height:60px;margin-bottom:0;padding:3px 4px}
+ body.page-layout[data-view=play] .training-panel .legend-heading{min-height:18px}
+ body.page-layout[data-view=play] .training-panel .legend-heading button{min-height:18px;padding:1px 5px}
+ body.page-layout[data-view=play] .training-panel .legend-row{min-height:15px;font-size:11px;line-height:1.25}
+ body.page-layout[data-view=play] .training-panel .playback-timeline{min-height:25px}
+ body.page-layout[data-view=library] .workspace>.library-deck-panel{grid-template-columns:minmax(0,1fr) 265px;grid-template-rows:32px minmax(0,1fr);gap:5px 14px;padding:6px;border-radius:14px}
+ body.page-layout[data-view=library] .library-deck-panel>.panel-heading{grid-column:1;grid-row:1}
+ body.page-layout[data-view=library] .library-deck-panel>.panel-heading h1{font-size:19px}
+ body.page-layout[data-view=library] .library-deck-panel>.kind-tabs{grid-column:2;grid-row:1;padding:2px}
+ body.page-layout[data-view=library] .library-deck-panel>.kind-tabs button{min-height:25px;font-size:10px}
+ body.page-layout[data-view=library] .library-deck-panel>.library-deck-container{grid-column:1/-1;grid-row:2}
+ body.page-layout[data-view=library] .library-deck-panel>.library-footer{display:none}
+ body.page-layout[data-view=library] .library-deck-panel .library-deck[data-compact=true] .library-card>.library-card-body{grid-template-columns:minmax(0,1fr) 120px;grid-template-rows:18px minmax(0,1fr) 35px;gap:5px 9px;padding:0 8px 8px}
+ body.page-layout[data-view=library] .library-deck-panel .library-deck[data-compact=true] .library-card-court{grid-column:1;grid-row:1/-1}
+ body.page-layout[data-view=library] .library-deck-panel .library-deck[data-compact=true] .library-card-meta{grid-column:2;grid-row:1;flex-wrap:wrap;justify-content:start;white-space:normal;gap:2px}
+ body.page-layout[data-view=library] .library-deck-panel .library-deck[data-compact=true] .library-card-category{max-width:100%}
+ body.page-layout[data-view=library] .library-deck-panel .library-deck[data-compact=true] .library-card-play{grid-column:2;grid-row:3;min-height:34px;font-size:10px}
+}
+@media(min-width:900px) and (min-height:601px){
+ body.page-layout[data-view=play],body.page-layout[data-view=library]{grid-template-rows:112px minmax(0,1fr) 73px}
+ body.page-layout[data-view=play] .workspace,body.page-layout[data-view=library] .workspace{padding:8px 30px 10px}
+ body.page-layout[data-view=play] .training-panel{grid-template-columns:minmax(0,1fr) 290px;grid-template-rows:39px minmax(0,1fr) 36px;gap:12px 18px;padding:18px 20px}
+ body.page-layout[data-view=play] .training-panel .board-topbar{grid-column:2;grid-row:1}
+ body.page-layout[data-view=play] .training-panel .template-chooser{grid-column:1;grid-row:1}
+ body.page-layout[data-view=play] .training-panel .court-stage{grid-column:1;grid-row:2/-1}
+ body.page-layout[data-view=play] .training-panel .playback-bar{grid-column:2;grid-row:2;justify-content:center;gap:13px;padding:12px}
+ body.page-layout[data-view=play] .training-panel .play-note-summary{align-items:start}
+ body.page-layout[data-view=play] .training-panel .live-step-note{min-height:50px;max-height:112px;font-size:12px;line-height:1.85;-webkit-line-clamp:5}
+ body.page-layout[data-view=play] .training-panel .note-open-button{min-height:31px}
+ body.page-layout[data-view=play] .training-panel>.steps-panel{grid-column:2;grid-row:3;grid-template-columns:minmax(0,1fr) 70px}
+ body.page-layout[data-view=play] .training-panel .frame-item{min-height:32px;height:32px}
+ body.page-layout[data-view=play] .training-panel .lineup-legend{max-height:80px;padding:5px 7px}
+ body.page-layout[data-view=play] .training-panel .legend-heading{min-height:23px}
+ body.page-layout[data-view=play] .training-panel .legend-row{min-height:20px;font-size:11px}
+ body.page-layout[data-view=library] .workspace>.library-deck-panel{grid-template-rows:39px 38px minmax(0,1fr) 18px;gap:12px;padding:18px 20px}
+}

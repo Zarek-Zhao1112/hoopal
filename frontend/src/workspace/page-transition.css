@@ -1,0 +1,24 @@
+/* Visual-only old page. The real page and navigation remain interactive. */
+.page-transition-layer,
+.page-transition-glow {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  display: block;
+  overflow: hidden;
+  contain: strict;
+  isolation: isolate;
+  pointer-events: none !important;
+}
+.page-transition-layer {
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+.page-transition-glow {
+  background-repeat: no-repeat;
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-transition-layer,
+  .page-transition-glow { display: none !important; }
+}

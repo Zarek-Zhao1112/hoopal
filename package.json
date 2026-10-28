@@ -1,0 +1,39 @@
+{
+  "name": "halfcourt-tactics",
+  "version": "1.22.3",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "start": "node scripts/start.mjs",
+    "dev": "vite --config vite.config.js",
+    "build": "vite build --config vite.config.js",
+    "pretest": "npm run build",
+    "test": "node --test tests/unit/*.test.mjs tests/integration/*.test.mjs",
+    "test:unit": "node --test tests/unit/*.test.mjs",
+    "test:browser": "node tests/e2e/browser-qa.mjs",
+    "android:sync": "node scripts/android.mjs sync",
+    "android:build": "node scripts/android.mjs build",
+    "android:open": "node scripts/android.mjs open"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/preferences": "^8.0.1",
+    "@capacitor/share": "^8.0.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.3",
+    "vite": "7.3.7"
+  },
+  "overrides": {
+    "xcode": {
+      "uuid": "^11.1.1"
+    },
+    "rollup": "npm:@rollup/wasm-node@4.65.0"
+  }
+}
