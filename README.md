@@ -6,6 +6,12 @@
 
 界面采用冰川蓝、银灰和室内木地板，包含NBA队徽/球衣选择、单人更衣柜、玻璃建队面板和底部柔光切页。球搭品牌开场共约2.4秒，可跳过；后台返回不重播。战术统一来自内置库，阵容档案独立保存在本机。
 
+## 仓库与同步
+
+GitHub：[Zarek-Zhao1112/hoopal](https://github.com/Zarek-Zhao1112/hoopal)，私有仓库，主分支为`main`，本地`origin`已绑定。后续开发完成并检查后，将本次源码和文档修改提交，再用`git push`同步；其他电脑继续开发前先用`git pull --ff-only`更新。
+
+整理前源码保留在`baseline/pre-hc043`标签。APK、效果图和本机验收记录位于被忽略的`artifacts/`，工具/缓存、依赖及签名私钥也不进入源码仓库。建库与远程校验见[HC-044](docs/tasks/HC-044-github-sync.md)。
+
 ## 本地运行
 
 需要Node.js 22.12+。首次安装依赖后，Windows可双击 start.cmd，或运行：

@@ -8,7 +8,8 @@
 
 | 编号 | 任务 | 状态 | 负责人 | 下一步 |
 | --- | --- | --- | --- | --- |
-| [HC-043](HC-043-project-organization.md) | 项目清理与模块整理 | `awaiting_device` | 主控基线/清理/数据/集成，engine播放绘制，ui阵容/CSS，interaction_design审查 | 拆分/376MiB清理/归档完成，225检查、完整Chrome、48布局及独立审查通过；1.23.0已安装、双hash同，WV四页/草稿/1332循环样本通过；人工体验待确认，远程推送另议 |
+| [HC-044](HC-044-github-sync.md) | GitHub建库与同步 | `completed` | 主控Git/API与文档 | 已创建私有Zarek-Zhao1112/hoopal，推送main及基线标签，origin/main跟踪与同步说明已配置 |
+| [HC-043](HC-043-project-organization.md) | 项目清理与模块整理 | `awaiting_device` | 主控基线/清理/数据/集成，engine播放绘制，ui阵容/CSS，interaction_design审查 | 拆分/376MiB清理/归档完成，225检查、完整Chrome、48布局及独立审查通过；1.23.0已安装、双hash同，WV四页/草稿/1332循环样本通过；人工体验待确认，后续HC-044已推送源码 |
 | [HC-042](HC-042-post-split-defense.md) | 低位分切追防与补位修正 | `awaiting_device` | engine战术/语义测试，ui浏览器，主控集成安装，interaction_design独立审查 | 215检查/6006动作样本/自然回放与四尺寸/七旧步骤恢复通过；1.22.3已安装、双hash同、WV96七帧循环1345样本通过；人工观感待验 |
 | [HC-041](HC-041-startup-timing-release.md) | 2.4秒启动节奏正式接入 | `awaiting_device` | 主控时序/安装，engine验证，interaction_design审查 | 213/27组合七控制/相关回归通过，1.22.2已保数据安装；COLD483ms、WV96实测2415.3ms/一秒hold/skip/四页同框通过，首次桥接异常保留且严格复验未现；新节奏人工观感待验 |
 | [HC-040](HC-040-startup-timing-preview.md) | 启动停留与展开节奏预览 | `completed` | ui预览，主控验证截图，interaction_design审查 | 2.4秒145帧/1.4秒85帧、21布局/1秒静止及终审通过，已打开两档预览；100正式hash同，手机仍1.4秒 |
