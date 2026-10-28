@@ -52,6 +52,8 @@ lineups/controller.js保留createLineupUI和splitLineupText的公有入口。内
 - wizard/view.js：三步配置内容、输入与成员交互的绘制。
 - components/：单柜、球衣、队徽转盘、玻璃面板、档案菜单和步骤/滑动动效。
 
+HC-046将archives视图显示名更新为「我的」，内部路由和真实档案接口不变。account-cards提供个人卡与本机工具入口，account-sheet用共用sheet的可选id/labelledBy建立独立说明面板，默认wizard参数保持；isModalOpen/handleBack统一包含账户说明，避免绕过导航/返回保护。账号与云备份尚未开放，组件不收集凭据、不发网络请求或持久化账号状态；实际球队操作继续沿用原session。
+
 外部render只更新已保存状态，不覆盖会话草稿。保存捕获完整快照，由原session一次提交，保revision校验、读失败锁、保存失败输入与焦点、不同草稿隔离。Back按内层球队列表/说明/确认/面板优先处理。只切换任务或成员不写盘。
 
 原lineups组件JS/CSS路径保薄re-export/@import兼容入口；新代码引用components/views/wizard目录。这些入口不复制实现。sheet是面板隔离壳，wizard-motion只管理320ms步骤/280ms成员运动，team-carousel管理手势和吸附；生命周期各自清理。

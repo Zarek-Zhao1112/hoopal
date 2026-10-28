@@ -1,11 +1,11 @@
 /** Native-modal shell. Its background guards also work on WebView 96. */
-export function createLineupSheet({ document, onRequestClose, onModalChange }) {
+export function createLineupSheet({ document, onRequestClose, onModalChange, id = 'lineup-wizard-dialog', labelledBy = 'lineup-wizard-title' }) {
   const window = document.defaultView;
   const dialog = document.createElement('dialog');
-  dialog.id = 'lineup-wizard-dialog';
+  dialog.id = id;
   dialog.className = 'lineup-wizard-dialog';
   dialog.dataset.lineupOwned = 'true';
-  dialog.setAttribute('aria-labelledby', 'lineup-wizard-title');
+  dialog.setAttribute('aria-labelledby', labelledBy);
   const shade = document.createElement('div'); shade.className = 'lineup-sheet-shade';
   const panel = document.createElement('section'); panel.className = 'lineup-glass-sheet';
   dialog.append(shade, panel); document.body.append(dialog);

@@ -11,6 +11,7 @@ import {createLockerView} from './views/locker.js';
 import {createArchivesView} from './views/archives.js';
 import {createRecommendationsView} from './views/recommendations.js';
 import {createArchiveMenu} from './components/archive-menu.js';
+import {createAccountSheet} from './components/account-sheet.js';
 export {splitLineupText} from './views/text.js';
 
 /** Coordinates saved state, views and owned dialogs. Drafts never persist here. */
@@ -37,6 +38,12 @@ export function createLineupUI({root,onAction,onInspect,onModalChange,onNavigate
   const archiveMenu = document.createElement('dialog');
   archiveMenu.id = 'lineup-archive-menu'; archiveMenu.className = 'lineup-archive-menu'; archiveMenu.dataset.lineupOwned = 'true'; archiveMenu.dataset.phase = 'closed';
   archiveMenu.setAttribute('aria-labelledby', 'lineup-archive-menu-title'); document.body.append(archiveMenu);
+  const accountSheet = createAccountSheet({
+    document, onModalChange,
+    isBlocked: () => sheet.isOpen || archiveMenu.open || model.pending || model.externalBusy,
+  });
+
+  function openAccount(kind, trigger) { return accountSheet.open(kind, trigger); }
 
   const wizardMotion = createWizardMotion({ document });
 
@@ -72,7 +79,7 @@ export function createLineupUI({root,onAction,onInspect,onModalChange,onNavigate
     if (options.pressed !== undefined) element.setAttribute('aria-pressed', String(options.pressed));
     if (options.title) element.title = options.title;
     element.addEventListener('click', () => {
-      if (model.pending || model.externalBusy || element.disabled || element.isConnected === false || sheet.closing || wizardView.teamAllOpen || archiveMenu.open && !archiveMenu.contains(element)) return;
+      if (model.pending || model.externalBusy || element.disabled || element.isConnected === false || sheet.closing || wizardView.teamAllOpen || accountSheet.isOpen || archiveMenu.open && !archiveMenu.contains(element)) return;
       if (!sheet.isOpen) sheet.rememberTrigger(element);
       callback();
     });
@@ -181,7 +188,7 @@ export function createLineupUI({root,onAction,onInspect,onModalChange,onNavigate
 
   function readLockedPageView() {
     const card = node('section', 'lineup-read-error');
-    const heading = node('h1', '', model.section === 'archives' ? '球队档案' : '更衣室');
+    const heading = node('h1', '', model.section === 'archives' ? '我的' : '更衣室');
     const message = node('div', 'lineup-read-error-message');
     message.setAttribute('role', 'status');
     message.append(node('h2', '', '档案暂时无法读取'), node('p', '', '读取恢复前不会覆盖本机档案。\n请重试读取，再继续选择或创建球队。'));
@@ -250,10 +257,12 @@ export function createLineupUI({root,onAction,onInspect,onModalChange,onNavigate
     }
     if (draftStore.wizard) { renderWizard(snapshot ? { snapshot, intent } : null); sheet.open(); }
     sheet.refreshIsolation();
+    accountSheet.refreshIsolation();
     if (archiveMenu.open) { renderArchiveMenu(); refreshMenuIsolation(); }
   }
   function handleBack() {
     if (model.pending || model.externalBusy) return true;
+    if (accountSheet.handleBack()) return true;
     if (model.inspection) { model.inspection = null; draw(); return true; }
     if (archiveMenu.open) { closeArchiveMenu(); return true; }
     if (sheet.isOpen) { requestWizardClose(); return true; }
@@ -265,7 +274,7 @@ export function createLineupUI({root,onAction,onInspect,onModalChange,onNavigate
  // Forwarders let the wizard controller and view cooperate without cyclic imports.
  const context={
   selectedByProfile, sheet, draftStore, model, dirty, document, identity,
-  wizardMotion, root, active, archiveMenu, onModalChange,
+  wizardMotion, root, active, archiveMenu, onModalChange, openAccount,
   get wizardView(){return wizardView;},
   draw:(...args)=>draw(...args),
   destroyTeamCarousel:(...args)=>destroyTeamCarousel(...args),
@@ -325,10 +334,10 @@ export function createLineupUI({root,onAction,onInspect,onModalChange,onNavigate
     setView(view) {
       if (!['lineups', 'archives'].includes(view)) return false;
       if (model.section === view) return true;
-      if (sheet.isOpen || archiveMenu.open || model.pending || model.externalBusy) return false;
+      if (sheet.isOpen || archiveMenu.open || accountSheet.isOpen || model.pending || model.externalBusy) return false;
       model.section = view; model.route = 'profiles'; model.feedback = ''; draw(); return true;
     },
-    get isModalOpen() { return sheet.isOpen || archiveMenu.open; },
+    get isModalOpen() { return sheet.isOpen || archiveMenu.open || accountSheet.isOpen; },
   };
 
 }

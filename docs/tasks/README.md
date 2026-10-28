@@ -8,6 +8,7 @@
 
 | 编号 | 任务 | 状态 | 负责人 | 下一步 |
 | --- | --- | --- | --- | --- |
+| [HC-046](HC-046-account-center-release.md) |「我的」页正式接入与手机更新 | `awaiting_device` | ui真实页面，engine回归，主控构建安装，interaction_design审查 | 225/完整14组/专项36布局20面板及终审通过；1.24.0已安装，双hash同，WV96真实我的/四面板通过；账号云备份尚未开放，人工体验待确认 |
 | [HC-045](HC-045-account-center-preview.md) |「我的」与个人账号交互预览 | `completed` | ui独立页面，主控验证/集成，interaction_design审查 | 可点原型、77组五尺寸/9组file与独立审查通过，213正式SHA保持；源码同步GitHub，真实登录/云备份未接入，APK未改 |
 | [HC-044](HC-044-github-sync.md) | GitHub建库与同步 | `completed` | 主控Git/API与文档 | 已创建私有Zarek-Zhao1112/hoopal，推送main及基线标签，origin/main跟踪与同步说明已配置 |
 | [HC-043](HC-043-project-organization.md) | 项目清理与模块整理 | `awaiting_device` | 主控基线/清理/数据/集成，engine播放绘制，ui阵容/CSS，interaction_design审查 | 拆分/376MiB清理/归档完成，225检查、完整Chrome、48布局及独立审查通过；1.23.0已安装、双hash同，WV四页/草稿/1332循环样本通过；人工体验待确认，后续HC-044已推送源码 |

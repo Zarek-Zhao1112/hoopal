@@ -1,0 +1,112 @@
+/* Real local teams keep their existing actions and outer workspace frame. */
+#lineups-panel[data-section=archives]>.lineup-archives-card.lineup-account-page,
+#lineups-panel[data-section=archives]>.lineup-archives-card.lineup-account-page.has-pages{grid-template-columns:minmax(0,1fr);grid-template-rows:36px 92px minmax(0,1fr) 124px;gap:10px}
+.lineup-account-page>.lineup-archives-heading{grid-column:1;grid-row:1}
+.lineup-account-glass{min-width:0;min-height:0;border:1px solid #c7dce9;border-radius:14px;background:linear-gradient(125deg,#ffffffdf,#edf7fcc9);box-shadow:inset 0 1px 1px #fff,0 3px 9px #557e9509}
+.lineup-account-card{grid-column:1;grid-row:2;display:flex;align-items:center;gap:10px;padding:11px}
+.lineup-account-avatar{display:grid;place-items:center;width:50px;height:50px;flex:0 0 50px;overflow:hidden;border:1px solid #d2e3ed;border-radius:50%;background:linear-gradient(145deg,#e6f1f8,#c8deec);box-shadow:inset 0 2px 2px #fff}
+.lineup-account-icon{display:block;width:23px;height:23px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round;color:#5e86a2}
+.lineup-account-avatar .lineup-account-icon{width:30px;height:30px;fill:#99b9ce;stroke:#7ba2bb;stroke-width:1}
+.lineup-account-copy{min-width:0;flex:1}
+.lineup-account-copy h2{margin:0 0 5px;color:#315975;font-size:16px;font-weight:650;line-height:1.3}
+.lineup-account-copy p{margin:0;color:#7899af;font-size:10px;line-height:1.5}
+.lineup-account-copy>span{display:block;margin-top:3px;color:#8ba4b5;font-size:8px;line-height:1.4}
+#lineups-panel .lineup-account-card>.lineup-account-entry{min-width:72px;min-height:35px;padding:6px 8px;white-space:nowrap;font-size:11px;border-radius:9px}
+.lineup-account-teams{grid-column:1;grid-row:3;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:28px minmax(0,1fr) 35px;gap:6px;padding:10px}
+.lineup-account-teams-heading{display:flex;align-items:center;justify-content:space-between;gap:6px;min-width:0;min-height:0}
+.lineup-account-teams-heading>div:first-child{display:flex;align-items:baseline;gap:7px;min-width:0;flex-shrink:0}
+.lineup-account-teams-heading h2{margin:0;color:#3a617d;font-size:15px;font-weight:650;white-space:nowrap}
+.lineup-teams-count{color:#94aab9;font-size:9px;font-variant-numeric:tabular-nums;white-space:nowrap}
+#lineups-panel[data-section=archives] .lineup-account-teams-heading>.lineup-pagination{grid-column:auto;grid-row:auto;align-self:auto;gap:4px;margin:0;min-width:0;min-height:0}
+#lineups-panel[data-section=archives] .lineup-account-teams-heading>.lineup-pagination>.button{min-height:25px;padding:2px 5px;font-size:9px;white-space:nowrap}
+.lineup-account-teams-heading .lineup-pagination>span{font-size:9px;color:#829eb2;white-space:nowrap}
+.lineup-account-teams>.lineup-archive-list{grid-column:1;grid-row:2;grid-template-columns:minmax(0,1fr);grid-template-rows:repeat(3,minmax(0,1fr));gap:6px;min-height:0}
+.lineup-account-teams .lineup-archive-card{display:grid;grid-template-columns:minmax(0,1fr) 27px;gap:2px;padding:7px;border-radius:9px;box-shadow:none;background:#f7fbfd96}
+#lineups-panel .lineup-account-teams .lineup-archive-select{display:flex;flex-direction:row;align-items:center;justify-content:start;gap:8px;width:100%;height:100%;min-height:0;padding:0}
+#lineups-panel .lineup-account-teams .lineup-archive-select>.lineup-crest{width:34px;height:34px;object-fit:contain;flex-basis:34px}
+.lineup-account-teams .lineup-archive-copy{flex:1;min-width:0;width:auto}
+.lineup-account-teams .lineup-archive-copy h2{font-size:12px}
+.lineup-account-teams .lineup-archive-copy>p{margin:4px 0 0;font-size:9px}
+.lineup-account-teams .lineup-archive-members{margin-top:5px;gap:4px;max-height:20px;flex-wrap:nowrap}
+.lineup-account-teams .lineup-archive-members>span{max-width:30%;font-size:8px}
+.lineup-account-teams .lineup-archive-members i{height:15px;min-width:13px;border-radius:4px;font-size:7px}
+.lineup-account-teams .lineup-archive-enter{display:none}
+#lineups-panel .lineup-account-teams .lineup-archive-manage{position:static;align-self:center;justify-self:end;right:auto;top:auto;width:27px;height:28px;min-height:28px;padding:0;font-size:19px;border-radius:7px}
+.lineup-account-teams .lineup-archive-current{right:40px;bottom:7px;padding:2px 4px;font-size:7px;line-height:1.3}
+#lineups-panel .lineup-account-teams>.lineup-archive-create{grid-column:1;grid-row:3;min-width:0;min-height:32px;width:100%;max-width:none;justify-self:stretch;margin:0;padding:4px 8px;border:1px solid #b7d7e9;background:linear-gradient(#f4fbff,#e0eff9);box-shadow:inset 0 1px #fff;color:#447e9f;font-size:11px}
+.lineup-account-teams .lineup-archives-empty{gap:9px;padding:5px}
+.lineup-account-teams .lineup-archives-empty h2{font-size:17px}
+.lineup-account-teams .lineup-archives-empty p{font-size:10px;line-height:1.7}
+.lineup-account-tools{grid-column:1;grid-row:4;display:grid;grid-template-rows:repeat(3,minmax(0,1fr));padding:2px 11px}
+#lineups-panel .lineup-account-tool{display:flex;align-items:center;gap:10px;min-width:0;min-height:0;width:100%;margin:0;padding:4px 0;border:0;border-radius:0;box-shadow:none;background:transparent;text-align:left;color:#557b96}
+#lineups-panel .lineup-account-tool+.lineup-account-tool{border-top:1px solid #d4e5ef}
+.lineup-account-tool-copy{display:flex;justify-content:space-between;align-items:center;gap:5px;min-width:0;flex:1}
+.lineup-account-tool-copy strong{color:#466d89;font-size:12px;font-weight:550;white-space:nowrap}
+.lineup-account-tool-copy small{color:#8da5b6;font-size:9px;white-space:nowrap}
+.lineup-account-tool-arrow{font-size:20px;line-height:1;color:#86a4b8}
+
+/* Separate owned modal; the shared shell's default wizard ID is unchanged. */
+#lineup-account-dialog{position:fixed;inset:0;width:100%;max-width:none;height:100vh;height:100dvh;height:var(--lineup-viewport-height,100vh);max-height:none;margin:0;padding:0;border:0;background:transparent;color:#385b73;overflow:visible;overflow:clip;overscroll-behavior:contain}
+#lineup-account-dialog:not([open]){display:none}
+#lineup-account-dialog::backdrop{background:transparent}
+#lineup-account-dialog .lineup-sheet-shade{position:absolute;inset:0;background:#405c7147;opacity:0;transition:opacity 450ms ease}
+#lineup-account-dialog[data-visible=true] .lineup-sheet-shade{opacity:1}
+#lineup-account-dialog .lineup-account-sheet{position:absolute;left:0;right:0;bottom:0;top:auto;width:100%;max-width:650px;margin:0 auto;display:grid;grid-template-rows:62px minmax(0,1fr) 40px;gap:15px;height:min(490px,84vh);height:min(490px,84dvh);max-height:100%;padding:24px 22px max(16px,env(safe-area-inset-bottom));border:1px solid #f5fbffcf;border-bottom:0;border-radius:25px 25px 0 0;background:linear-gradient(125deg,#eef8fbea,#dcecf5eb 66%,#d5e8f2ed);box-shadow:0 -12px 45px #365b702b,inset 0 1px 1px #fff;-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);transform:translateY(110%);transition:transform 450ms cubic-bezier(.22,.62,.25,1);overflow:hidden;outline:none}
+#lineup-account-dialog[data-visible=true] .lineup-account-sheet{transform:translateY(0)}
+.lineup-account-sheet-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0;min-height:0}
+.lineup-account-sheet-heading h2{margin:0 0 6px;color:#3c6884;font-size:25px;font-weight:650;line-height:1.25}
+.lineup-account-sheet-heading p{margin:0;color:#7899af;font-size:11px;line-height:1.5}
+#lineup-account-dialog .lineup-account-sheet-close{align-self:start;width:34px;min-width:34px;height:34px;padding:0;border:1px solid #c2dce9;border-radius:50%;background:#f1f9fdad;color:#7094ac;font-size:25px;line-height:1}
+.lineup-account-sheet-body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:15px;min-width:0;min-height:0;text-align:center}
+.lineup-account-availability{flex-shrink:0;padding:5px 9px;border:1px solid #c3dce9;border-radius:7px;background:#eff8fbbd;color:#7a99ad;font-size:10px}
+.lineup-account-sheet-body>p{min-width:0;min-height:0;margin:0;color:#5b8098;font-size:13px;line-height:1.8;white-space:pre-wrap;overflow:auto;overflow-wrap:anywhere}
+#lineup-account-dialog .lineup-account-local{width:100%;min-height:38px;margin:0;padding:7px 12px;border:1px solid #5c90ac;border-radius:10px;background:linear-gradient(#6f9fba,#4783a4);color:#f7fcff;font-size:12px}
+
+@media(max-width:599px) and (max-height:720px){
+ #lineups-panel[data-section=archives]>.lineup-archives-card.lineup-account-page,#lineups-panel[data-section=archives]>.lineup-archives-card.lineup-account-page.has-pages{grid-template-columns:minmax(0,1fr);grid-template-rows:30px 74px minmax(0,1fr) 99px;gap:7px}
+ .lineup-account-card{padding:8px;gap:8px}.lineup-account-avatar{width:42px;height:42px;flex-basis:42px}.lineup-account-avatar .lineup-account-icon{width:26px;height:26px}.lineup-account-copy h2{font-size:14px;margin-bottom:3px}.lineup-account-copy p{font-size:9px}.lineup-account-copy>span{font-size:7px;margin-top:2px}
+ #lineups-panel .lineup-account-card>.lineup-account-entry{min-width:65px;min-height:32px;padding:4px 6px;font-size:10px}
+ .lineup-account-teams{grid-template-rows:25px minmax(0,1fr) 31px;gap:4px;padding:7px}.lineup-account-teams-heading h2{font-size:13px}.lineup-teams-count{font-size:8px}.lineup-account-teams-heading>div:first-child{gap:4px}
+ #lineups-panel[data-section=archives] .lineup-account-teams-heading>.lineup-pagination{gap:3px}#lineups-panel[data-section=archives] .lineup-account-teams-heading>.lineup-pagination>.button{min-height:23px;padding:2px 4px;font-size:8px}.lineup-account-teams-heading .lineup-pagination>span{font-size:8px}
+ .lineup-account-teams>.lineup-archive-list{gap:4px}.lineup-account-teams .lineup-archive-card{grid-template-columns:minmax(0,1fr) 25px;gap:1px;padding:5px;border-radius:8px}
+ #lineups-panel .lineup-account-teams .lineup-archive-select{gap:6px}#lineups-panel .lineup-account-teams .lineup-archive-select>.lineup-crest{width:28px;height:28px;flex-basis:28px}
+ .lineup-account-teams .lineup-archive-copy h2{font-size:11px}.lineup-account-teams .lineup-archive-copy>p{font-size:8px;margin-top:3px}.lineup-account-teams .lineup-archive-members{display:none}.lineup-account-teams .lineup-archive-current{right:35px;bottom:5px;padding:1px 3px;font-size:6px}
+ #lineups-panel .lineup-account-teams .lineup-archive-manage{width:25px;height:26px;min-height:26px;font-size:18px}
+ #lineups-panel .lineup-account-teams>.lineup-archive-create{min-height:29px;font-size:10px;padding:3px 6px}
+ .lineup-account-tools{padding:1px 9px}#lineups-panel .lineup-account-tool{gap:8px;padding:2px 0}.lineup-account-tools .lineup-account-icon{width:19px;height:19px}.lineup-account-tool-copy strong{font-size:11px}.lineup-account-tool-copy small{font-size:8px}
+ .lineup-account-teams .lineup-archives-empty h2{font-size:14px}.lineup-account-teams .lineup-archives-empty p{font-size:9px}
+}
+@media(max-width:599px) and (max-height:500px){
+ #lineups-panel[data-section=archives]>.lineup-archives-card.lineup-account-page,#lineups-panel[data-section=archives]>.lineup-archives-card.lineup-account-page.has-pages{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-template-rows:27px 69px minmax(0,1fr);gap:6px;padding:8px}
+ .lineup-account-page>.lineup-archives-heading{grid-column:1/-1}.lineup-account-page>.lineup-archives-heading h1{font-size:19px}.lineup-account-page>.lineup-archives-heading>span{font-size:9px}
+ .lineup-account-card{grid-column:1;grid-row:2;display:grid;grid-template-columns:29px minmax(0,1fr);grid-template-rows:minmax(0,1fr) 25px;gap:3px;padding:5px;border-radius:10px}.lineup-account-avatar{width:29px;height:29px;flex-basis:29px}.lineup-account-avatar .lineup-account-icon{width:20px;height:20px}.lineup-account-copy h2{font-size:11px;margin-bottom:2px}.lineup-account-copy p{font-size:7px;white-space:nowrap}.lineup-account-copy>span{display:none}
+ #lineups-panel .lineup-account-card>.lineup-account-entry{grid-column:1/-1;min-height:25px;padding:2px 4px;font-size:9px}
+ .lineup-account-teams{grid-column:2;grid-row:2/4;grid-template-rows:36px minmax(0,1fr) 28px;padding:5px;gap:3px;border-radius:10px}.lineup-account-teams-heading{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:14px 21px;gap:1px}.lineup-account-teams-heading>div:first-child{justify-content:space-between}.lineup-account-teams-heading h2{font-size:11px}.lineup-teams-count{font-size:7px}
+ #lineups-panel[data-section=archives] .lineup-account-teams-heading>.lineup-pagination{justify-content:space-between;gap:2px}#lineups-panel[data-section=archives] .lineup-account-teams-heading>.lineup-pagination>.button{min-height:20px;padding:1px 3px;font-size:7px}.lineup-account-teams-heading .lineup-pagination>span{font-size:7px}
+ .lineup-account-teams>.lineup-archive-list{gap:3px}.lineup-account-teams .lineup-archive-card{grid-template-columns:minmax(0,1fr) 21px;padding:3px;gap:0}
+ #lineups-panel .lineup-account-teams .lineup-archive-select{gap:4px}#lineups-panel .lineup-account-teams .lineup-archive-select>.lineup-crest{width:21px;height:21px;flex-basis:21px}.lineup-account-teams .lineup-archive-copy h2{font-size:9px;line-height:1.4}.lineup-account-teams .lineup-archive-copy>p{font-size:7px;margin-top:1px;line-height:1.4}.lineup-account-teams .lineup-archive-current{display:block;right:27px;bottom:3px;padding:1px 2px;font-size:0}.lineup-account-teams .lineup-archive-current::after{content:'当前';font-size:6px}
+ #lineups-panel .lineup-account-teams .lineup-archive-manage{width:21px;height:25px;min-height:25px;font-size:16px}.lineup-account-teams .lineup-archives-empty{gap:5px;padding:2px}.lineup-account-teams .lineup-archives-empty h2{font-size:11px}.lineup-account-teams .lineup-archives-empty p{font-size:8px;line-height:1.5}
+ #lineups-panel .lineup-account-teams>.lineup-archive-create{min-height:26px;font-size:9px;padding:2px}
+ .lineup-account-tools{grid-column:1;grid-row:3;padding:0 6px;border-radius:10px}#lineups-panel .lineup-account-tool{gap:6px;padding:1px 0}.lineup-account-tool .lineup-account-icon{width:16px;height:16px}.lineup-account-tool-copy{display:block}.lineup-account-tool-copy strong{font-size:9px}.lineup-account-tool-copy small{display:block;font-size:7px;line-height:1.3}.lineup-account-tool-arrow{font-size:16px}
+}
+@media(min-width:600px) and (max-height:600px){
+ #lineups-panel[data-section=archives]>.lineup-archives-card.lineup-account-page,#lineups-panel[data-section=archives]>.lineup-archives-card.lineup-account-page.has-pages{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-template-rows:28px 77px minmax(0,1fr);gap:7px 12px}
+ .lineup-account-page>.lineup-archives-heading{grid-column:1/-1;grid-row:1}.lineup-account-card{grid-column:1;grid-row:2;padding:8px}.lineup-account-avatar{width:43px;height:43px;flex-basis:43px}.lineup-account-copy h2{font-size:14px}.lineup-account-copy p{font-size:9px}#lineups-panel .lineup-account-card>.lineup-account-entry{min-width:65px;min-height:32px;font-size:10px;padding:4px 6px}
+ .lineup-account-teams{grid-column:2;grid-row:2/4;grid-template-rows:27px minmax(0,1fr) 30px;gap:4px;padding:7px}.lineup-account-teams>.lineup-archive-list{grid-template-columns:minmax(0,1fr);grid-template-rows:repeat(3,minmax(0,1fr));gap:4px}.lineup-account-teams .lineup-archive-card{display:grid;grid-template-columns:minmax(0,1fr) 25px;padding:4px 6px;border-radius:8px}
+ #lineups-panel .lineup-account-teams .lineup-archive-select>.lineup-crest{width:26px;height:26px;flex-basis:26px}.lineup-account-teams .lineup-archive-copy h2{font-size:11px}.lineup-account-teams .lineup-archive-copy>p{font-size:8px;margin-top:2px}.lineup-account-teams .lineup-archive-members{display:none}.lineup-account-teams .lineup-archive-current{right:35px;bottom:5px;font-size:6px;padding:1px 3px}
+ #lineups-panel .lineup-account-teams .lineup-archive-manage{position:static;width:25px;height:26px;min-height:26px;font-size:17px}.lineup-account-teams-heading h2{font-size:14px}#lineups-panel .lineup-account-teams>.lineup-archive-create{grid-column:1;grid-row:3;min-height:28px;font-size:10px}
+ .lineup-account-tools{grid-column:1;grid-row:3;padding:1px 10px}#lineups-panel .lineup-account-tool{padding:2px 0;gap:8px}.lineup-account-tool-copy strong{font-size:11px}.lineup-account-tools .lineup-account-icon{width:19px;height:19px}
+}
+@media(min-width:900px) and (min-height:601px){
+ #lineups-panel[data-section=archives]>.lineup-archives-card.lineup-account-page,#lineups-panel[data-section=archives]>.lineup-archives-card.lineup-account-page.has-pages{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-template-rows:39px 116px minmax(0,1fr);gap:14px 20px}
+ .lineup-account-page>.lineup-archives-heading{grid-column:1/-1}.lineup-account-card{grid-column:1;grid-row:2;padding:16px}.lineup-account-avatar{width:57px;height:57px;flex-basis:57px}.lineup-account-copy h2{font-size:18px}.lineup-account-copy p{font-size:11px}.lineup-account-copy>span{font-size:9px}
+ .lineup-account-teams{grid-column:2;grid-row:2/4;grid-template-rows:33px minmax(0,1fr) 39px;padding:14px;gap:9px}.lineup-account-teams-heading h2{font-size:18px}.lineup-teams-count{font-size:10px}.lineup-account-teams>.lineup-archive-list{grid-template-columns:minmax(0,1fr);grid-template-rows:repeat(3,minmax(0,1fr));gap:10px}.lineup-account-teams .lineup-archive-card{display:grid;grid-template-columns:minmax(0,1fr) 30px;padding:10px}
+ #lineups-panel .lineup-account-teams .lineup-archive-select>.lineup-crest{width:47px;height:47px;flex-basis:47px}.lineup-account-teams .lineup-archive-copy h2{font-size:15px}.lineup-account-teams .lineup-archive-copy>p{font-size:10px}.lineup-account-teams .lineup-archive-members{margin-top:10px;max-height:21px}.lineup-account-teams .lineup-archive-current{right:46px;bottom:9px;font-size:8px}
+ #lineups-panel .lineup-account-teams .lineup-archive-manage{position:static;width:30px;height:31px;min-height:31px}.lineup-account-tools{grid-column:1;grid-row:3;padding:3px 17px}.lineup-account-tool-copy{display:block}.lineup-account-tool-copy strong{font-size:14px}.lineup-account-tool-copy small{display:block;margin-top:5px;font-size:10px}.lineup-account-tools .lineup-account-icon{width:25px;height:25px}
+}
+@media(max-height:600px){
+ #lineup-account-dialog .lineup-account-sheet{height:calc(100% - 22px);max-height:420px;grid-template-rows:47px minmax(0,1fr) 35px;gap:9px;padding:17px 16px 12px}
+ .lineup-account-sheet-heading h2{font-size:22px;margin-bottom:4px}.lineup-account-sheet-heading p{font-size:10px}.lineup-account-sheet-body{gap:10px}.lineup-account-sheet-body>p{font-size:11px;line-height:1.65}.lineup-account-availability{font-size:9px;padding:4px 7px}
+ #lineup-account-dialog .lineup-account-local{min-height:33px;font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){#lineup-account-dialog .lineup-account-sheet,#lineup-account-dialog .lineup-sheet-shade{transition:none}}

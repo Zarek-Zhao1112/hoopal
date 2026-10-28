@@ -15,6 +15,7 @@ import { runArchivesFlow } from './archives-flow.mjs';
 import { runCreationMotionFlow } from './creation-motion-flow.mjs';
 import { runLockerFrameFlow } from './locker-frame-flow.mjs';
 import { runStartupFlow } from './startup-flow.mjs';
+import { runAccountCenterFlow } from './account-center-flow.mjs';
 
 const version=JSON.parse(await readFile('package.json','utf8')).version;
 const folder=path.resolve('artifacts/qa/runs',version+'-'+Date.now());
@@ -31,7 +32,7 @@ try{
  assert.equal(await evaluate("document.querySelectorAll('#frame-list button').length"),4);
  assert.equal(await evaluate("document.querySelectorAll('#template-picker option').length"),10);
  const context={send,evaluate,wait,waitFor,folder,downloadFolder:session.downloads};
- for(const[name,flow]of [['startup',runStartupFlow],['readonly-26-tactics',runReadOnlyFlow],['library',runLibraryDeckFlow],['page-layout',runPageLayoutFlow],['inline-loop',runInlinePreviewFlow],['expansion-recommendations',runOffenseExpansionFlow],['archives',runArchivesFlow],['creation-motion',runCreationMotionFlow],['locker-frame',runLockerFrameFlow],['team-carousel',runTeamCarouselFlow],['glass-sheet',runGlassSheetFlow],['lineups',runLineupFlow],['page-motion',runPageMotionFlow]]){
+ for(const[name,flow]of [['startup',runStartupFlow],['readonly-26-tactics',runReadOnlyFlow],['library',runLibraryDeckFlow],['page-layout',runPageLayoutFlow],['inline-loop',runInlinePreviewFlow],['expansion-recommendations',runOffenseExpansionFlow],['archives',runArchivesFlow],['creation-motion',runCreationMotionFlow],['locker-frame',runLockerFrameFlow],['team-carousel',runTeamCarouselFlow],['glass-sheet',runGlassSheetFlow],['lineups',runLineupFlow],['page-motion',runPageMotionFlow],['account-center',runAccountCenterFlow]]){
   const group={name,started:new Date().toISOString(),passed:false};report.groups.push(group);console.log('Checking '+name);
   await flow(context);group.passed=true;group.finished=new Date().toISOString();
  }

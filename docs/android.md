@@ -34,9 +34,11 @@ APK 内包含前端页面、动画引擎、阵容推荐规则和内置 3v3 / 4v4
 
 ## 构建
 
+1.24.0/code29将「我的」接入真实本地球队管理，账号/备份入口用玻璃说明面板明确尚未开放。225检查、完整Chrome14组、新页36布局/20面板及独立审查通过；28秒构建，30网页同dist/15图标同1.23.0/no server.url/原v2证书通过。指定手机正常覆盖安装，COLD754ms/Wait760ms，实际0档案及进度双hash保持；真实WebView96竖屏393×819我的/四说明、无溢出/锁与关闭/无凭据和主Play保持通过。人工操作另待验，见[HC-046](tasks/HC-046-account-center-release.md)。
+
 1.23.0/code28仅整理目录、拆分模块与QA工具，26套战术及推荐输出保持。225检查、完整Chrome13组、48对布局事实与独立审查通过；21秒构建、30网页同dist/15图标同前包、无server.url及v2原证书通过。指定手机install-r Success/COLD952ms，实际0档案及进度双hash保持；本轮横屏WebView96四页同框、未保存建队三步/放弃及1332样本自然循环通过。物理体验未作新验，见[HC-043](tasks/HC-043-project-organization.md)。
 
-1.22.3/code27修正低位分切蓝方对位、绕挡追防和低位限补回收，进攻路线/七帧/球权/旧进度及其他25套保持。215检查、独立动作审查、自然库/训练回放、四尺寸和七旧步骤恢复通过；25秒构建，30网页同dist/15原图标/Native保持/v2原证书通过。指定手机正常覆盖安装，COLD682ms，实际0档案及进度前后双hash同；真实WebView96整轮1345样本、暂停/同源位置/数据保持通过，未点手机训练CTA或写测试队。人工观感待验，见[HC-042](tasks/HC-042-post-split-defense.md)及[1.22.3 APK](../artifacts/apk/hoopal-1.22.3.apk)。
+1.22.3/code27修正低位分切蓝方对位、绕挡追防和低位限补回收，进攻路线/七帧/球权/旧进度及其他25套保持。215检查、独立动作审查、自然库/训练回放、四尺寸和七旧步骤恢复通过；25秒构建，30网页同dist/15原图标/Native保持/v2原证书通过。指定手机正常覆盖安装，COLD682ms，实际0档案及进度前后双hash同；真实WebView96整轮1345样本、暂停/同源位置/数据保持通过，未点手机训练CTA或写测试队。人工观感待验，见[HC-042](tasks/HC-042-post-split-defense.md)及[1.22.3 APK](../artifacts/apk/archive/hoopal-1.22.3.apk)。
 
 1.22.2/code26将批准节奏更新为品牌静止1000ms、展开1100ms、交接300ms，标题1165–1825ms淡出；原生启动衔接/桌面头像/布局与旧键保持。213检查、27组合七控制与相关页面阵容回归、28秒构建、30网页同dist/15图标同旧包/Native三源码同基线、v2原签名通过。2026-10-28指定新机install-r Success，实际0档案与进度双hash保持；用户解锁后明确COLD483ms，WebView96自然2415.3ms/一秒静止/skip/四页同框严格复验通过。首轮桥接异常记录保留且未再现，人工节奏观感待确认，见[HC-041](tasks/HC-041-startup-timing-release.md)。[球搭1.22.2 APK](../artifacts/apk/archive/hoopal-1.22.2.apk)可直接发Android平板安装。
 
@@ -65,7 +67,7 @@ npm run android:build
 
 脚本会构建网页、同步 Android 资源、运行 `assembleDebug`，再生成 `artifacts/apk/halfcourt-debug.apk`、`hoopal-版本号.apk`及各自的SHA256文件。原始产物在 `android/app/build/outputs/apk/debug/app-debug.apk`。顶层保当前版与一个回退版，更旧包放在`artifacts/apk/archive/`，同步历史文档链接。
 
-当前构建版本为 `1.23.0`（versionCode 28），目录和模块整理不改变现有功能、存储键或数据格式。安装证据见[HC-043](tasks/HC-043-project-organization.md)，[1.23.0安装包](../artifacts/apk/hoopal-1.23.0.apk)可直接发Android平板，升级保留档案与进度，不需卸载或电脑服务。[1.22.3](../artifacts/apk/hoopal-1.22.3.apk)保作源码/资源核对与回退参考，Android降级安装受版本限制。
+当前构建版本为 `1.24.0`（versionCode 29），「我的」页面使用真实本地球队，账号/云备份服务尚未开放。安装证据见[HC-046](tasks/HC-046-account-center-release.md)，[1.24.0安装包](../artifacts/apk/hoopal-1.24.0.apk)可直接发Android平板，升级保留档案与进度，不需卸载或电脑服务。[1.23.0](../artifacts/apk/hoopal-1.23.0.apk)保作源码/资源核对与回退参考，Android降级安装受版本限制。
 
 当前开发机的便携工具放在被忽略的 `.tools/` 中，构建脚本可以自动使用其中的 JDK、SDK 和 Gradle。这些大体积工具不属于项目源码；其他电脑按上面的标准环境变量配置即可。首次构建需要联网下载依赖，安装后的战术应用可离线使用。
 

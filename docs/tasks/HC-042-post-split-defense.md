@@ -38,7 +38,7 @@ engine已交回数据和测试。所有进攻坐标/路线及七帧球权保持�
 
 ## APK与当前手机
 
-[25秒Android构建](../../artifacts/qa/hc042/android-build.log)成功，[1.22.3/code27 APK](../../artifacts/apk/hoopal-1.22.3.apk) SHA256 `a3742ca42dc2d5bca6cbb79c6cc9c94e2a1e109c2017323f3c3a6397fbd04da5`。[包资产](../../artifacts/qa/hc042-apk-assets.json)核30网页同dist、15编译图标同1.22.2、Native三个源码保持，无server.url；[原v2签名](../../artifacts/qa/hc042/apk-signature.txt)及[球搭版本/包名](../../artifacts/qa/hc042/apk-badging.txt)通过。
+[25秒Android构建](../../artifacts/qa/hc042/android-build.log)成功，[1.22.3/code27 APK](../../artifacts/apk/archive/hoopal-1.22.3.apk) SHA256 `a3742ca42dc2d5bca6cbb79c6cc9c94e2a1e109c2017323f3c3a6397fbd04da5`。[包资产](../../artifacts/qa/hc042-apk-assets.json)核30网页同dist、15编译图标同1.22.2、Native三个源码保持，无server.url；[原v2签名](../../artifacts/qa/hc042/apk-signature.txt)及[球搭版本/包名](../../artifacts/qa/hc042/apk-badging.txt)通过。
 
 重新核ef473680/M2101K9C、preflight无草稿，即时备份真实0档案和进度后[正常覆盖安装](../../artifacts/qa/hc042/device-install.txt)。[明确COLD682ms/Wait686ms](../../artifacts/qa/hc042/device-launch.txt)，[before](../../artifacts/qa/hc042-device-before.json)/[after](../../artifacts/qa/hc042-device-after.json)核1.22.3/code27/本应用前台，档案SHA `dd42b596eba63db184dd3e4e60ff2c52b48a712743f538d6e668d2eab397e253`、进度SHA `7ad33bfb7b3680e01933afc54e22624f8e7549cf05af50543556b42115417e7c`完全相同。未卸载、清数据或写入测试阵容。
 

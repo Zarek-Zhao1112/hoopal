@@ -1,15 +1,21 @@
 import { getNbaTeam } from '../../../../data/nba-teams.js';
 import { playerName } from './text.js';
+import { createAccountCards } from '../components/account-cards.js';
 
 /** A feature-owned view, using the coordinator's explicit state and callbacks. */
 export function createArchivesView(context){
- const {node,model,button,navigate,perform,crest,openArchiveMenu,pager,draw,draftStore,beginCreate,root}=context;
+ const {node,model,button,navigate,perform,crest,openArchiveMenu,pager,draw,draftStore,beginCreate,root,document,openAccount}=context;
+ const account = createAccountCards({document,node,button,openAccount});
 
  function archivesPageView() {
-    const card = node('section', 'lineup-archives-card');
+    const card = node('section', 'lineup-archives-card lineup-account-page');
     const heading = node('header', 'lineup-archives-heading');
-    heading.append(node('h1', '', '球队档案'), node('span', '', `${model.state.profiles.length} / 20`));
-    card.append(heading, node('p', 'lineup-archives-intro', '点球队卡片，进入它的更衣室'));
+    heading.append(node('h1', '', '我的'), node('span', '', '球队与账号'));
+    card.append(heading, account.identity());
+    const teams = node('section', 'lineup-account-teams lineup-account-glass');
+    const teamHeading = node('header', 'lineup-account-teams-heading'), teamTitle = node('div');
+    teamTitle.append(node('h2', '', '我的球队'), node('span', 'lineup-teams-count', `${model.state.profiles.length} / 20`));
+    teamHeading.append(teamTitle); teams.append(teamHeading);
     const list = node('div', 'lineup-archive-list');
     const pages = Math.max(1, Math.ceil(model.state.profiles.length / 3));
     model.profilePage = Math.max(0, Math.min(pages - 1, model.profilePage));
@@ -40,9 +46,10 @@ export function createArchivesView(context){
       if (profile.id === model.state.activeProfileId) item.append(node('span', 'lineup-archive-current', '当前使用'));
       list.append(item);
     }
-    card.append(list);
-    if (pages > 1) { card.classList.add('has-pages'); card.append(pager(pages, model.profilePage, page => { model.profilePage = page; model.feedback = ''; draw(); }, 'lineup-archives')); }
-    card.append(button(draftStore.createDraft ? '继续创建球队' : '＋ 创建球队', model.state.profiles.length ? 'lineup-create' : 'lineup-create-empty', beginCreate, { className: 'button button-primary lineup-archive-create', disabled: model.state.profiles.length >= 20 }));
+    teams.append(list);
+    if (pages > 1) { card.classList.add('has-pages'); teamHeading.append(pager(pages, model.profilePage, page => { model.profilePage = page; model.feedback = ''; draw(); }, 'lineup-archives')); }
+    teams.append(button(draftStore.createDraft ? '继续创建球队' : '＋ 创建球队', model.state.profiles.length ? 'lineup-create' : 'lineup-create-empty', beginCreate, { className: 'button button-primary lineup-archive-create', disabled: model.state.profiles.length >= 20 }));
+    card.append(teams, account.tools());
     root.append(card);
   }
 

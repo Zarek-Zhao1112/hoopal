@@ -16,8 +16,8 @@ export function createLockerView(context){
     const profile = active();
     if (!profile) {
       const empty = node('article', 'lineup-empty lineup-main-empty');
-      empty.append(cardHeading, node('h2', '', model.state.profiles.length ? '选一支球队，进入更衣室' : '先组一支自己的球队'), createEmptyLocker({ document }), node('p', '', '球队的创建与管理，都在档案中。'));
-      empty.append(button(model.state.profiles.length ? '去档案选择球队' : '去档案创建球队', 'lineup-open-archives', () => navigate('archives'), { className: 'button button-primary' }));
+      empty.append(cardHeading, node('h2', '', model.state.profiles.length ? '选一支球队，进入更衣室' : '先组一支自己的球队'), createEmptyLocker({ document }), node('p', '', '球队的创建与管理，都在「我的」中。'));
+      empty.append(button(model.state.profiles.length ? '去我的选择球队' : '去我的创建球队', 'lineup-open-archives', () => navigate('archives'), { className: 'button button-primary' }));
       root.append(empty); return;
     }
     const card = node('article', 'lineup-profile-card'); card.dataset.color = profile.color; card.dataset.mode = profile.mode;

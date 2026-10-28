@@ -177,7 +177,7 @@ export async function runPageLayoutFlow({ send, evaluate, wait, waitFor, folder 
     assert.ok(value.card.x >= -1 && value.card.right <= width + 1 && value.card.bottom <= height + 1, `${label}: card stays inside screen`);
     if (width >= 1280) assert.ok(value.card.width <= 1280, `${label}: desktop card has a bounded reading width`);
     assert.ok(value.title?.includes(view === 'lineups' ? '更衣室' : view === 'play' ? '训练场' : '战术库'), `${label}: visible page title ${value.title}`);
-    assert.deepEqual(value.nav.map(n => n.label), ['更衣室', '训练场', '战术库', '档案']);
+    assert.deepEqual(value.nav.map(n => n.label), ['更衣室', '训练场', '战术库', '我的']);
     assert.equal(value.nav.find(n => n.view === view)?.pressed, 'true');
     assert.equal(value.brandVisible, view === 'lineups', `${label}: brand belongs only to locker room`);
     assert.equal(value.legacyBrandVisible, false, `${label}: no duplicate legacy brand`);
