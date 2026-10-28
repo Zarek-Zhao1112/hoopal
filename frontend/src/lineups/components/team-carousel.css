@@ -1,0 +1,100 @@
+/* HC-025: local styling for the second task only. */
+#lineup-wizard-dialog .lineup-wizard-teams.lineup-wizard-carousel{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) 126px;gap:10px;height:100%;min-width:0;min-height:0;overflow:hidden}
+#lineup-wizard-dialog .lineup-wizard-carousel .lineup-team-carousel{display:grid;grid-template-rows:minmax(0,1fr);min-width:0;min-height:0;height:100%}
+#lineup-wizard-dialog .lineup-wizard-carousel[data-all-open=true] .lineup-team-carousel{grid-column:1/-1;grid-row:1/-1}
+#lineup-wizard-dialog .lineup-wizard-carousel .lineup-carousel-content{display:grid;grid-template-rows:23px minmax(0,1fr) 43px 15px;gap:8px;min-width:0;min-height:0;overflow:hidden}
+#lineup-wizard-dialog .lineup-wizard-carousel .carousel-caption{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:0;color:#94aebf;font-size:10px}
+#lineup-wizard-dialog .lineup-wizard-carousel .carousel-caption button{min-height:24px;padding:3px 0 3px 7px;border:0;background:transparent;color:#7e9fb6;font-size:10px;white-space:nowrap}
+#lineup-wizard-dialog .lineup-wizard-carousel .carousel-stage{position:relative;min-width:0;min-height:0;overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none;outline-offset:-3px}
+#lineup-wizard-dialog .lineup-wizard-carousel .carousel-track{position:absolute;inset:0;perspective:none}
+#lineup-wizard-dialog .lineup-wizard-carousel .carousel-arc{position:absolute;left:-24%;right:-24%;bottom:10%;height:65%;border:1px solid #aacbdc44;border-top:0;border-radius:0 0 50% 50%;background:radial-gradient(ellipse at 50% 60%,#e9f8ff4d,transparent 65%);pointer-events:none}
+#lineup-wizard-dialog .lineup-wizard-carousel .carousel-stage::after{content:'';position:absolute;left:35%;right:35%;bottom:7%;height:8%;border-radius:50%;background:radial-gradient(ellipse,#6f9bb12a,transparent 70%);pointer-events:none}
+#lineup-wizard-dialog .lineup-wizard-carousel .carousel-team{position:absolute;left:50%;top:44%;display:grid;place-items:center;width:158px;height:158px;min-width:0;min-height:0;padding:6px;border:0;background:transparent;transform-origin:center;will-change:transform,opacity;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;touch-action:pan-y}
+#lineup-wizard-dialog .lineup-wizard-carousel .carousel-team img,#lineup-wizard-dialog .lineup-wizard-carousel .carousel-neutral{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none;-webkit-user-drag:none;filter:drop-shadow(0 6px 4px #496b8218)}
+#lineup-wizard-dialog .lineup-wizard-carousel .carousel-team[aria-hidden=true]{pointer-events:none}
+#lineup-wizard-dialog .lineup-wizard-carousel .selection-heading{display:flex;justify-content:center;align-items:center;gap:13px;min-width:0;min-height:0}
+#lineup-wizard-dialog .lineup-wizard-carousel .selection-heading>div{flex:1;min-width:0;text-align:center}
+#lineup-wizard-dialog .lineup-wizard-carousel .lineup-carousel-name{display:block;max-width:100%;font-size:18px;font-weight:600;line-height:1.5;color:#6087a1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#lineup-wizard-dialog .lineup-wizard-carousel .lineup-carousel-position{display:block;font-size:9px;color:#9cb4c4;letter-spacing:1px;margin-top:3px;font-variant-numeric:tabular-nums}
+#lineup-wizard-dialog .lineup-wizard-carousel .selection-heading>button{width:32px;min-width:32px;min-height:33px;padding:0;border:1px solid #bfd8e8;border-radius:10px;background:linear-gradient(#f3fbffb3,#e3f1f99c);box-shadow:inset 0 1px #fff;color:#8caabe;font-size:25px;line-height:1}
+#lineup-wizard-dialog .lineup-wizard-carousel .swipe-hint{margin:0;font-size:9px;line-height:15px;text-align:center;color:#a4baca}
+#lineup-wizard-dialog .lineup-wizard-carousel>.lineup-wizard-kit{display:grid;grid-template-columns:minmax(0,1fr) 82px;gap:13px;align-items:center;min-height:0;min-width:0;padding:10px 16px;border:1px solid #c7deeb;border-radius:12px;background:linear-gradient(130deg,#f5fbfd9c,#e9f5fcb3);box-shadow:inset 0 1px #fff}
+#lineup-wizard-dialog .lineup-wizard-carousel>.lineup-wizard-kit>div:not(.lineup-jersey){display:flex;flex-direction:column;gap:7px;min-width:0}
+#lineup-wizard-dialog .lineup-wizard-carousel>.lineup-wizard-kit .lineup-text-link{min-height:25px;white-space:normal;overflow-wrap:anywhere;font-size:14px;font-weight:550;line-height:1.7;color:#7b9db5;text-align:left}
+#lineup-wizard-dialog .lineup-wizard-carousel>.lineup-wizard-kit small{font-size:9px;margin:0;color:#a1b8c8;line-height:1.8}
+#lineup-wizard-dialog .lineup-wizard-carousel>.lineup-wizard-kit .lineup-jersey{width:82px;height:100%;min-width:0;min-height:0;filter:drop-shadow(2px 4px 2px #587d962b)}
+#lineup-wizard-dialog .lineup-wizard-carousel>.lineup-wizard-kit .lineup-jersey svg{width:100%;height:100%;max-width:100%;max-height:100%;display:block}
+#lineup-wizard-dialog .lineup-wizard-carousel .all-teams-panel{display:grid;grid-template-rows:43px minmax(0,1fr) 30px;gap:10px;min-width:0;min-height:0;height:100%;overflow:hidden}
+#lineup-wizard-dialog .lineup-wizard-carousel .all-teams-panel>header{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0}
+#lineup-wizard-dialog .lineup-wizard-carousel .all-teams-panel h3{margin:0 0 4px;font-size:17px;font-weight:550;color:#6f92ab}
+#lineup-wizard-dialog .lineup-wizard-carousel .all-teams-panel header p{font-size:9px;color:#a1b6c6;margin:0}
+#lineup-wizard-dialog .lineup-wizard-carousel [data-action=lineup-carousel-all-close]{width:33px;min-width:33px;min-height:33px;padding:3px;border:1px solid #c1d9e8;border-radius:50%;background:#f1f9fc96;color:#86a6ba;font-size:23px;line-height:1}
+#lineup-wizard-dialog .lineup-wizard-carousel .all-teams-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));gap:7px;min-width:0;min-height:0}
+#lineup-wizard-dialog .lineup-wizard-carousel .all-team-option{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;min-height:0;padding:4px;border:1px solid #c8deec;border-radius:9px;background:#f1f9fda3;color:#91adbf;font-size:9px}
+#lineup-wizard-dialog .lineup-wizard-carousel .all-team-option img{width:47px;height:47px;max-width:80%;max-height:calc(100% - 16px);object-fit:contain;pointer-events:none}
+#lineup-wizard-dialog .lineup-wizard-carousel .all-team-option span{white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+#lineup-wizard-dialog .lineup-wizard-carousel .all-team-option[aria-pressed=true]{border-color:#93bfd9;background:#dceffb;box-shadow:inset 0 1px #fff}
+#lineup-wizard-dialog .lineup-wizard-carousel .team-pager{display:flex;align-items:center;justify-content:center;gap:20px;font-size:10px;color:#92adbf}
+#lineup-wizard-dialog .lineup-wizard-carousel .team-pager button{min-height:27px;padding:4px 8px;border:1px solid #c4dce9;border-radius:7px;background:#edf8fcc9;color:#88a7bd;font-size:9px}
+@media(max-height:700px){
+ #lineup-wizard-dialog .lineup-wizard-teams.lineup-wizard-carousel{grid-template-rows:minmax(0,1fr) 94px;gap:8px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .lineup-carousel-content{grid-template-rows:21px minmax(0,1fr) 38px 13px;gap:6px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .carousel-caption{font-size:9px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .carousel-caption button{font-size:9px;min-height:22px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .carousel-team{width:126px;height:126px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .lineup-carousel-name{font-size:16px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .lineup-carousel-position{font-size:8px;margin-top:2px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .selection-heading>button{min-height:29px;width:29px;min-width:29px;font-size:22px}
+ #lineup-wizard-dialog .lineup-wizard-carousel>.lineup-wizard-kit{grid-template-columns:minmax(0,1fr) 61px;padding:7px 12px;gap:9px}
+ #lineup-wizard-dialog .lineup-wizard-carousel>.lineup-wizard-kit>div:not(.lineup-jersey){gap:5px}
+ #lineup-wizard-dialog .lineup-wizard-carousel>.lineup-wizard-kit .lineup-text-link{font-size:12px}
+ #lineup-wizard-dialog .lineup-wizard-carousel>.lineup-wizard-kit small{font-size:8px}
+ #lineup-wizard-dialog .lineup-wizard-carousel>.lineup-wizard-kit .lineup-jersey{width:61px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .swipe-hint{font-size:8px;line-height:13px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .all-teams-panel{grid-template-rows:35px minmax(0,1fr) 25px;gap:7px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .all-teams-grid{gap:5px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .all-team-option{gap:2px;font-size:8px;padding:3px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .all-team-option img{width:36px;height:36px;max-height:calc(100% - 13px)}
+ #lineup-wizard-dialog .lineup-wizard-carousel .all-teams-panel h3{font-size:15px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .all-teams-panel header p{font-size:8px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .team-pager button{min-height:24px;font-size:8px}
+}
+@media(min-width:600px) and (max-height:600px){
+ #lineup-wizard-dialog .lineup-wizard-teams.lineup-wizard-carousel{grid-template-columns:minmax(0,1fr) 133px;grid-template-rows:minmax(0,1fr);gap:13px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .lineup-carousel-content{grid-template-rows:21px minmax(0,1fr) 38px;gap:4px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .carousel-team{width:111px;height:111px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .selection-heading{gap:6px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .lineup-carousel-name{font-size:13px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .lineup-carousel-position{font-size:7px}
+ #lineup-wizard-dialog .lineup-wizard-carousel>.lineup-wizard-kit{display:flex;flex-direction:column-reverse;justify-content:center;gap:5px;padding:7px}
+ #lineup-wizard-dialog .lineup-wizard-carousel>.lineup-wizard-kit .lineup-jersey{width:57px;height:83px;flex-shrink:1}
+ #lineup-wizard-dialog .lineup-wizard-carousel>.lineup-wizard-kit>div:not(.lineup-jersey){flex:0;gap:3px;max-width:100%}
+ #lineup-wizard-dialog .lineup-wizard-carousel>.lineup-wizard-kit .lineup-text-link{font-size:9px;text-align:center;line-height:1.6}
+ #lineup-wizard-dialog .lineup-wizard-carousel>.lineup-wizard-kit small{font-size:7px;text-align:center}
+ #lineup-wizard-dialog .lineup-wizard-carousel .swipe-hint{display:none}
+ #lineup-wizard-dialog .lineup-wizard-carousel .all-teams-panel{grid-template-rows:30px minmax(0,1fr) 23px;gap:4px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .all-teams-grid{grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:4px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .all-team-option img{width:32px;height:32px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .all-team-option{font-size:8px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .all-teams-panel header p{display:none}
+ #lineup-wizard-dialog .lineup-wizard-carousel .all-teams-panel h3{font-size:14px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .team-pager{gap:15px;font-size:9px}
+}
+@media(min-width:900px) and (min-height:601px){
+ #lineup-wizard-dialog .lineup-wizard-teams.lineup-wizard-carousel{grid-template-columns:minmax(0,1fr) 205px;grid-template-rows:minmax(0,1fr);gap:28px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .lineup-carousel-content{grid-template-rows:27px minmax(0,1fr) 48px 18px;gap:10px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .carousel-caption{font-size:12px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .carousel-caption button{font-size:11px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .carousel-team{width:187px;height:187px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .lineup-carousel-name{font-size:20px}
+ #lineup-wizard-dialog .lineup-wizard-carousel>.lineup-wizard-kit{display:flex;flex-direction:column-reverse;justify-content:center;padding:16px;gap:15px}
+ #lineup-wizard-dialog .lineup-wizard-carousel>.lineup-wizard-kit .lineup-jersey{width:116px;height:171px;flex-shrink:1}
+ #lineup-wizard-dialog .lineup-wizard-carousel>.lineup-wizard-kit>div:not(.lineup-jersey){flex:0;gap:7px;max-width:100%}
+ #lineup-wizard-dialog .lineup-wizard-carousel>.lineup-wizard-kit .lineup-text-link{text-align:center;font-size:13px}
+ #lineup-wizard-dialog .lineup-wizard-carousel>.lineup-wizard-kit small{text-align:center;font-size:9px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .all-teams-grid{grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:12px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .all-team-option img{width:75px;height:75px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .all-team-option{font-size:12px}
+ #lineup-wizard-dialog .lineup-wizard-carousel .all-teams-panel{grid-template-rows:45px minmax(0,1fr) 32px}
+}
+@media(prefers-reduced-motion:reduce){#lineup-wizard-dialog .lineup-wizard-carousel .carousel-team{will-change:auto}}

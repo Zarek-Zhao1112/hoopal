@@ -23,7 +23,7 @@
 | Agent | 职责 | 主要文件 |
 | --- | --- | --- |
 | 主 agent | Vite / Capacitor 集成、界面接入、触屏修复、构建、回归和交付记录 | [`frontend/src/app.js`](../../frontend/src/app.js)、[`frontend/src/board/hit-test.js`](../../frontend/src/board/hit-test.js)、[`tests/unit/hit-test.test.mjs`](../../tests/unit/hit-test.test.mjs)、[`vite.config.js`](../../vite.config.js)、[`capacitor.config.json`](../../capacitor.config.json)、[`package.json`](../../package.json)、[`package-lock.json`](../../package-lock.json)、[`scripts/android.mjs`](../../scripts/android.mjs)、[`scripts/start.mjs`](../../scripts/start.mjs)、[`backend/app.mjs`](../../backend/app.mjs)、[`tests/integration/server.test.mjs`](../../tests/integration/server.test.mjs)、[`tests/e2e/browser-qa.mjs`](../../tests/e2e/browser-qa.mjs)、[`android/`](../../android/)、相关使用与验证文档 |
-| engine | 异步存储仓库、快照与并发保护、损坏数据备份、读取失败保护 | [`frontend/src/storage/repository.js`](../../frontend/src/storage/repository.js)、[`tests/unit/storage.test.mjs`](../../tests/unit/storage.test.mjs) |
+| engine | 异步存储仓库、快照与并发保护、损坏数据备份、读取失败保护 | [`frontend/src/storage/repository.js`](HC-043-project-organization.md)、[`tests/unit/storage.test.mjs`](HC-043-project-organization.md) |
 | ui | 网页 / Android 平台适配、私有文件、系统分享、生命周期、原生接口 mock 测试 | [`frontend/src/platform/index.js`](../../frontend/src/platform/index.js)、[`frontend/src/platform/core.js`](../../frontend/src/platform/core.js)、[`tests/unit/platform.test.mjs`](../../tests/unit/platform.test.mjs) |
 | interaction_design | 独立只读审查存储、平台、交互、Android 配置与构建；回报缺陷和验证限制 | 上述实现及配置；审查结论汇入 [验证记录](../validation.md) |
 

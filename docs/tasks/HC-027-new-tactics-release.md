@@ -55,7 +55,7 @@ Windows阻止Vite8/Rolldown的原生DLL；匹配官方WASI包虽可导入，实�
 
 ## APK与实际手机
 
-`npm run android:build`成功，Gradle21秒；版本1.16.0/code18。[版本安装包](../../artifacts/apk/halfcourt-1.16.0.apk)与通用halfcourt-debug.apk相同，SHA256 `8aa05ea16b5113d3bd90eac866d334b7cdc95daa6f2926e7d00f9b01352bedfb`。[28网页资源](../../artifacts/qa/hc027-apk-assets.json)逐hash与最终dist一致，无server.url；v2签名通过，证书SHA256仍为e13d5e107d797d5233b8bf18f24f498d3edccaf8db6e15fcde791af5d2465e26。最终网页bundle与Chrome验收输入相同。
+`npm run android:build`成功，Gradle21秒；版本1.16.0/code18。[版本安装包](../../artifacts/apk/archive/halfcourt-1.16.0.apk)与通用halfcourt-debug.apk相同，SHA256 `8aa05ea16b5113d3bd90eac866d334b7cdc95daa6f2926e7d00f9b01352bedfb`。[28网页资源](../../artifacts/qa/hc027-apk-assets.json)逐hash与最终dist一致，无server.url；v2签名通过，证书SHA256仍为e13d5e107d797d5233b8bf18f24f498d3edccaf8db6e15fcde791af5d2465e26。最终网页bundle与Chrome验收输入相同。
 
 再次识别当前新机ef473680/M2101K9C，`adb install -r`返回Success，COLD启动628ms、前台和版本确认。安装前[真实档案摘要](../../artifacts/qa/hc027-device-before.json)与[安装后](../../artifacts/qa/hc027-device-after.json)相同：本次实际0份档案、文件SHA256 dd42b596eba63db184dd3e4e60ff2c52b48a712743f538d6e668d2eab397e253；没有卸载、清数据或写测试阵容。
 

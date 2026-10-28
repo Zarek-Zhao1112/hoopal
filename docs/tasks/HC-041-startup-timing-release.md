@@ -28,7 +28,7 @@ npm test及构建后的真实Chrome正式启动专项27组合（九尺寸×空/3
 
 ## APK与当前手机
 
-[Android构建](../../artifacts/qa/hc041-android-build.log)成功28秒；[1.22.2/code26 APK](../../artifacts/apk/hoopal-1.22.2.apk) SHA256 `00694ba7cbb6df5c1b8e93f0a2ebe1331fc86b2bb996e284c8f5af8925267437`。[包资产](../../artifacts/qa/hc041-apk-assets.json)核30网页逐hash同dist、15编译图标PNG同1.22.1、Native三个启动源码同HC-040基线；无server.url、原包名、球搭显示名。[v2原签名](../../artifacts/qa/hc041-apk-signature.txt)与[版本/label](../../artifacts/qa/hc041-apk-badging.txt)通过。
+[Android构建](../../artifacts/qa/hc041-android-build.log)成功28秒；[1.22.2/code26 APK](../../artifacts/apk/archive/hoopal-1.22.2.apk) SHA256 `00694ba7cbb6df5c1b8e93f0a2ebe1331fc86b2bb996e284c8f5af8925267437`。[包资产](../../artifacts/qa/hc041-apk-assets.json)核30网页逐hash同dist、15编译图标PNG同1.22.1、Native三个启动源码同HC-040基线；无server.url、原包名、球搭显示名。[v2原签名](../../artifacts/qa/hc041-apk-signature.txt)与[版本/label](../../artifacts/qa/hc041-apk-badging.txt)通过。
 
 2026-10-28重新核对ef473680/M2101K9C；即时preflight无运行草稿，备份真实0档案和进度后正常[install-r Success](../../artifacts/qa/hc041-device-install.txt)。[before](../../artifacts/qa/hc041-device-before.json)/[after](../../artifacts/qa/hc041-device-after.json)核1.22.2/code26/前台，档案SHA `dd42b596eba63db184dd3e4e60ff2c52b48a712743f538d6e668d2eab397e253`、进度SHA `7ad33bfb7b3680e01933afc54e22624f8e7549cf05af50543556b42115417e7c`完全相同，未清数据或创建测试档案。
 

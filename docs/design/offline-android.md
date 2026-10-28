@@ -1,5 +1,7 @@
 # 离线 Android 半场战术板设计记录
 
+本文保留HC-001时点的原设计。个人战术保存/导入已在HC-006退出；无调用的旧仓库和专属测试在[HC-043](../tasks/HC-043-project-organization.md)退役，原实现保留于Git基线。当前接口以[架构说明](../architecture.md)为准。
+
 日期：2026-10-22。状态：现有实现整理；实现、自动验证和 APK 构建已完成，安装启动已确认，完整真机功能待验收。
 
 本文基于当前源码和验证结果补录模块约定及实现原因，不追溯声称这些设计在开发前已经完成。构建命令和设备使用说明以 [Android 离线版](../android.md) 为准，完整目录职责见[模块架构](../architecture.md)，验证证据见[验证记录](../validation.md)。
@@ -20,7 +22,7 @@ APK 应能在断网状态下冷启动并完成编辑、回放和本地保存。�
 | [engine.js](../../shared/engine.js) | `createPlay(mode)`、`createBoard(mode)`、`validatePlay(value)`；`PlayStore` 管理帧、编辑和历史；`interpolateBoards(from,to,t)` 与 `ballPosition(board)` 计算动画 |
 | [templates.js](../../shared/templates.js) / [内置数据](../../data/templates.js) | 将纯数据定义转换为独立战术副本，内置配合与用户数据分开 |
 | [hit-test.js](../../frontend/src/board/hit-test.js) | `resolveDragTarget(board,point,showDefense)` 用球场坐标解析触摸目标，避免触屏目标调整误选持球队员旁的篮球 |
-| [repository.js](../../frontend/src/storage/repository.js) | `createRepository({adapter,validatePlay,maxLibrary=40})`；返回 `load()`、`saveDraft(play)`、`saveLibrary(plays)`、`flush()` |
+| [repository.js](../tasks/HC-043-project-organization.md) | `createRepository({adapter,validatePlay,maxLibrary=40})`；返回 `load()`、`saveDraft(play)`、`saveLibrary(plays)`、`flush()` |
 | [platform/index.js](../../frontend/src/platform/index.js) | 绑定 Capacitor 插件，导出 `isNative()`、`createStorageAdapter()`、`createSettingsAdapter()`、`exportFile(blob,filename)`、`setupLifecycle(callbacks)` |
 | [platform/core.js](../../frontend/src/platform/core.js) | 可注入的 `createPlatformAdapters(...)`，负责网页/原生实现差异和独立测试 |
 
@@ -76,7 +78,7 @@ Android 导出 JSON 写 UTF-8 文本，PNG 写二进制对应的 Base64 数据�
 | 验收层级 | 已有证据 | 剩余边界 |
 | --- | --- | --- |
 | 引擎与交互逻辑 | [engine.test.mjs](../../tests/unit/engine.test.mjs)、[hit-test.test.mjs](../../tests/unit/hit-test.test.mjs) 覆盖帧、历史、路线、持球插值和触屏命中 | 不代表真实设备输入时序已验收 |
-| 存储与平台 | [storage.test.mjs](../../tests/unit/storage.test.mjs)、[platform.test.mjs](../../tests/unit/platform.test.mjs) 覆盖读取故障锁、损坏备份、并发快照、失败恢复、原生接口模拟 | 原生文件系统和系统分享接收端需真机验证 |
+| 存储与平台 | [storage.test.mjs](../tasks/HC-043-project-organization.md)、[platform.test.mjs](../../tests/unit/platform.test.mjs) 覆盖读取故障锁、损坏备份、并发快照、失败恢复、原生接口模拟 | 原生文件系统和系统分享接收端需真机验证 |
 | 构建资源 | [server.test.mjs](../../tests/integration/server.test.mjs)、[browser-qa.mjs](../../tests/e2e/browser-qa.mjs) 验证 HTTP、编辑回放、刷新恢复、导出、断网后的动画及手机触屏 | 浏览器模拟不能替代 APK 断网冷启动 |
 | APK | Debug 构建和签名验证完成，产物为 `artifacts/apk/halfcourt-debug.apk`；用户安装后，包管理器及启动结果确认成功 | 完整真机功能尚未验收，安装记录见 [HC-003](../tasks/HC-003-device-install.md) |
 

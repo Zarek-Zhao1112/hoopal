@@ -33,7 +33,7 @@ ui四文件已冻结交还；保留原API及page/pages=0/1兼容，移除pager�
 
 手机已重新识别ef473680，安装前读取当前真实0档案，文件SHA256 dd42b596eba63db184dd3e4e60ff2c52b48a712743f538d6e668d2eab397e253。最终安装/前后字节比对与原生浏览稍后记录。
 
-预构建`npm run android:build`成功（Gradle48秒）。[1.17.0安装包](../../artifacts/apk/halfcourt-1.17.0.apk) SHA256 `2e1140d1016539a3189d98c4f87924a02e4f5960a6e657a1f56f455d0004d6c1`；[资源检查](../../artifacts/qa/hc029-apk-assets.json)28项逐hash与dist一致、没有server.url。v2签名通过，证书SHA256保持e13d5e107d797d5233b8bf18f24f498d3edccaf8db6e15fcde791af5d2465e26。尚未把构建当浏览器或物理验收。
+预构建`npm run android:build`成功（Gradle48秒）。[1.17.0安装包](../../artifacts/apk/archive/halfcourt-1.17.0.apk) SHA256 `2e1140d1016539a3189d98c4f87924a02e4f5960a6e657a1f56f455d0004d6c1`；[资源检查](../../artifacts/qa/hc029-apk-assets.json)28项逐hash与dist一致、没有server.url。v2签名通过，证书SHA256保持e13d5e107d797d5233b8bf18f24f498d3edccaf8db6e15fcde791af5d2465e26。尚未把构建当浏览器或物理验收。
 
 ## 最终自动与浏览器证据
 

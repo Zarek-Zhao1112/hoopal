@@ -40,7 +40,7 @@
 - 最终Vite主JS为`index-DUPGJGOX.js`。修后完整`node tests/e2e/browser-qa.mjs`退出0：20战术/只读与库/六屏排版、转盘专项、真实三任务创建与失败重试、已有阵容编辑/推荐/重启/离线/导出、主页面动效均通过；没有运行时异常或远程资源依赖。
 - [转盘报告](../../artifacts/qa/hc025-team-carousel.json)：四尺寸各有中性/已选态，共8布局，logo完整、主要操作可命中、panelOverflow0；CDP实际touch方向/轴锁/取消回null/快拨≤3/吸附打断/首尾循环、不自转、30队逐个直选、20Tab及Escape隔离、忙/closing失效旧组件和旧中性显式保存均通过。吸附中打开全文、关闭后继续下一队的新增断言通过。主控与独立审查均图检四张PNG。
 - [独立审查](../reviews/HC-025-team-carousel-release.md)：RO时序问题已修复并独立A/B及真实Chrome复验，未留P1/P2。
-- `npm run android:build`成功，28项APK网页资源与最终dist逐哈希一致；无server.url，v2签名有效。[带版本APK](../../artifacts/apk/halfcourt-1.15.0.apk) SHA256：`57dddd0f97c236f9508c7cfc585020488420252d30d783909efb95956d54b703`。
+- `npm run android:build`成功，28项APK网页资源与最终dist逐哈希一致；无server.url，v2签名有效。[带版本APK](../../artifacts/apk/archive/halfcourt-1.15.0.apk) SHA256：`57dddd0f97c236f9508c7cfc585020488420252d30d783909efb95956d54b703`。
 - 新机正常覆盖安装返回Success，冷启动595ms；版本1.15.0/code17及应用前台核对。安装前后实际0档案，[before](../../artifacts/qa/hc025-device-before.json)/[after](../../artifacts/qa/hc025-device-after.json)文件hash都为`dd42b596eba63db184dd3e4e60ff2c52b48a712743f538d6e668d2eab397e253`，未卸载、未清除数据。
 - [实际WebView96程序检查](../../artifacts/qa/hc025-native-carousel.json)通过：393×819可视区/主要控件无溢出、初始中性且空选不能继续、BOS队徽球衣同步、下一LAL/返回BOS、全队列表及模拟Escape回入口焦点、任务2→3→2保持BOS。只创建内存草稿，未点击最终保存，结束放弃草稿；真实档案hash保持。两张设备PNG已图检，ADB转发已清理。
 - 最终文档检查：77份Markdown、394个本地链接通过；本轮测试Chrome/临时profile与ADB转发已清理，手机回到更衣室。

@@ -16,6 +16,6 @@
 
 ## 模块与验证
 
-`app.js → storage/builtins.js → 平台存储`；`shared/` 和内置数据不变。旧通用 `storage/repository.js` 与测试保留为历史兼容代码，当前应用不引用。
+`app.js → storage/builtins.js → 平台存储`；`shared/` 和内置数据不变。旧通用 `storage/repository.js` 与专属测试后来在[HC-043](../tasks/HC-043-project-organization.md)退役，原实现保留在Git基线；现行旧键清理和失败重试继续由builtins/platform执行。
 
 专项测试覆盖删除范围、失败重试、不同存储副本、只保存 ID / 步骤及并发快照；浏览器验证旧个人数据不会显示或复活、临时编辑重启恢复原始模板、十二套动画、六屏一屏布局、60 个临时步骤和长讲解。设备核对版本与旧文件实际内容，详见任务和 [审查](../reviews/HC-006-builtins-only.md)。

@@ -36,7 +36,7 @@ P2修后最终npm test195无skip通过，[专项Chrome](../../artifacts/qa/hc033
 
 ## APK与手机
 
-1.19.0/code21 [APK](../../artifacts/apk/halfcourt-1.19.0.apk)构建21秒通过；[28资源逐hash检查](../../artifacts/qa/hc033-apk-assets.json)等于dist，无server.url；v2证书与原包一致，证书SHA256 e13d5e107d797d5233b8bf18f24f498d3edccaf8db6e15fcde791af5d2465e26，APK SHA256 c681f290a4926945449c42a1ff6236e4dbad135d9507ccdef0ef5193c1b6fcc4。
+1.19.0/code21 [APK](../../artifacts/apk/archive/halfcourt-1.19.0.apk)构建21秒通过；[28资源逐hash检查](../../artifacts/qa/hc033-apk-assets.json)等于dist，无server.url；v2证书与原包一致，证书SHA256 e13d5e107d797d5233b8bf18f24f498d3edccaf8db6e15fcde791af5d2465e26，APK SHA256 c681f290a4926945449c42a1ff6236e4dbad135d9507ccdef0ef5193c1b6fcc4。
 
 ef473680/M2101K9C正常install-r Success后COLD820ms，版本21/1.19.0与前台确认。[安装前](../../artifacts/qa/hc033-device-before.json)即时备份真实原文、[安装后](../../artifacts/qa/hc033-device-after.json)双hash相同：实际0档案dd42b596eba63db184dd3e4e60ff2c52b48a712743f538d6e668d2eab397e253，战术选择397c6cb369a367c0cf5b7d4a2a047c2748becc85e1af744731323b2b75ebd9eb；未卸载或清数据。
 

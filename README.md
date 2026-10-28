@@ -1,99 +1,74 @@
 # 球搭 · HOOPAL
 
-面向电脑浏览器与 Android 离线 APK 的半场 3v3 / 4v4 战术动画工具，支持阵容档案、进攻推荐、分步回放、讲解和导出。界面使用原生 HTML / CSS / JavaScript，Vite 构建资源，Capacitor 接入 Android。
+手机本地离线的半场3v3 / 4v4战术动画工具，同时支持电脑浏览器。原生JavaScript / SVG、Vite与Capacitor Android，无账号或业务服务器。
 
-内置 26 套战术：18 套进攻、8 套独立防守。3v3 / 4v4 各有 9 套进攻与 4 套防守。新增低位分切、假掩护顺下、无球外弹接投、弱侧锤子配合、下掩护接手递手、掩护者再获掩护，均接入本地阵容推荐。进攻库九张标题一页显示，点单卡展开；较矮屏幕展开当前卡后可收起返回列表，浏览不会切换当前演练。
+目前提供26套内置战术（18进攻、8防守）、本地球队档案、标签式球员配置、进攻推荐与人员分工。训练场支持步骤讲解、倍速、循环和导出；战术库展开单卡即可循环预览。手机竖屏一屏操作，横屏和平板扩大球场。
 
-1.18.0 在一页九张战术卡内加入真实循环动画：展开1倍速播放，末帧停1秒，点球场暂停/继续；进入训练场才载入完整演练。保留26套动画、旧战术ID、进度和阵容。球队配置仍用手指滑动的队徽转盘：中央突出、两侧浅弧排列，左滑下一队、右滑返回，松手减速吸附，球队名称与球衣同步；「全部球队」可直接选择30队。未选球队保持中性，选择先记草稿，最后保存阵容时才写入本机。
+界面采用冰川蓝、银灰和室内木地板，包含NBA队徽/球衣选择、单人更衣柜、玻璃建队面板和底部柔光切页。球搭品牌开场共约2.4秒，可跳过；后台返回不重播。战术统一来自内置库，阵容档案独立保存在本机。
 
-1.19.0 将底栏扩为「更衣室 / 训练场 / 战术库 / 档案」。更衣室保留品牌和当前球队的单人柜位；档案集中创建、选用和管理球队，每页三张卡，点卡成功选用后进入对应更衣室，管理菜单可配置、改名、换NBA球队或确认删除。重新打开当前队保留合法人员对应，换队持久化失败则保留原队和档案页。训练场、战术库和档案顶部留白，卡片沿同一起线；原训练场、卡内循环和推荐规则保持。安装和验收见[HC-033](docs/tasks/HC-033-archive-tab-release.md)。
+## 本地运行
 
-更衣室保留开放式单柜；1.21.0将玻璃主卡宽高、边距与训练场/战术库/档案对齐，手机横屏与平板同步适配，柜体保持自身比例。创建 / 配置使用450ms浮起的玻璃任务面板，背景渐暗、模糊；在同一面板依次填写名称人数、NBA球队、队员特点，最后一次保存完整阵容，失败保留输入。会话草稿只存内存，关闭时可继续、保留或放弃。尺寸验收与安装见[HC-036](docs/tasks/HC-036-locker-card-frame.md)。
+需要Node.js 22.12+。首次安装依赖后，Windows可双击 start.cmd，或运行：
 
-1.22.0采用中文「球搭」、英文「HOOPAL」与原卡通头像。冷启动在读取真实档案后，以约1.4秒圆角画框展开当前更衣室柜位，可点跳过；后台返回和普通切页不重播，减少动态效果时直接进入。读失败保留错误/重试，不创建示例球队；极短竖屏将真实柜位与详情左右分区，切人和配置仍可达。更名保留原包名、签名和档案/战术进度键，更新无需卸载。实现与验证见[HC-038](docs/tasks/HC-038-hoopal-startup-release.md)。
-
-1.22.1调整系统开屏交接：原生阶段采用同色静态窗口及启动专用透明图案，直接交接应用内品牌展开，桌面头像与网页资源保持。用户已确认重复开场消失，记录见[HC-039](docs/tasks/HC-039-single-startup.md)。
-
-1.22.2采用用户批准的较慢节奏：品牌完整停留1秒、画框展开1.1秒、收尾0.3秒，总约2.4秒；标题在展开后再淡出。保留跳过、真实资料读取与后台返回不重播，原生交接和柜体布局保持。213检查、正式27组屏幕组合与相关页面回归通过，已保留资料覆盖安装当前手机；设备验收分别记录在[HC-041](docs/tasks/HC-041-startup-timing-release.md)。[安装包](artifacts/apk/hoopal-1.22.2.apk)可发至Android平板直接安装。
-
-1.22.3修正「低位分切」的防守动作：固定人盯人、不换防，蓝1跟住掩护者，蓝2接近挡点后绕行追防，蓝3有限补位后回收。进攻跑位、七步球权和其余25套战术保持，旧进度可继续读取。215检查、独立动作审查、浏览器自然回放/四尺寸和七步恢复通过，已保数据覆盖安装当前手机；实际WebView循环/暂停和原资料保持已核，人工观感见[HC-042](docs/tasks/HC-042-post-split-defense.md)。[当前APK](artifacts/apk/hoopal-1.22.3.apk)可直接发Android平板安装。
-
-1.20.0接入批准的建队三步：队名与人数卡、球队风格、上方大球衣/下方标签。步骤前后切换320ms，成员球衣和资料280ms同步横移，面板/进度/底控保持位置；左拖下一位、右拖返回，取消不切换。姓名和号码随输入同步到球衣，保留光标；手机短屏/横屏与输入时适配，三人和四人成员栏横排。实际保存、来源与已有档案协议保持，验收和安装见[HC-035](docs/tasks/HC-035-creation-motion-release.md)。
-
-保留已确认的库里卡通App图标，冰川蓝、银灰与浅枫木的体育馆风格，以及30支NBA球队选择：每份阵容的队徽与全队代表球衣同步，昵称和自定义号码保留，资源随APK离线打包。旧阵容不会被自动分配球队。阵容柜位左拖下一位、右拖返回，详情和配置对应当前队员；底部玻璃导航使用600ms柔光扩散。战术库默认全部标题收起，点单卡自动循环、点球场暂停/继续，再点标题收回；进入训练场才载入并自动播放；人数和攻防筛选只浏览。每份阵容保存三名 / 四名队员的体型、擅长和可选弱项，推荐最多三套同人数内置进攻，解释分工和执行条件，并把昵称 / 球衣号对应到动画职责号。所有计算与档案保存都在本地完成。
-
-战术继续统一使用内置来源，不恢复个人战术库或旧草稿。防守仍可独立选择播放。手机竖屏主界面无需上下滚动，手机横屏扩大球场，平板横屏采用多栏。具体操作与推荐边界见 [使用说明](docs/user-guide.md)。
-
-## 启动
-
-首次使用先安装依赖。之后 Windows 可双击根目录 `start.cmd`，或在根目录运行：
-
-```sh
+~~~sh
 npm ci
 npm start
-```
+~~~
 
-电脑打开 http://localhost:4173 。手机连接同一 Wi-Fi，打开启动窗口显示的手机地址。PowerShell 启动入口为 `scripts/start.ps1`。
-
-需要 Node.js 22.12 或更新版本。`npm start` 会先构建再启动网页服务；`npm run dev` 用于开发时自动刷新。APK 无需电脑服务，构建和安装方法见 [Android 离线版](docs/android.md)。阵容配置与播放方法见 [使用说明](docs/user-guide.md)。
+电脑访问 http://localhost:4173 。手机网页预览使用启动窗口显示的局域网地址；安装后的APK独立运行，无需电脑服务。开发热更新运行 npm run dev。
 
 ## 项目目录
 
-```text
-3v3篮球战术/
-├── frontend/                前端页面与交互
-│   ├── index.html
-│   ├── src/app.js
-│   ├── src/storage/          内置选择记录与旧个人数据清理
-│   ├── src/lineups/          阵容卡、球员配置、推荐界面
-│   ├── src/platform/         网页 / Android 平台接口
-│   ├── src/board/            球场触屏命中逻辑
-│   ├── src/workspace/        视图、弹窗及分页逻辑
-│   └── styles/app.css
-├── backend/                 本地 HTTP 服务
-│   ├── server.mjs           启动与局域网地址提示
-│   └── app.mjs              静态资源路由
-├── shared/                  与界面无关的战术逻辑
-│   ├── engine.js            状态、校验、历史与动画插值
-│   ├── lineups.js           阵容输入规范
-│   ├── recommendations.js   本地推荐与一对一职责分配
-│   └── templates.js         将内置数据生成可编辑战术
-├── data/
-│   ├── templates.js         内置战术汇总与稳定顺序
-│   ├── tactics/             按人数拆分的战术数据与路线辅助函数
-│   └── recommendations/     十八套进攻职责规则与资料依据
-├── android/                 Capacitor Android 原生工程
-├── tests/
-│   ├── unit/                引擎与动画测试
-│   ├── integration/         HTTP 与资源路径测试
-│   └── e2e/                 桌面和手机浏览器测试
-├── scripts/                 辅助启动脚本
-├── docs/                    架构与使用说明
-├── artifacts/               测试截图、下载和临时产物，忽略提交
-├── capacitor.config.json    APK 标识和资源目录
-├── vite.config.js           网页资源构建
-├── package.json
-└── start.cmd
-```
+~~~text
+frontend/                 # 页面、交互与打包素材
+  src/
+    main.js               # 启动入口
+    app.js                # 初始化、来源切换、保存和生命周期协调
+    board/                # 共用SVG球场、棋子、路线与可见性
+    training/             # 训练播放状态、帧调度与步骤进度
+    lineups/
+      views/              # 更衣室、档案与推荐结果的绘制
+      wizard/             # 建队/配置向导、草稿和成员切换
+      components/         # 衣柜、球衣、队徽转盘、玻璃面板
+    workspace/            # 页面转场、战术库卡片和公共弹窗
+    startup/              # 品牌开场、读取保护与跳过
+    storage/              # 档案/战术进度持久化与来源协议
+    platform/             # Android与浏览器能力适配
+  styles/                 # 全局变量、基础控件和页面框架
+shared/                   # 不依赖DOM/平台的校验、插值与推荐
+data/
+  tactics/offense/        # 3v3/4v4进攻，一套一文件
+  tactics/defense/        # 3v3/4v4防守，一套一文件
+  recommendations/        # 战术职责、能力要求与规则说明
+  nba/                    # 球队素材来源资料
+backend/                  # 电脑/局域网静态预览服务
+android/                  # Android原生工程与打包配置
+resources/                # 图标母版等原始资产
+scripts/qa/               # 可复用检查、浏览器会话和清理工具
+tests/                    # 单元、HTTP与完整浏览器流程
+docs/                     # 架构、需求、任务、审查与使用说明
+artifacts/
+  apk/                    # 当前安装包与回退包，旧包归archive
+  design/                 # 效果图和交互预览
+  qa/                     # 必要验收证据；新回归按runs分目录
+  temp/                   # 测试浏览器和下载临时文件，结束清理
+.tools/                   # 本机Android SDK/Java/Gradle与缓存
+dist/                     # 自动构建的网页资源，供预览与APK共用
+~~~
 
-`backend/` 提供打包后的 `dist/` 供电脑和局域网浏览器访问。APK 把同一份资源装入手机，独立运行。网页端在 `localStorage`、Android 端在应用私有文件分别记录内置选择与阵容档案。`data/` 定义内置战术和推荐职责规则，详见 [架构说明](docs/architecture.md)。
+模块接口与兼容入口见[架构说明](docs/architecture.md)。组件样式跟随组件，全局样式由 frontend/styles/app.css 汇总。data/templates.js维护稳定战术顺序，shared/templates.js生成独立可播放数据。
 
-## 验证
+## 检查与打包
 
-```sh
-npm test                    # 构建、引擎 / 存储 / 平台与 HTTP 测试
-npm run test:unit           # 仅单元测试，无需启动服务
-npm run build               # 生成 dist 离线资源
-npm run test:browser        # 构建后，自动启动临时服务验证浏览器
-npm run android:sync        # 构建并同步到 Android
-npm run android:build       # 生成测试 APK
-```
+~~~sh
+npm test                  # 构建、单元及HTTP检查
+npm run test:browser      # 已构建资源的完整浏览器回归
+npm run check:docs        # 文档本地链接检查
+npm run clean:artifacts   # 仅预览下载残留清理清单
+npm run android:build     # 构建并打包Android离线APK
+~~~
 
-浏览器测试使用本机 Chrome，可通过 `CHROME_PATH` 指定可执行文件。截图和导出文件写入 `artifacts/qa/`。
+清理脚本默认只列候选，显式传 -Apply 才删除限定的旧下载残留。保留.tools、已确认设计/原图和被引用验收资料；源码基线由本地Git管理。临时产物、依赖和工具不作为源码提交。
 
-当前测试 APK 位于 `artifacts/apk/halfcourt-debug.apk`。已通过的检查和设备验证限制见 [验证记录](docs/validation.md)。
-
-## 多 agent 开发
-
-项目约束见 [AGENTS.md](AGENTS.md)，完整入口见 [文档索引](docs/README.md)。后续功能按 [协作流程](docs/collaboration.md) 分工，并在 [任务看板](docs/tasks/README.md) 和 [审查记录](docs/reviews/README.md) 跟踪接口、验证与修复结果。
+当前整理与验证见[HC-043](docs/tasks/HC-043-project-organization.md)，版本历史见[CHANGELOG](CHANGELOG.md)。操作说明见[使用指南](docs/user-guide.md)，Android构建/设备证据见[离线版说明](docs/android.md)，完整资料见[文档入口](docs/README.md)。
 

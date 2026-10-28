@@ -1,20 +1,2 @@
-.lineup-sheet-content { position: relative; }
-.lineup-sheet-content[data-wizard-motion="running"] { overflow: hidden; }
-.lineup-wizard-page { min-width: 0; }
-.wizard-motion-snapshot {
-  position: absolute !important;
-  inset: 0 !important;
-  margin: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  z-index: 2;
-  overflow: hidden !important;
-  user-select: none !important;
-}
-.wizard-motion-snapshot,
-.wizard-motion-snapshot * { pointer-events: none !important; }
-.lineup-wizard-player-hero { touch-action: pan-y; }
-@media (prefers-reduced-motion: reduce) {
-  .wizard-motion-snapshot { display: none !important; }
-  .lineup-wizard-page { transition: none !important; transform: none !important; opacity: 1 !important; }
-}
+/* Compatibility stylesheet; keep existing import order. */
+@import './components/wizard-motion.css';

@@ -1,0 +1,16 @@
+:root {
+  color-scheme: light;
+  --navy: #dce7ed;
+  --navy-soft: #c5d6e0;
+  --paper: #f4f6f7;
+  --ink: #263f50;
+  --muted: #587082;
+  --line: #c2d1dc;
+  --orange: #3c7d9b;
+  --orange-soft: #d9eaf3;
+  --blue: #4c91c5;
+  --surface: #e5edf3;
+  --court: #e8c997;
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  font-synthesis: none;
+}

@@ -65,7 +65,7 @@ reviewer 亲看 hc027-library-page-2.png：正式 3v3 目录显示 9 套，第�
 
 ## APK 与实际设备
 
-主控执行 npm android:build，Android BUILD SUCCESSFUL（21s），v2 签名有效，证书 SHA256：`e13d5e107d797d5233b8bf18f24f498d3edccaf8db6e15fcde791af5d2465e26`。artifacts/apk/halfcourt-1.16.0.apk SHA256：`8aa05ea16b5113d3bd90eac866d334b7cdc95daa6f2926e7d00f9b01352bedfb`。主控逐项核对 28 个 APK 网页资源与 dist 哈希一致；reviewer 只读核对 hc027-apk-assets.json 的 webAssets=28、serverUrlAbsent=true 及同一 APK 哈希，未自行解包 / 签名或构建。
+主控执行 npm android:build，Android BUILD SUCCESSFUL（21s），v2 签名有效，证书 SHA256：`e13d5e107d797d5233b8bf18f24f498d3edccaf8db6e15fcde791af5d2465e26`。artifacts/apk/archive/halfcourt-1.16.0.apk SHA256：`8aa05ea16b5113d3bd90eac866d334b7cdc95daa6f2926e7d00f9b01352bedfb`。主控逐项核对 28 个 APK 网页资源与 dist 哈希一致；reviewer 只读核对 hc027-apk-assets.json 的 webAssets=28、serverUrlAbsent=true 及同一 APK 哈希，未自行解包 / 签名或构建。
 
 主控重新识别 ef473680 后覆盖安装成功，1.16.0/code18 COLD 启动 628ms。reviewer 已读 hc027-device-before.json / hc027-device-after.json：实际均为 0 档案，归档 SHA256 均为 `dd42b596eba63db184dd3e4e60ff2c52b48a712743f538d6e668d2eab397e253`，after 版本 / 前台校验通过；未卸载或清除数据。
 

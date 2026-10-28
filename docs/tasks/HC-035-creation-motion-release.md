@@ -41,7 +41,7 @@ R2已修：仅在宽≤599px/高≤500px采用未focus也紧凑的壳/内容，�
 
 ## APK、安装与原生程序
 
-1.20.0/code22 [APK](../../artifacts/apk/halfcourt-1.20.0.apk)46秒构建成功，[28网页资源逐hash](../../artifacts/qa/hc035-apk-assets.json)等于dist且无server.url；v2证书SHA256 e13d5e107d797d5233b8bf18f24f498d3edccaf8db6e15fcde791af5d2465e26与原包同。APK SHA256 4e2c3243fb702a4bd1d3bfd7769370f35decefd4c278a95c76d525a063cea5c7。
+1.20.0/code22 [APK](../../artifacts/apk/archive/halfcourt-1.20.0.apk)46秒构建成功，[28网页资源逐hash](../../artifacts/qa/hc035-apk-assets.json)等于dist且无server.url；v2证书SHA256 e13d5e107d797d5233b8bf18f24f498d3edccaf8db6e15fcde791af5d2465e26与原包同。APK SHA256 4e2c3243fb702a4bd1d3bfd7769370f35decefd4c278a95c76d525a063cea5c7。
 
 ef473680/M2101K9C install-r Success、COLD798ms，版本22/1.20.0前台确认。安装前即时备份原文，[before](../../artifacts/qa/hc035-device-before.json)/[after](../../artifacts/qa/hc035-device-after.json)实际0档案SHA256 dd42b596eba63db184dd3e4e60ff2c52b48a712743f538d6e668d2eab397e253、selection397c6cb369a367c0cf5b7d4a2a047c2748becc85e1af744731323b2b75ebd9eb双hash均同；未卸载或清数据。
 

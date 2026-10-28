@@ -26,27 +26,29 @@ APK 内包含前端页面、动画引擎、阵容推荐规则和内置 3v3 / 4v4
 
 1.15.0/code17已正常覆盖安装同一新机，球队第二任务采用批准的浅弧队徽转盘、左右滑动/吸附、30队快速入口与球衣联动。150单元+3HTTP、修后完整Chrome/四尺寸、独立审查、28资源/v2签名通过；COLD启动595ms、版本/前台及实际0档案前后文件hash一致确认。实际WebView96程序检查初始中性/空选拒绝、BOS→LAL/返回、列表模拟Escape焦点和任务往返通过；未最终保存测试阵容，结束放弃草稿，转发已清理。物理滑动/FPS/系统Back等待验，见[HC-025](tasks/HC-025-team-carousel-release.md)。
 
-1.16.0/code18已覆盖更新同一新机：26套战术、新六套进攻与推荐、每人数进攻6＋3分页。181检查/完整Chrome/独立审查/28资源逐hash与v2签名通过，COLD启动628ms。实际0档案安装前后hash一致；WebView96程序浏览六卡、分页/防守过滤及点击范围通过，阵容和内置进度字节均保持。未点原生CTA/最终保存，物理操作待验，见[HC-027](tasks/HC-027-new-tactics-release.md)。[该版APK](../artifacts/apk/halfcourt-1.16.0.apk)也可发送到Android平板直接安装。
+1.16.0/code18已覆盖更新同一新机：26套战术、新六套进攻与推荐、每人数进攻6＋3分页。181检查/完整Chrome/独立审查/28资源逐hash与v2签名通过，COLD启动628ms。实际0档案安装前后hash一致；WebView96程序浏览六卡、分页/防守过滤及点击范围通过，阵容和内置进度字节均保持。未点原生CTA/最终保存，物理操作待验，见[HC-027](tasks/HC-027-new-tactics-release.md)。[该版APK](../artifacts/apk/archive/halfcourt-1.16.0.apk)也可发送到Android平板直接安装。
 
-1.17.0/code19已覆盖更新同一新机：战术库一页九张、短屏覆盖返回和横屏分区，实际动画/推荐与阵容保持。182检查/完整Chrome及代码图检通过，28资源/v2签名通过，COLD725ms；安装前即时刷新真实0档案及播放进度，前后双hash一致。真WebView96/393×819程序浏览18张进攻与防守筛选通过，无pager/溢出且全部命中；未点原生CTA/最终保存，物理操作待验，见[HC-029](tasks/HC-029-single-page-library-release.md)。[该版APK](../artifacts/apk/halfcourt-1.17.0.apk)可直接发送到Android平板安装。
+1.17.0/code19已覆盖更新同一新机：战术库一页九张、短屏覆盖返回和横屏分区，实际动画/推荐与阵容保持。182检查/完整Chrome及代码图检通过，28资源/v2签名通过，COLD725ms；安装前即时刷新真实0档案及播放进度，前后双hash一致。真WebView96/393×819程序浏览18张进攻与防守筛选通过，无pager/溢出且全部命中；未点原生CTA/最终保存，物理操作待验，见[HC-029](tasks/HC-029-single-page-library-release.md)。[该版APK](../artifacts/apk/archive/halfcourt-1.17.0.apk)可直接发送到Android平板安装。
 
-1.18.0/code20已覆盖更新同一新机：卡内真实循环/1秒末停/点击暂停继续及进入训练场。195检查、完整Chrome与代码审查通过，28资源逐hash/v2签名通过，COLD851ms。安装前后真实0档案及进度双hash同，真WebView96全部26卡、自然循环/暂停剩余、实际HOME后台暂停与手动继续程序检查通过，原主Play保持；未最终保存测试档案或点原生EnterTraining，完整物理验收待做，见[HC-031](tasks/HC-031-inline-motion-release.md)。[当前APK](../artifacts/apk/halfcourt-1.18.0.apk)可发送到Android平板安装。
+1.18.0/code20已覆盖更新同一新机：卡内真实循环/1秒末停/点击暂停继续及进入训练场。195检查、完整Chrome与代码审查通过，28资源逐hash/v2签名通过，COLD851ms。安装前后真实0档案及进度双hash同，真WebView96全部26卡、自然循环/暂停剩余、实际HOME后台暂停与手动继续程序检查通过，原主Play保持；未最终保存测试档案或点原生EnterTraining，完整物理验收待做，见[HC-031](tasks/HC-031-inline-motion-release.md)。[当前APK](../artifacts/apk/archive/halfcourt-1.18.0.apk)可发送到Android平板安装。
 
 ## 构建
 
+1.23.0/code28仅整理目录、拆分模块与QA工具，26套战术及推荐输出保持。225检查、完整Chrome13组、48对布局事实与独立审查通过；21秒构建、30网页同dist/15图标同前包、无server.url及v2原证书通过。指定手机install-r Success/COLD952ms，实际0档案及进度双hash保持；本轮横屏WebView96四页同框、未保存建队三步/放弃及1332样本自然循环通过。物理体验未作新验，见[HC-043](tasks/HC-043-project-organization.md)。
+
 1.22.3/code27修正低位分切蓝方对位、绕挡追防和低位限补回收，进攻路线/七帧/球权/旧进度及其他25套保持。215检查、独立动作审查、自然库/训练回放、四尺寸和七旧步骤恢复通过；25秒构建，30网页同dist/15原图标/Native保持/v2原证书通过。指定手机正常覆盖安装，COLD682ms，实际0档案及进度前后双hash同；真实WebView96整轮1345样本、暂停/同源位置/数据保持通过，未点手机训练CTA或写测试队。人工观感待验，见[HC-042](tasks/HC-042-post-split-defense.md)及[1.22.3 APK](../artifacts/apk/hoopal-1.22.3.apk)。
 
-1.22.2/code26将批准节奏更新为品牌静止1000ms、展开1100ms、交接300ms，标题1165–1825ms淡出；原生启动衔接/桌面头像/布局与旧键保持。213检查、27组合七控制与相关页面阵容回归、28秒构建、30网页同dist/15图标同旧包/Native三源码同基线、v2原签名通过。2026-10-28指定新机install-r Success，实际0档案与进度双hash保持；用户解锁后明确COLD483ms，WebView96自然2415.3ms/一秒静止/skip/四页同框严格复验通过。首轮桥接异常记录保留且未再现，人工节奏观感待确认，见[HC-041](tasks/HC-041-startup-timing-release.md)。[球搭1.22.2 APK](../artifacts/apk/hoopal-1.22.2.apk)可直接发Android平板安装。
+1.22.2/code26将批准节奏更新为品牌静止1000ms、展开1100ms、交接300ms，标题1165–1825ms淡出；原生启动衔接/桌面头像/布局与旧键保持。213检查、27组合七控制与相关页面阵容回归、28秒构建、30网页同dist/15图标同旧包/Native三源码同基线、v2原签名通过。2026-10-28指定新机install-r Success，实际0档案与进度双hash保持；用户解锁后明确COLD483ms，WebView96自然2415.3ms/一秒静止/skip/四页同框严格复验通过。首轮桥接异常记录保留且未再现，人工节奏观感待确认，见[HC-041](tasks/HC-041-startup-timing-release.md)。[球搭1.22.2 APK](../artifacts/apk/archive/hoopal-1.22.2.apk)可直接发Android平板安装。
 
-1.22.1/code25仅调整原生系统开屏衔接，启动专用透明vector/同色窗口、兼容SplashScreen退出直接remove，不改桌面头像或网页1400ms。213检查和23秒构建通过，30网页及15编译图标逐hash同1.22.0 APK，v2原签名/球搭label/no server.url通过。指定手机正常覆盖安装、COLD741ms，安装前无未保存配置，实际0档案与进度双hash同；用户确认重复开场消失。after视频未取得，视觉验收采用用户真机反馈，未伪称新skip/恢复程序检查。见[HC-039](tasks/HC-039-single-startup.md)及[球搭1.22.1 APK](../artifacts/apk/hoopal-1.22.1.apk)。
+1.22.1/code25仅调整原生系统开屏衔接，启动专用透明vector/同色窗口、兼容SplashScreen退出直接remove，不改桌面头像或网页1400ms。213检查和23秒构建通过，30网页及15编译图标逐hash同1.22.0 APK，v2原签名/球搭label/no server.url通过。指定手机正常覆盖安装、COLD741ms，安装前无未保存配置，实际0档案与进度双hash同；用户确认重复开场消失。after视频未取得，视觉验收采用用户真机反馈，未伪称新skip/恢复程序检查。见[HC-039](tasks/HC-039-single-startup.md)及[球搭1.22.1 APK](../artifacts/apk/archive/hoopal-1.22.1.apk)。
 
-1.22.0/code24已覆盖安装当前手机，采用球搭/HOOPAL与原头像，真实柜位圆角展开约1400ms，可跳过，后台返回不重播。213检查/完整Chrome/27布局7控制及独立审查通过；短屏重叠、柜位2px和next遮挡已修。27秒构建、30离线资源逐hash/编译label球搭/原v2证书通过，COLD700ms，安装前即时备份的实际0档案及进度双hash保持。实际WebView96自然63条记录、加载中skip有效意图/无展开帧及四页同框程序检查通过，errors空；未造测试队伍。物理手势/Back/旋转等另待验，见[HC-038](tasks/HC-038-hoopal-startup-release.md)。[球搭1.22.0 APK](../artifacts/apk/hoopal-1.22.0.apk)可发Android平板覆盖安装，无需卸载。
+1.22.0/code24已覆盖安装当前手机，采用球搭/HOOPAL与原头像，真实柜位圆角展开约1400ms，可跳过，后台返回不重播。213检查/完整Chrome/27布局7控制及独立审查通过；短屏重叠、柜位2px和next遮挡已修。27秒构建、30离线资源逐hash/编译label球搭/原v2证书通过，COLD700ms，安装前即时备份的实际0档案及进度双hash保持。实际WebView96自然63条记录、加载中skip有效意图/无展开帧及四页同框程序检查通过，errors空；未造测试队伍。物理手势/Back/旋转等另待验，见[HC-038](tasks/HC-038-hoopal-startup-release.md)。[球搭1.22.0 APK](../artifacts/apk/archive/hoopal-1.22.0.apk)可发Android平板覆盖安装，无需卸载。
 
-1.21.0/code23已正常覆盖更新当前手机：更衣室玻璃主卡与另三页统一尺寸和边距，保持单柜比例及顶部品牌。205检查、96边界与相关浏览器回归通过；43秒构建、28资源逐hash/v2原证书通过，COLD746ms，安装前后实际0档案与当前进度双hash同。真实WebView96四页主框x18/y116/w357.09/h620.27px、控件可达/无溢出/原数据保持通过；未保存测试球队。物理操作与原生CRUD待验，详见[HC-036](tasks/HC-036-locker-card-frame.md)。[当前APK](../artifacts/apk/halfcourt-1.21.0.apk)可发送到Android平板正常覆盖安装。
+1.21.0/code23已正常覆盖更新当前手机：更衣室玻璃主卡与另三页统一尺寸和边距，保持单柜比例及顶部品牌。205检查、96边界与相关浏览器回归通过；43秒构建、28资源逐hash/v2原证书通过，COLD746ms，安装前后实际0档案与当前进度双hash同。真实WebView96四页主框x18/y116/w357.09/h620.27px、控件可达/无溢出/原数据保持通过；未保存测试球队。物理操作与原生CRUD待验，详见[HC-036](tasks/HC-036-locker-card-frame.md)。[当前APK](../artifacts/apk/archive/halfcourt-1.21.0.apk)可发送到Android平板正常覆盖安装。
 
-1.20.0/code22已覆盖更新当前手机：批准的建队三步、大球衣/下标签、320ms步骤/280ms成员横移与真实输入同步，450ms壳及四页柔光保持。205检查、最终完整Chrome与代码终审通过；横屏成员8px裁切和极短窗口未focus输入两项P2均修复并真实复验。APK46秒构建、28资源逐hash/v2原证书通过，COLD798ms；安装前后实际0档案及进度双hash同。真实WebView96未保存4v4草稿的三步/选BOS/成员/名号同步/3↔4/明确放弃七布局通过，未保存测试球队。物理手指/IME/系统Back/旋转及真实CRUD仍待验，见[HC-035](tasks/HC-035-creation-motion-release.md)。[新版APK](../artifacts/apk/halfcourt-1.20.0.apk)可发Android平板正常覆盖安装。
+1.20.0/code22已覆盖更新当前手机：批准的建队三步、大球衣/下标签、320ms步骤/280ms成员横移与真实输入同步，450ms壳及四页柔光保持。205检查、最终完整Chrome与代码终审通过；横屏成员8px裁切和极短窗口未focus输入两项P2均修复并真实复验。APK46秒构建、28资源逐hash/v2原证书通过，COLD798ms；安装前后实际0档案及进度双hash同。真实WebView96未保存4v4草稿的三步/选BOS/成员/名号同步/3↔4/明确放弃七布局通过，未保存测试球队。物理手指/IME/系统Back/旋转及真实CRUD仍待验，见[HC-035](tasks/HC-035-creation-motion-release.md)。[新版APK](../artifacts/apk/archive/halfcourt-1.20.0.apk)可发Android平板正常覆盖安装。
 
-1.19.0/code21已覆盖安装同一手机：独立「档案」底栏和球队创建/管理、更衣室只显示当前队，保留原26套动画和推荐。195检查、完整Chrome、档案专项/50布局与独立代码审查通过；APK21秒编译，28网页资源逐hash一致、无server.url、原v2证书。COLD820ms，安装前后实际0档案和战术进度双hash同；真实WebView96四页及未编辑创建面板开/放弃关通过。未保存测试档案，物理手势/系统Back/输入法/旋转及原生CRUD待验，详见[HC-033](tasks/HC-033-archive-tab-release.md)。[新版APK](../artifacts/apk/halfcourt-1.19.0.apk)可直接发送到Android平板覆盖安装。
+1.19.0/code21已覆盖安装同一手机：独立「档案」底栏和球队创建/管理、更衣室只显示当前队，保留原26套动画和推荐。195检查、完整Chrome、档案专项/50布局与独立代码审查通过；APK21秒编译，28网页资源逐hash一致、无server.url、原v2证书。COLD820ms，安装前后实际0档案和战术进度双hash同；真实WebView96四页及未编辑创建面板开/放弃关通过。未保存测试档案，物理手势/系统Back/输入法/旋转及原生CRUD待验，详见[HC-033](tasks/HC-033-archive-tab-release.md)。[新版APK](../artifacts/apk/archive/halfcourt-1.19.0.apk)可直接发送到Android平板覆盖安装。
 
 首次准备：
 
@@ -61,9 +63,9 @@ APK 编译需要 Node.js 22.12+、JDK 21、Android SDK Platform 36 及构建工�
 npm run android:build
 ```
 
-脚本会构建网页、同步 Android 资源、运行 `assembleDebug`，再把测试安装包复制到 `artifacts/apk/halfcourt-debug.apk`。原始产物在 `android/app/build/outputs/apk/debug/app-debug.apk`。
+脚本会构建网页、同步 Android 资源、运行 `assembleDebug`，再生成 `artifacts/apk/halfcourt-debug.apk`、`hoopal-版本号.apk`及各自的SHA256文件。原始产物在 `android/app/build/outputs/apk/debug/app-debug.apk`。顶层保当前版与一个回退版，更旧包放在`artifacts/apk/archive/`，同步历史文档链接。
 
-本轮构建版本为 `1.22.3`（versionCode 27），修正低位分切的防守动作，保留七帧/旧进度与其余25套。批准的1000ms品牌静止、1100ms展开、300ms交接和原生启动方案保持。统一玻璃主卡、建队三步、四项底栏/600ms柔光、30队NBA、卡内循环和本地推荐均沿用。安装验收见[HC-042](tasks/HC-042-post-split-defense.md)，[1.22.3安装包](../artifacts/apk/hoopal-1.22.3.apk)可直接发Android平板，升级保留档案与进度，不需卸载或电脑服务。
+当前构建版本为 `1.23.0`（versionCode 28），目录和模块整理不改变现有功能、存储键或数据格式。安装证据见[HC-043](tasks/HC-043-project-organization.md)，[1.23.0安装包](../artifacts/apk/hoopal-1.23.0.apk)可直接发Android平板，升级保留档案与进度，不需卸载或电脑服务。[1.22.3](../artifacts/apk/hoopal-1.22.3.apk)保作源码/资源核对与回退参考，Android降级安装受版本限制。
 
 当前开发机的便携工具放在被忽略的 `.tools/` 中，构建脚本可以自动使用其中的 JDK、SDK 和 Gradle。这些大体积工具不属于项目源码；其他电脑按上面的标准环境变量配置即可。首次构建需要联网下载依赖，安装后的战术应用可离线使用。
 

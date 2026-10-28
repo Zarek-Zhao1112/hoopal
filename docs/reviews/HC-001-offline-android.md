@@ -2,6 +2,8 @@
 
 日期：2026-10-22。本文依据已发生的 agent 审查与修复补录。
 
+对应旧个人Play仓库及专属测试已在[HC-043](../tasks/HC-043-project-organization.md)退役；原审查事实保持，原实现可从Git基线读取。当前存储协议见[架构说明](../architecture.md)。
+
 - 关联任务：[HC-001](../tasks/HC-001-offline-android.md)。
 - 关联设计：[离线 Android](../design/offline-android.md)。
 - 实现：`engine`、`ui` 与主 agent；独立审查：`interaction_design`，只读检查并反馈，未直接修改实现。
@@ -11,7 +13,7 @@
 
 | 编号 | 级别 / 状态 | 问题与影响 | 修复及复验 |
 | --- | --- | --- | --- |
-| R-001 | P1 / verified | [repository](../../frontend/src/storage/repository.js) 首次读取异常后返回空值，随后自动保存可在读取恢复时覆盖有效旧草稿或库 | 按键记录读取失败锁，重新读取成功前拒绝写入；存储 agent 修复，新增草稿 / 库的恢复回归，独立复审确认 |
+| R-001 | P1 / verified | [repository](../tasks/HC-043-project-organization.md) 首次读取异常后返回空值，随后自动保存可在读取恢复时覆盖有效旧草稿或库 | 按键记录读取失败锁，重新读取成功前拒绝写入；存储 agent 修复，新增草稿 / 库的恢复回归，独立复审确认 |
 | R-002 | P2 / verified | [app](../../frontend/src/app.js) 异步切换等待保存期间仍能输入，替换界面后新输入可能丢失 | 主 agent 在切换期间对标题和工作区设置 inert、禁用输入与键盘入口，finally 恢复；独立代码复审确认 |
 | R-003 | P2 / verified | PNG 先截取球场，异步生成后才读取实时标题 / 步骤，期间切换会产生内容错配 | 主 agent 在导出开始时捕获标题、步骤和文件名；独立代码复审确认，PNG 浏览器导出检查通过 |
 | R-004 | P2 / verified | [safeFilename](../../frontend/src/platform/core.js) 按字符计数无法防止长中文合法标题超过 Android 文件名字节限制 | 平台 agent 改为 UTF-8 最多 200 字节，按码点截短并保留扩展名，新增长中文与 emoji 测试 |

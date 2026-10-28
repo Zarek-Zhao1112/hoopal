@@ -24,7 +24,7 @@ engine只读核查网页是否双实例/重复调用，反馈结论不改实现�
 
 MainActivity使用现有core-splashscreen，在super前install、super后退出回调直接remove；启动专用透明vector/透明icon背景/动画duration0，NoActionBar窗口底色与原app_window_background一致。没有windowDisablePreview、全局动画设置或桌面icon改动。engine只读核网页为单例/幂等ready/完成不可重播，普通导航和恢复没有第二个网页入口。
 
-213检查（210单元/3HTTP）与23秒Android构建通过。新[APK](../../artifacts/apk/hoopal-1.22.1.apk)为1.22.1/code25，SHA256 1fa6dee15b42a5059f3b7df2af8ffc098d9a694e18bb4fd7d1a99308a6494615；[资源](../../artifacts/qa/hc039-apk-assets.json)核30网页逐hash同dist及1.22.0 APK、15编译mipmap PNG同旧包、无server.url/同包名/球搭显示名；[签名](../../artifacts/qa/hc039-apk-signature.txt)v2原证书通过，[透明vector编译](../../artifacts/qa/hc039-compiled-empty.txt)核对。前端源/资源未变，本轮未重复26套长时浏览器回放，明确沿用HC-038完整Chrome与启动专项。
+213检查（210单元/3HTTP）与23秒Android构建通过。新[APK](../../artifacts/apk/archive/hoopal-1.22.1.apk)为1.22.1/code25，SHA256 1fa6dee15b42a5059f3b7df2af8ffc098d9a694e18bb4fd7d1a99308a6494615；[资源](../../artifacts/qa/hc039-apk-assets.json)核30网页逐hash同dist及1.22.0 APK、15编译mipmap PNG同旧包、无server.url/同包名/球搭显示名；[签名](../../artifacts/qa/hc039-apk-signature.txt)v2原证书通过，[透明vector编译](../../artifacts/qa/hc039-compiled-empty.txt)核对。前端源/资源未变，本轮未重复26套长时浏览器回放，明确沿用HC-038完整Chrome与启动专项。
 
 旧1.22.0真实[COLD录像元数据](../../artifacts/qa/hc039-cold-before.json)记录818ms；[干净阶段联系表](../../artifacts/qa/hc039-before-sequence.png)仅展示本应用系统窗口进入→HOOPAL展开，所选11帧未见独立的原生中心头像，不能声称视频证实两次头像。配置中launcher头像原生开屏与网页品牌并存是源码证据；系统入口动作与网页展开相继发生是录像证据，两者不可混同。
 

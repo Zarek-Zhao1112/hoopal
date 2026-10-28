@@ -37,7 +37,7 @@ pending/externalbusy锁标题、收回、球场和CTA并先暂停；载入或来
 
 [卡内报告](../../artifacts/qa/hc031-inline-playback.json)已验证自然完整1倍循环、1000ms末停及暂停剩余、真实SVG/球位置对实际引擎、离库/换卡/resize/后台手动继续与主Play/两键原文不变；最终完整Chrome57379已退出0，预览历史不代替正式证据。
 
-在首轮Chrome退出后预构建APK23秒成功，与195检查相同最终源。版本1.18.0/code20，[安装包](../../artifacts/apk/halfcourt-1.18.0.apk) SHA256 `4e1e5e20b1ec061420b39ffba789f6186b3879ee59199eb2eb0189e527a9d3f8`；[28网页资源检查](../../artifacts/qa/hc031-apk-assets.json)逐hash=dist、无server.url，v2签名通过、证书保持e13d5e107d797d5233b8bf18f24f498d3edccaf8db6e15fcde791af5d2465e26。完整回归/独立代码审查通过后覆盖安装；构建、安装和物理验收分开记录。
+在首轮Chrome退出后预构建APK23秒成功，与195检查相同最终源。版本1.18.0/code20，[安装包](../../artifacts/apk/archive/halfcourt-1.18.0.apk) SHA256 `4e1e5e20b1ec061420b39ffba789f6186b3879ee59199eb2eb0189e527a9d3f8`；[28网页资源检查](../../artifacts/qa/hc031-apk-assets.json)逐hash=dist、无server.url，v2签名通过、证书保持e13d5e107d797d5233b8bf18f24f498d3edccaf8db6e15fcde791af5d2465e26。完整回归/独立代码审查通过后覆盖安装；构建、安装和物理验收分开记录。
 
 ## 完整浏览器与独立审查
 

@@ -4,10 +4,11 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 // Serve exactly the bundle copied into the APK. No Node process is needed on Android.
-const root = path.resolve(fileURLToPath(new URL('../dist/', import.meta.url)));
+const defaultRoot = path.resolve(fileURLToPath(new URL('../dist/', import.meta.url)));
 const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png' };
 
-export function createAppServer() {
+export function createAppServer({ rootDirectory = defaultRoot } = {}) {
+  const root = path.resolve(rootDirectory);
   return http.createServer(async (req, res) => {
     if (req.method !== 'GET' && req.method !== 'HEAD') {
       res.writeHead(405, { Allow: 'GET, HEAD' }).end('Method not allowed');

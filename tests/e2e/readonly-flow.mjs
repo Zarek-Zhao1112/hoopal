@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
-import { mkdir, readdir, readFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import {templates} from '../../shared/templates.js';
 
-export async function runReadOnlyFlow({send,evaluate,wait,waitFor,folder}) {
+export async function runReadOnlyFlow({send,evaluate,wait,waitFor,folder,downloadFolder}) {
   const nav=async view=>evaluate(`document.querySelector('[data-view-target=${view}]').click()`);
   assert.equal(await evaluate('document.body.dataset.view'),'lineups');
   assert.ok(await evaluate("!document.querySelector('[data-view-target=edit],[data-tool],#frame-note,#add-frame,#delete-frame,#undo,#redo,#reset,#edit-note-dialog,#saved-list,#save-play,#new-play,#import-file')"));
@@ -69,7 +69,7 @@ export async function runReadOnlyFlow({send,evaluate,wait,waitFor,folder}) {
   await evaluate("document.querySelector('#restart-play').click()");await waitFor("Number(document.querySelector('#timeline-scrub').value)>1");
   await evaluate("document.querySelector('#play-toggle').click()");
   await send('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});
-  const downloads=path.join(folder,`downloads-readonly-${Date.now()}`);await mkdir(downloads,{recursive:true});
+  const downloads=downloadFolder||path.join(folder,`downloads-readonly-${Date.now()}`);await mkdir(downloads,{recursive:true});
   await send('Browser.setDownloadBehavior',{behavior:'allow',downloadPath:downloads});
   await evaluate("document.querySelector('#open-menu').click();document.querySelector('#export-json').click()");
   let files=[];for(let i=0;i<30;i++){files=await readdir(downloads);if(files.some(f=>f.endsWith('.json')))break;await wait(100)}
@@ -80,5 +80,7 @@ export async function runReadOnlyFlow({send,evaluate,wait,waitFor,folder}) {
   const png=await readFile(path.join(downloads,files.find(f=>f.endsWith('.png'))));
   assert.equal(png.subarray(0,8).toString('hex'),'89504e470d0a1a0a');
   assert.equal(png.readUInt32BE(16),1600);assert.equal(png.readUInt32BE(20),1432);
+  await writeFile(path.join(folder,'export-sample.json'),JSON.stringify(play,null,2));
+  await writeFile(path.join(folder,'export-sample.png'),png);
   await nav('lineups');
 }

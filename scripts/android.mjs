@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process';
-import { access, readdir, mkdir, copyFile } from 'node:fs/promises';
+import { access, readdir, mkdir, copyFile, readFile, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { build } from 'vite';
@@ -46,5 +47,13 @@ if (command === 'build') {
   else await run(resolve('android/gradlew'), args, resolve('android'));
   await mkdir(resolve('artifacts/apk'), { recursive: true });
   await copyFile(resolve('android/app/build/outputs/apk/debug/app-debug.apk'), resolve('artifacts/apk/halfcourt-debug.apk'));
+  const { version } = JSON.parse(await readFile(resolve('package.json'), 'utf8'));
+  if (!/^\d+\.\d+\.\d+(?:[-+][a-zA-Z0-9.-]+)?$/.test(version)) throw new Error('安装包版本号无效');
+  const versionedName = `hoopal-${version}.apk`;
+  await copyFile(resolve('artifacts/apk/halfcourt-debug.apk'), resolve('artifacts/apk', versionedName));
+  const sha256 = createHash('sha256').update(await readFile(resolve('artifacts/apk', versionedName))).digest('hex');
+  await writeFile(resolve('artifacts/apk', `${versionedName}.sha256`), `${sha256}  ${versionedName}\n`);
+  await writeFile(resolve('artifacts/apk/halfcourt-debug.apk.sha256'), `${sha256}  halfcourt-debug.apk\n`);
   console.log(`APK 已生成：${resolve('artifacts/apk/halfcourt-debug.apk')}`);
+  console.log(`版本安装包：${resolve('artifacts/apk', versionedName)}`);
 }

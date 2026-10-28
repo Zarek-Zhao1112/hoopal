@@ -1,15 +1,17 @@
-import { PlayStore, interpolateBoards, ballPosition } from '../../shared/engine.js';
+import { PlayStore, interpolateBoards } from '../../shared/engine.js';
 import { templates } from '../../shared/templates.js';
 import { createBuiltinRepository } from './storage/builtins.js';
 import { createStorageAdapter, cleanupLegacyExtras, exportFile, setupLifecycle, isNative } from './platform/index.js';
-import { isPlayerVisible, isBallVisible, isTransitionBallVisible } from './board/hit-test.js';
+import { isBallVisible, isTransitionBallVisible } from './board/hit-test.js';
 import { paginate, pageForIndex } from './workspace/state.js';
 import { createWorkspaceController } from './workspace/controller.js';
 import { createLineupRepository } from './storage/lineups.js';
 import { createLineupSession } from './storage/lineup-session.js';
 import { recommendLineup } from '../../shared/recommendations.js';
 import { createLineupUI } from './lineups/controller.js';
-import { COURT_COLORS, appendWoodSurface, appendPlayerPiece } from './board/appearance.js';
+import { COURT_COLORS } from './board/appearance.js';
+import { createTrainingCourt } from './board/court-renderer.js';
+import { createTrainingPlayer } from './training/player.js';
 import { createLibraryDeck } from './workspace/library-deck.js';
 import { createLibraryPreview } from './workspace/library-preview.js';
 import { startup } from './startup/runtime.js';
@@ -38,13 +40,18 @@ let activeTemplateId = initialTemplate.id;
 let activeKind = initialTemplate.kind || 'offense', catalogKind = activeKind, catalogMode = initial.mode;
 let saveVersion = 0, switching = false;
 const store = new PlayStore(initial);
-let playing = false;
-let position = store.play.frameIndex, lastTime = 0, raf = 0, toastTimer;
-let showDefense = true, renderedStep = -1, endHold = 0;
-let workspace, libraryDeck;
+let toastTimer;
+let showDefense = true, renderedStep = -1;
+let workspace, libraryDeck, courtRenderer;
 const pages = { steps: 0 };
 let listedFrame = -1;
 const svg = $('court');
+const training = createTrainingPlayer({
+  frameCount: store.play.frames.length, position: store.play.frameIndex,
+  requestFrame: callback => requestAnimationFrame(callback), cancelFrame: id => cancelAnimationFrame(id), now: () => performance.now(),
+  getSpeed: () => Number($('speed').value), getLoop: () => $('loop-play').checked,
+  onFrame: showPosition, onComplete: () => stop(),
+});
 const NS = 'http://www.w3.org/2000/svg';
 const focusTeam = () => activeKind === 'defense' ? 'defense' : 'attack';
 const catalogFor = (kind, mode = store.play.mode) => templates.filter(t => t.mode === mode && (t.kind || 'offense') === kind);
@@ -58,12 +65,6 @@ function placeModeControl(view) {
 }
 
 
-function el(tag, attrs = {}, text) {
-  const node = document.createElementNS(NS, tag);
-  for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);
-  if (text !== undefined) node.textContent = text;
-  return node;
-}
 function html(tag, className, text) {
   const node = document.createElement(tag);
   if (className) node.className = className;
@@ -132,7 +133,7 @@ async function handleLineupAction(kind, payload = {}) {
   if (lineupBusy || switching) return false;
   lineupBusy = true; lineupError = '';
   const finishOperation = beginOperation();
-  if (playing) stop();
+  if (training.playing) stop();
   renderLineups(); controls();
   let openPlay = false;
   try {
@@ -200,7 +201,7 @@ async function loadTemplate(templateId, { fromRecommendation = false } = {}) {
     activeKind = template.kind || 'offense';
     catalogKind = activeKind;
     catalogMode = template.mode;
-    position = store.play.frameIndex;
+    training.load({ frameCount: store.play.frames.length, position: store.play.frameIndex });
     pages.steps = pageForIndex(store.play.frameIndex, 6);
     renderAll();
     await persist();
@@ -222,84 +223,11 @@ async function loadTemplate(templateId, { fromRecommendation = false } = {}) {
     finishOperation();
   }
 }
-function courtBase() {
-  svg.replaceChildren();
-  svg.setAttribute('role', 'img');
-  svg.setAttribute('aria-label', '半场篮球战术动画');
-  const defs = el('defs');
-  for (const id of ['run', 'pass', 'dribble', 'screen', 'defense']) {
-    const color = id === 'defense' ? COURT_COLORS.defenseRoute : COURT_COLORS[id];
-    const marker = el('marker', { id: `arrow-${id}`, viewBox: '0 0 12 12', refX: 10, refY: 6, markerWidth: 10, markerHeight: 10, orient: 'auto-start-reverse', markerUnits: 'userSpaceOnUse' });
-    marker.append(el('path', { d: id === 'screen' ? 'M9 0 L9 12' : 'M2 1 L10 6 L2 11', fill: 'none', stroke: color, 'stroke-width': 2.6, 'stroke-linejoin': 'round' }));
-    defs.append(marker);
-  }
-  svg.append(defs);
-  appendWoodSurface(svg, el, 'court-wood', true);
-  svg.append(el('rect', { x: 350, y: 70, width: 300, height: 320, fill: COURT_COLORS.key, 'fill-opacity': .9 }));
-  const lines = el('g', { stroke: COURT_COLORS.marking, 'stroke-width': 3, fill: 'none' });
-  lines.append(
-    el('rect', { x: 70, y: 70, width: 860, height: 660 }),
-    el('rect', { x: 350, y: 70, width: 300, height: 320 }),
-    el('path', { d: 'M390 390 A110 110 0 0 0 610 390' }),
-    el('path', { d: 'M390 390 A110 110 0 0 1 610 390', 'stroke-dasharray': '9 10', opacity: 0.6 }),
-    el('path', { d: 'M110 70 L110 226 A399 399 0 0 0 890 226 L890 70' }),
-    el('path', { d: 'M395 730 A105 105 0 0 1 605 730' }),
-    el('path', { d: 'M425 140 A75 75 0 0 0 575 140' }),
-    el('path', { d: 'M350 210H330 M350 260H330 M650 210H670 M650 260H670', 'stroke-width': 3 })
-  );
-  const lineEdge = lines.cloneNode(true);
-  lineEdge.setAttribute('stroke', COURT_COLORS.lineEdge);
-  lineEdge.setAttribute('stroke-width', '5');
-  lineEdge.setAttribute('opacity', '.4');
-  svg.append(lineEdge, lines, el('path', { d: 'M447 108H553', stroke: COURT_COLORS.lineEdge, 'stroke-width': 9, 'stroke-linecap': 'round' }), el('path', { d: 'M447 108H553', stroke: COURT_COLORS.marking, 'stroke-width': 5, 'stroke-linecap': 'round' }), el('path', { d: 'M500 108V125', stroke: COURT_COLORS.lineEdge, 'stroke-width': 4 }), el('circle', { cx: 500, cy: 140, r: 16, stroke: COURT_COLORS.pass, 'stroke-width': 5, fill: 'none' }), el('text', { x: 500, y: 786, 'text-anchor': 'middle', fill: COURT_COLORS.muted, 'font-size': 17, 'letter-spacing': 7, 'font-family': 'system-ui' }, 'HOOPAL / PLAY WITH PURPOSE'));
-  svg.append(el('g', { id: 'routes-layer' }), el('g', { id: 'players-layer' }), el('g', { id: 'ball-layer' }));
-}
-function routeElement(route) {
-  const defending = activeKind === 'defense' && !route.playerId?.startsWith('attack-');
-  const color = defending ? COURT_COLORS.defenseRoute : COURT_COLORS[route.type];
-  const points = route.points;
-  let d = points.map((p, i) => `${i ? 'L' : 'M'}${p.x} ${p.y}`).join(' ');
-  if (route.type === 'dribble') {
-    const a = points[0], b = points.at(-1), dx = b.x - a.x, dy = b.y - a.y, length = Math.hypot(dx, dy);
-    const n = Math.max(2, Math.floor(length / 20));
-    d = `M${a.x} ${a.y}`;
-    for (let i = 1; i <= n; i++) {
-      const t = i / n, wave = i === n ? 0 : (i % 2 ? 5 : -5);
-      d += ` L${a.x + dx * t - dy / length * wave} ${a.y + dy * t + dx / length * wave}`;
-    }
-  }
-  const group = el('g', { 'data-route': route.id, 'data-actor': route.playerId || '', opacity: activeKind === 'defense' && !defending ? 0.35 : 1 });
-  group.append(el('path', { d, stroke: 'transparent', 'stroke-width': 24, fill: 'none', 'pointer-events': 'stroke' }));
-  group.append(el('path', { d, stroke: color, 'stroke-width': 4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', fill: 'none', 'stroke-dasharray': route.type === 'pass' ? '11 10' : '', 'marker-end': `url(#arrow-${defending && route.type !== 'screen' ? 'defense' : route.type})`, 'pointer-events': 'none' }));
-  return group;
-}
-function draw(board = store.board, ballVisible = isBallVisible(board, showDefense, focusTeam())) {
-  const routes = $('routes-layer'), players = $('players-layer'), balls = $('ball-layer');
-  const visibleRoutes = board.paths.filter(path => {
-    const actor = board.players.find(player => player.id === path.playerId);
-    if (actor && !isPlayerVisible(actor, showDefense, focusTeam())) return false;
-    return activeKind !== 'defense' || actor?.team !== 'attack';
-  });
-  routes.replaceChildren(...visibleRoutes.map(p => routeElement(p)));
-  players.replaceChildren();
-  for (const player of board.players) {
-    if (!isPlayerVisible(player, showDefense, focusTeam())) continue;
-    const attack = player.team === 'attack';
-    const cursor = 'default';
-    const group = el('g', { transform: `translate(${player.x} ${player.y})`, 'data-player': player.id, opacity: activeKind === 'defense' && attack ? 0.4 : 1, cursor });
-    const assignment = attack && playbackAssignment.find(a => a.role === player.number);
-    group.append(el('title', {}, assignment ? `职责 ${player.number}：${assignment.name} · 球衣 ${assignment.player.number} 号 · ${assignment.task}` : `${attack ? '进攻' : '防守'} ${player.number} 号`));
-    group.append(el('circle', { r: 36, fill: 'transparent' }));
-    appendPlayerPiece(group, el, 'court-wood', player.team);
-    group.append(el('text', { y: 7, 'text-anchor': 'middle', fill: COURT_COLORS.line, 'font-size': 21, 'font-family': 'system-ui', 'font-weight': 750, 'pointer-events': 'none', 'paint-order': 'stroke', stroke: attack ? '#B74F24' : '#2A6088', 'stroke-width': .5 }, player.number));
-    players.append(group);
-  }
-  const ball = ballPosition(board);
-  balls.replaceChildren();
-  if (!ballVisible) return;
-  const group = el('g', { transform: `translate(${ball.x} ${ball.y})`, 'data-ball': 'true', opacity: activeKind === 'defense' ? 0.6 : 1, cursor: 'default' });
-  group.append(el('title', {}, '篮球'), el('circle', { r: 12, fill: '#F9A861', stroke: COURT_COLORS.ink, 'stroke-width': 2 }), el('path', { d: 'M-12 0H12 M0 -12V12 M-8 -9Q5 0 -8 9 M8 -9Q-5 0 8 9', stroke: COURT_COLORS.ink, 'stroke-width': 1.2, fill: 'none', 'pointer-events': 'none' }));
-  balls.append(group);
+function draw(board = store.board, ballVisible) {
+  courtRenderer.draw(board, { kind: activeKind, showOpponent: showDefense, ballVisible, playerTitle(player) {
+    const assignment = player.team === 'attack' && playbackAssignment.find(a => a.role === player.number);
+    return assignment ? `职责 ${player.number}：${assignment.name} · 球衣 ${assignment.player.number} 号 · ${assignment.task}` : `${player.team === 'attack' ? '进攻' : '防守'} ${player.number} 号`;
+  } });
 }
 
 function renderPager(prefix, page) {
@@ -323,7 +251,7 @@ function renderSteps() {
     button.dataset.frameIndex = String(i);
     button.setAttribute('aria-current', i === store.play.frameIndex ? 'step' : 'false');
     button.append(html('span', 'frame-number', String(i + 1).padStart(2, '0')), html('span', 'frame-label', board.note.split(/[：。\n]/)[0].slice(0, 18) || `步骤 ${i + 1}`));
-    button.addEventListener('click', () => { stop(); store.changeFrame(i); position = i; renderAll(); persist(); });
+    button.addEventListener('click', () => { stop(); store.changeFrame(i); training.seek(i); renderAll(); persist(); });
     list.append(button);
   });
   renderPager('step', page);
@@ -353,23 +281,23 @@ function renderTemplates() {
 function controls() {
   const busy = switching || lineupBusy || Boolean(lineupUI?.isModalOpen);
   libraryDeck?.setBusy(busy);
-  $('play-toggle').textContent = playing ? 'Ⅱ 暂停' : '▶ 播放战术';
-  $('play-toggle').setAttribute('aria-label', playing ? '暂停战术' : '播放战术');
-  $('play-toggle').setAttribute('aria-pressed', String(playing));
-  $('frame-counter').textContent = `${Math.min(Math.floor(position) + 1, store.play.frames.length)} / ${store.play.frames.length}`;
-  $('timeline-scrub').value = store.play.frames.length > 1 ? position / (store.play.frames.length - 1) * 1000 : 0;
+  $('play-toggle').textContent = training.playing ? 'Ⅱ 暂停' : '▶ 播放战术';
+  $('play-toggle').setAttribute('aria-label', training.playing ? '暂停战术' : '播放战术');
+  $('play-toggle').setAttribute('aria-pressed', String(training.playing));
+  $('frame-counter').textContent = `${Math.min(Math.floor(training.position) + 1, store.play.frames.length)} / ${store.play.frames.length}`;
+  $('timeline-scrub').value = store.play.frames.length > 1 ? training.position / (store.play.frames.length - 1) * 1000 : 0;
   $('timeline-scrub').disabled = busy || store.play.frames.length < 2;
-  $('play-progress').textContent = store.play.frames.length > 1 ? `${Math.round(position / (store.play.frames.length - 1) * 100)}%` : '0%';
-  $('prev-frame').disabled = busy || position <= 0;
-  $('next-frame').disabled = busy || position >= store.play.frames.length - 1;
-  $('play-title').disabled = playing || busy;
-  $('status').textContent = playing ? '正在演练 · 可调整播放速度或拖动进度' : '按步骤观察跑位，点击讲解查看动作分工。';
+  $('play-progress').textContent = store.play.frames.length > 1 ? `${Math.round(training.position / (store.play.frames.length - 1) * 100)}%` : '0%';
+  $('prev-frame').disabled = busy || training.position <= 0;
+  $('next-frame').disabled = busy || training.position >= store.play.frames.length - 1;
+  $('play-title').disabled = training.playing || busy;
+  $('status').textContent = training.playing ? '正在演练 · 可调整播放速度或拖动进度' : '按步骤观察跑位，点击讲解查看动作分工。';
   const note = Array.from(store.board.note || '这一步暂无讲解。');
   $('live-step-note').textContent = `${String(store.play.frameIndex + 1).padStart(2, '0')} / ${note.slice(0, 72).join('')}${note.length > 72 ? '…' : ''}`;
-  svg.classList.toggle('is-playing', playing);
+  svg.classList.toggle('is-playing', training.playing);
   for (const node of document.querySelectorAll('[data-view-target],#open-menu,#open-note,#play-toggle,#restart-play,#frame-list button')) node.disabled = busy || Boolean(lineupUI?.isModalOpen);
-  $('mode').disabled = playing || busy;
-  $('template-picker').disabled = playing || busy;
+  $('mode').disabled = training.playing || busy;
+  $('template-picker').disabled = training.playing || busy;
   for (const button of document.querySelectorAll('[data-kind-target]')) button.disabled = busy;
 }
 function renderAll() {
@@ -378,71 +306,40 @@ function renderAll() {
   renderSteps(); renderTemplates(); renderLegend(); draw(); controls();
 }
 function showPosition() {
-  const index = Math.min(Math.floor(position), store.play.frames.length - 1);
-  const fraction = position - index;
-  const progress = playing ? Math.max(0, (fraction - 0.18) / 0.82) : fraction;
-  const eased = playing ? progress * progress * (3 - 2 * progress) : progress;
-  const board = fraction > 0 ? interpolateBoards(store.play.frames[index], store.play.frames[index + 1], eased) : store.play.frames[index];
+  const { stepIndex: index, fraction, interpolation } = training.state;
+  const board = fraction > 0 ? interpolateBoards(store.play.frames[index], store.play.frames[index + 1], interpolation) : store.play.frames[index];
   draw(board, fraction > 0 ? isTransitionBallVisible(store.play.frames[index], store.play.frames[index + 1], showDefense, focusTeam()) : isBallVisible(board, showDefense, focusTeam()));
-  if (renderedStep !== index) {
-    renderedStep = index;
-    store.changeFrame(index);
-    renderSteps();
-  }
+  if (renderedStep !== index) { renderedStep = index; store.changeFrame(index); renderSteps(); }
   controls();
 }
 function stop(snap = true) {
-  playing = false;
-  cancelAnimationFrame(raf);
-  if (snap) { position = Math.round(position); store.changeFrame(position); }
+  training.pause({ snap });
+  if (snap) store.changeFrame(training.position);
   renderedStep = -1;
   renderSteps(); draw(); controls();
-}
-function tick(time) {
-  if (!playing) return;
-  // A callback scheduled within the same display frame can have a timestamp
-  // earlier than performance.now() at start(); never move before frame zero.
-  const delta = Math.max(0, Math.min((time - lastTime) / 1000, 0.1));
-  lastTime = time;
-  position += delta * Number($('speed').value) / 2.4;
-  const last = store.play.frames.length - 1;
-  if (position >= last) {
-    if ($('loop-play').checked) {
-      position = last;
-      endHold += delta * Number($('speed').value);
-      if (endHold >= 1.2) { position = 0; endHold = 0; }
-    }
-    else { position = last; store.changeFrame(last); stop(); return; }
-  }
-  showPosition();
-  raf = requestAnimationFrame(tick);
 }
 function start() {
   if (switching || lineupBusy) return;
   workspace?.setView('play');
   persist();
   if (store.play.frames.length < 2) return;
-  if (position >= store.play.frames.length - 1) position = 0;
-  store.changeFrame(Math.floor(position));
+  training.play();
+  store.changeFrame(Math.floor(training.position));
   pages.steps = pageForIndex(store.play.frameIndex, 6);
-  playing = true;
-  endHold = 0;
-  lastTime = performance.now();
   renderSteps(); controls();
-  raf = requestAnimationFrame(tick);
 }
 
-$('play-toggle').addEventListener('click', () => playing ? stop() : start());
-$('restart-play').addEventListener('click', () => { stop(); position = 0; store.changeFrame(0); draw(); start(); });
-$('prev-frame').addEventListener('click', () => { stop(); store.changeFrame(Math.max(0, store.play.frameIndex - 1)); position = store.play.frameIndex; renderAll(); persist(); });
-$('next-frame').addEventListener('click', () => { stop(); store.changeFrame(Math.min(store.play.frames.length - 1, store.play.frameIndex + 1)); position = store.play.frameIndex; renderAll(); persist(); });
+$('play-toggle').addEventListener('click', () => training.playing ? stop() : start());
+$('restart-play').addEventListener('click', () => { stop(); training.seek(0); store.changeFrame(0); draw(); start(); });
+$('prev-frame').addEventListener('click', () => { stop(); store.changeFrame(Math.max(0, store.play.frameIndex - 1)); training.seek(store.play.frameIndex); renderAll(); persist(); });
+$('next-frame').addEventListener('click', () => { stop(); store.changeFrame(Math.min(store.play.frames.length - 1, store.play.frameIndex + 1)); training.seek(store.play.frameIndex); renderAll(); persist(); });
 $('timeline-scrub').addEventListener('input', () => {
   const progress = Number($('timeline-scrub').value);
-  if (playing) stop(false);
-  position = progress / 1000 * (store.play.frames.length - 1);
+  if (training.playing) stop(false);
+  training.seek(progress / 1000 * (store.play.frames.length - 1));
   showPosition();
 });
-$('timeline-scrub').addEventListener('change', () => { position = Math.round(position); store.changeFrame(position); renderAll(); persist(); });
+$('timeline-scrub').addEventListener('change', () => { training.seek(Math.round(training.position)); store.changeFrame(training.position); renderAll(); persist(); });
 for (const [prefix, key, render] of [['step', 'steps', renderSteps]]) {
   for (const [direction, delta] of [['prev', -1], ['next', 1]]) $(`${prefix}-page-${direction}`)?.addEventListener('click', () => {
     if (switching) return;
@@ -522,16 +419,16 @@ document.addEventListener('keydown', event => {
   if (switching || lineupBusy) return;
   if (workspace?.hasOpenDialog) return;
   if (event.target.matches('input,textarea,select,[contenteditable]')) return;
-  if (event.code === 'Space' && workspace.view === 'play') { event.preventDefault(); playing ? stop() : start(); }
+  if (event.code === 'Space' && workspace.view === 'play') { event.preventDefault(); training.playing ? stop() : start(); }
   if (event.key === 'Escape') {
     if (['lineups', 'archives'].includes(workspace.view) && lineupUI?.handleBack()) event.preventDefault();
-    else if (playing) stop();
+    else if (training.playing) stop();
   }
 });
 async function saveBeforeBackground() {
   libraryDeck?.pause();
   await Promise.all([...pendingOperations]);
-  if (playing) stop();
+  if (training.playing) stop();
   if (!await persist()) throw new Error('内置战术选择进度未能记录，请重新载入后重试');
   await repository.flush();
   await lineupSession.flush();
@@ -545,7 +442,7 @@ workspace = createWorkspaceController({
   beforeNavigate(next) {
     if (startup.active || switching || lineupBusy || lineupUI?.isModalOpen) return false;
     if (next !== 'library') libraryDeck?.pause();
-    if (next !== 'play' && playing) stop();
+    if (next !== 'play' && training.playing) stop();
     persist();
     return true;
   },
@@ -560,13 +457,13 @@ workspace = createWorkspaceController({
   beforeModalOpen() {
     if (startup.active || switching || lineupBusy) return false;
     libraryDeck?.pause();
-    if (playing) stop();
+    if (training.playing) stop();
     persist();
     return true;
   },
   getNote: () => store.board.note,
 });
-lineupUI = createLineupUI({ root: $('lineups-panel'), onAction: handleLineupAction, onNavigate: view => workspace.setView(view), onInspect: ({ title, text }) => workspace.openText(title, text), onModalChange(open) { if (open) { workspace.cancelTransition(); if (playing) stop(); } controls(); } });
+lineupUI = createLineupUI({ root: $('lineups-panel'), onAction: handleLineupAction, onNavigate: view => workspace.setView(view), onInspect: ({ title, text }) => workspace.openText(title, text), onModalChange(open) { if (open) { workspace.cancelTransition(); if (training.playing) stop(); } controls(); } });
 libraryDeck = createLibraryDeck({
   root: $('template-list'), visible: workspace.view === 'library',
   makePreview: (template, button) => createLibraryPreview({ template, button }),
@@ -578,7 +475,7 @@ libraryDeck = createLibraryDeck({
   },
 });
 renderLineups();
-courtBase();
+courtRenderer = createTrainingCourt({ document, svg });
 renderAll();
 if (restored.warnings.length || lineupRestored.warnings.length) toast([...restored.warnings, ...lineupRestored.warnings].join('；'));
 await persist();
@@ -589,7 +486,7 @@ await setupLifecycle({
     if (switching || lineupBusy) return true;
     if (workspace.closeTopDialog()) { await persist(); return true; }
     if (lineupUI.isModalOpen) { lineupUI.handleBack(); return true; }
-    if (playing) { stop(); await persist(); return true; }
+    if (training.playing) { stop(); await persist(); return true; }
     const focused = document.activeElement;
     if (focused?.matches('input,textarea,select')) { focused.blur(); await persist(); return true; }
     if (['lineups', 'archives'].includes(workspace.view) && lineupUI.handleBack()) return true;

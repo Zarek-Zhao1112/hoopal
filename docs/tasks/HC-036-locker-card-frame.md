@@ -28,7 +28,7 @@ styles.css末尾定向覆盖主panel与空态/已选球队卡：最大1040、全
 
 ## APK与原生程序证据
 
-1.21.0/code23 [APK](../../artifacts/apk/halfcourt-1.21.0.apk)43秒构建成功，28网页资源逐hash与dist一致、无server.url；v2签名与原证书一致。APK SHA256为db1eff86f616307677d702b5f51774d7925b1a12a81832e108fe43fef7b14d50，见[资源核对](../../artifacts/qa/hc036-apk-assets.json)和[签名](../../artifacts/qa/hc036-apk-signature.txt)。
+1.21.0/code23 [APK](../../artifacts/apk/archive/halfcourt-1.21.0.apk)43秒构建成功，28网页资源逐hash与dist一致、无server.url；v2签名与原证书一致。APK SHA256为db1eff86f616307677d702b5f51774d7925b1a12a81832e108fe43fef7b14d50，见[资源核对](../../artifacts/qa/hc036-apk-assets.json)和[签名](../../artifacts/qa/hc036-apk-signature.txt)。
 
 安装前即时核对当前ef473680/M2101K9C并备份实际0档案与当前进度，正常install-r Success，COLD746ms。版本/前台及[安装前](../../artifacts/qa/hc036-device-before.json)、[安装后](../../artifacts/qa/hc036-device-after.json)双hash保持：档案dd42b596eba63db184dd3e4e60ff2c52b48a712743f538d6e668d2eab397e253；进度7ad33bfb7b3680e01933afc54e22624f8e7549cf05af50543556b42115417e7c。采用本次即时进度，不能用上次HC-035的历史进度代替。
 

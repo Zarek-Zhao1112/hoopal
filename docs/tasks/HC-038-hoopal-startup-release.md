@@ -37,7 +37,7 @@ main/runtime在任何本地读取前建立同一启动实例，app原读取/真�
 
 ## APK与安装
 
-[球搭1.22.0 APK](../../artifacts/apk/hoopal-1.22.0.apk)27秒构建成功，30网页资源逐hash同dist、无server.url；编译label球搭/code24，包名com.halfcourt.tactics。[资源核对](../../artifacts/qa/hc038-apk-assets.json)、[签名](../../artifacts/qa/hc038-apk-signature.txt)、[badging](../../artifacts/qa/hc038-apk-badging.txt)通过，v2原证书e13d5e107d797d5233b8bf18f24f498d3edccaf8db6e15fcde791af5d2465e26。APK SHA256为771cb1603ae913cedeaa01c58492fe549cd004cad76bf2a74e688b168e51b5d3。
+[球搭1.22.0 APK](../../artifacts/apk/archive/hoopal-1.22.0.apk)27秒构建成功，30网页资源逐hash同dist、无server.url；编译label球搭/code24，包名com.halfcourt.tactics。[资源核对](../../artifacts/qa/hc038-apk-assets.json)、[签名](../../artifacts/qa/hc038-apk-signature.txt)、[badging](../../artifacts/qa/hc038-apk-badging.txt)通过，v2原证书e13d5e107d797d5233b8bf18f24f498d3edccaf8db6e15fcde791af5d2465e26。APK SHA256为771cb1603ae913cedeaa01c58492fe549cd004cad76bf2a74e688b168e51b5d3。
 
 安装前重新核设备ef473680/M2101K9C，并[检查无未保存球队配置](../../artifacts/qa/hc038-device-preflight.json)。即时备份实际0档案/当前进度，正常install-r Success、COLD700ms。版本/前台及[安装前](../../artifacts/qa/hc038-device-before.json)/[安装后](../../artifacts/qa/hc038-device-after.json)双hash同：档案dd42b596eba63db184dd3e4e60ff2c52b48a712743f538d6e668d2eab397e253，进度7ad33bfb7b3680e01933afc54e22624f8e7549cf05af50543556b42115417e7c。没有在手机写入测试队伍或清除用户资料。
 
