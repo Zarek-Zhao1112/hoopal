@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>球搭 · 我的与账号备份预览</title>
+  <link rel="stylesheet" href="preview.css">
+  <script src="preview.js" defer></script>
+</head>
+<body>
+  <svg class="icon-sprite" aria-hidden="true"><defs>
+    <symbol id="icon-person" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3Z"/></symbol>
+    <symbol id="icon-cloud" viewBox="0 0 24 24"><path d="M6 19a5 5 0 0 1-1-10 7 7 0 0 1 13-2 6 6 0 0 1 0 12Z"/></symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24"><path d="m10 3 4 0 1 3 3 1 3 3-2 3v4l-4 1-1 3h-4l-1-3-3-1-3-3 2-3V7l4-1Z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="icon-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 10v7M12 6v1"/></symbol>
+    <symbol id="icon-shirt" viewBox="0 0 24 24"><path d="m8 3-5 3 3 5 2-1v11h8V10l2 1 3-5-5-3a4 4 0 0 1-8 0Z"/></symbol>
+    <symbol id="icon-court" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="1"/><path d="M8 4v6H2m14-6v6h6M12 4v16M2 14a4 4 0 0 1 0-8m20 8a4 4 0 0 0 0-8"/></symbol>
+    <symbol id="icon-library" viewBox="0 0 24 24"><rect x="6" y="7" width="15" height="14" rx="2"/><path d="M3 17V3h14M10 12h7m-7 4h5"/></symbol>
+    <symbol id="icon-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="12" rx="2"/><path d="M8 10V6a4 4 0 0 1 8 0v4M12 14v4"/></symbol>
+    <symbol id="icon-eye" viewBox="0 0 24 24"><path d="M2 12S6 5 12 5s10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+  </defs></svg>
+  <main class="preview-shell">
+    <section class="device" aria-label="手机页面预览">
+      <div id="app-screen" class="app-screen" data-view="account" data-layout="portrait">
+        <div class="top-space" aria-hidden="true"></div>
+        <main class="account-main">
+          <header class="page-heading"><div><h1 id="page-title">我的</h1><p id="page-subtitle">球队与账号</p></div><span class="preview-tag">交互预览</span></header>
+          <section id="account-card" class="account-card glass-card" aria-label="个人账号">
+            <span class="avatar"><svg id="guest-avatar" class="icon" aria-hidden="true"><use href="#icon-person"/></svg><img id="member-avatar" src="../../assets/app-icon.png" alt="示例账号头像" hidden></span>
+            <div class="account-copy"><h2 id="account-name">登录球搭</h2><p id="account-description">备份球队，换机恢复</p><span id="account-status" hidden>备份状态示意</span></div>
+            <button id="account-primary" class="primary" type="button" data-action="login-open">登录 / 注册</button>
+          </section>
+          <section id="teams-card" class="teams-card glass-card" aria-labelledby="teams-heading">
+            <header class="section-heading"><h2 id="teams-heading">我的球队</h2><button class="text-button" type="button" data-action="teams-manage">管理 ›</button></header>
+            <div class="team-list">
+              <article class="team-entry" data-team-id="GSW" data-current="true">
+                <button class="team-select" type="button" data-action="team-select" data-team-id="GSW" aria-label="选择周末三人组，3v3勇士球队示例"><img src="../../assets/nba/GSW.svg" alt="勇士队徽"><span class="team-copy"><strong>周末三人组</strong><small>3v3 · 勇士</small><span class="current-pill">当前使用</span></span><span class="chevron" aria-hidden="true">›</span></button>
+                <button class="team-manage" type="button" data-action="team-manage" data-team-id="GSW" aria-label="管理周末三人组">⋯</button>
+              </article>
+              <article class="team-entry" data-team-id="BOS" data-current="false">
+                <button class="team-select" type="button" data-action="team-select" data-team-id="BOS" aria-label="选择下班四人组，4v4凯尔特人球队示例"><img src="../../assets/nba/BOS.svg" alt="凯尔特人队徽"><span class="team-copy"><strong>下班四人组</strong><small>4v4 · 凯尔特人</small><span class="current-pill" hidden>当前使用</span></span><span class="chevron" aria-hidden="true">›</span></button>
+                <button class="team-manage" type="button" data-action="team-manage" data-team-id="BOS" aria-label="管理下班四人组">⋯</button>
+              </article>
+            </div>
+            <button class="create-team" type="button" data-action="team-create">＋&nbsp; 创建球队</button>
+          </section>
+          <section id="tools-card" class="tools-card glass-card" aria-label="账号工具">
+            <button class="tool-row" type="button" data-action="backup-open"><svg class="icon" aria-hidden="true"><use href="#icon-cloud"/></svg><span class="tool-copy"><strong>同步与备份</strong><small id="backup-status">登录后可用 · 尚未接入</small></span><span class="chevron" aria-hidden="true">›</span></button>
+            <button class="tool-row" type="button" data-action="settings-open"><svg class="icon" aria-hidden="true"><use href="#icon-settings"/></svg><span class="tool-copy"><strong>设置</strong></span><span class="chevron" aria-hidden="true">›</span></button>
+            <button class="tool-row" type="button" data-action="about-open"><svg class="icon" aria-hidden="true"><use href="#icon-info"/></svg><span class="tool-copy"><strong>关于球搭</strong></span><span class="chevron" aria-hidden="true">›</span></button>
+          </section>
+          <section id="reference-view" class="reference-view glass-card" hidden><img id="reference-logo" src="../../assets/nba/GSW.svg" alt="当前球队队徽"><span class="reference-kicker">页面示意</span><h2 id="reference-title">周末三人组</h2><p id="reference-description"></p><button class="primary" type="button" data-action="return-account">返回我的</button></section>
+        </main>
+        <nav class="glass-nav" aria-label="主要页面">
+          <button type="button" data-view-target="lineups"><svg class="icon" aria-hidden="true"><use href="#icon-shirt"/></svg><span>更衣室</span></button>
+          <button type="button" data-view-target="play"><svg class="icon" aria-hidden="true"><use href="#icon-court"/></svg><span>训练场</span></button>
+          <button type="button" data-view-target="library"><svg class="icon" aria-hidden="true"><use href="#icon-library"/></svg><span>战术库</span></button>
+          <button type="button" data-view-target="account" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="#icon-person"/></svg><span>我的</span></button>
+        </nav>
+      </div>
+    </section>
+    <aside class="preview-info"><p class="eyebrow">球搭 · 个人账号提案</p><h2>把球队带到<br>下一部手机</h2><p>账号属于使用 App 的人，<br>球队仍是独立的阵容档案。</p><div class="demo-controls" aria-label="切换展示状态"><button type="button" data-demo-state="guest" aria-pressed="true">未登录</button><button type="button" data-demo-state="member">已登录示例</button><button type="button" data-demo-state="login">登录面板</button></div><p class="scope-note">仅为交互预览。账号认证、云端备份和换机恢复均未接入，不读取或保存本机球队。可在上方切换示例状态。</p></aside>
+  </main>
+  <dialog id="account-dialog" data-phase="closed" aria-labelledby="modal-title">
+    <div class="modal-shade" data-action="modal-close" aria-hidden="true"></div>
+    <section class="account-panel panel" tabindex="-1">
+      <div class="sheet-grip" aria-hidden="true"></div>
+      <header class="modal-heading"><div><h2 id="modal-title">登录球搭</h2><p id="modal-subtitle">把球队带到下一部手机</p></div><button class="modal-close" type="button" data-action="modal-close" aria-label="关闭账号面板">×</button></header>
+      <div class="modal-body">
+        <form id="login-form" novalidate>
+          <label class="input-row"><svg class="icon" aria-hidden="true"><use href="#icon-person"/></svg><input id="account-email" type="email" inputmode="email" autocomplete="off" aria-label="账号，仅交互预览" placeholder="请输入账号"></label>
+          <label class="input-row"><svg class="icon" aria-hidden="true"><use href="#icon-lock"/></svg><input id="account-password" type="password" autocomplete="off" aria-label="密码，仅交互预览" placeholder="请输入密码"><button type="button" class="password-toggle" data-action="password-toggle" aria-label="显示密码" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#icon-eye"/></svg></button></label>
+          <button class="primary login-submit" type="submit" data-action="login-submit">登录</button>
+          <div class="account-links"><button type="button" data-action="register-open">注册账号</button><span aria-hidden="true">|</span><button type="button" data-action="recover-open">忘记密码</button></div>
+          <p id="login-feedback" class="login-feedback" role="status">交互预览，账号服务尚未接入。请勿填写真实密码。</p>
+        </form>
+        <section id="info-content" class="info-content" hidden><span class="info-symbol" aria-hidden="true">i</span><p id="info-message"></p><button id="return-login" class="secondary" type="button" data-action="return-login" hidden>返回登录</button></section>
+      </div>
+      <footer class="modal-footer"><button id="continue-local" type="button" data-action="continue-local">继续本地使用</button><span class="preview-note">账号与备份仅作交互示意</span></footer>
+    </section>
+  </dialog>
+</body>
+</html>

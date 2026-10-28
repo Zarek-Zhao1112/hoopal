@@ -27,6 +27,7 @@ npm start
 
 ~~~text
 frontend/                 # 页面、交互与打包素材
+  previews/               # 独立交互原型，不进入默认APK
   src/
     main.js               # 启动入口
     app.js                # 初始化、来源切换、保存和生命周期协调
@@ -75,6 +76,8 @@ npm run android:build     # 构建并打包Android离线APK
 ~~~
 
 清理脚本默认只列候选，显式传 -Apply 才删除限定的旧下载残留。保留.tools、已确认设计/原图和被引用验收资料；源码基线由本地Git管理。临时产物、依赖和工具不作为源码提交。
+
+「我的」页[交互原型](frontend/previews/account-center/index.html)可在本地直接打开，[三态对照](frontend/previews/account-center/overview.html)展示未登录、已登录示例与玻璃面板。原型不连接正式档案或账号服务，不进入APK；账号第一版方向为个人备份与换机恢复，见[HC-045](docs/tasks/HC-045-account-center-preview.md)。
 
 当前整理与验证见[HC-043](docs/tasks/HC-043-project-organization.md)，版本历史见[CHANGELOG](CHANGELOG.md)。操作说明见[使用指南](docs/user-guide.md)，Android构建/设备证据见[离线版说明](docs/android.md)，完整资料见[文档入口](docs/README.md)。
 
