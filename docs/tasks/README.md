@@ -8,6 +8,7 @@
 
 | 编号 | 任务 | 状态 | 负责人 | 下一步 |
 | --- | --- | --- | --- | --- |
+| [HC-053](HC-053-tactic-requirements-concept.md) | 战术条件与角色确认效果图 | `completed` | 主控视觉与记录 | 三屏候选已交付，三态条件/承担者/试练待讨论，正式1.26.0保持 |
 | [HC-052](HC-052-tactic-role-flow-concept.md) | 同队切换战术的分工效果图 | `completed` | 主控视觉与记录 | 三屏效果已交付：本次上场→两套战术沿用成员；策略待讨论，正式版未改 |
 | [HC-051](HC-051-tactic-role-design.md) | 战术角色认领需求与覆盖设计 | `completed` | 主控汇总，role_audit清点，role_review审查 | 26套/155帧/91本队职责位已清点，覆盖与未来双构建门槛、旧档案边界已讨论；正式替换尚未实施 |
 | [HC-050](HC-050-tactic-picker-release.md) | 标题下展玻璃选单正式接入 | `awaiting_device` | picker_ui组件，picker_tests回归，主控接线/安装，picker_review审查 | 225/完整16组/36布局与独立审查通过；1.26.0已保数据安装，WV96四开合322样本/取消及原非零进度保持，人工体验待确认 |
