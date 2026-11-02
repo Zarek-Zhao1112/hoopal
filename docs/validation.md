@@ -1,5 +1,13 @@
 # Android 接入验证记录
 
+## 1.26.0标题下展玻璃选单（2026-11-02）
+
+新增training/tactic-picker纯DOM组件，原select隐藏保留兼容、按钮/选项承载真实操作，220/160ms开合、局部blur、内部滚动和背景锁。快速双击第二击落外部层撤销首选的P2已修，九条实际函数体VM与六次真实closing+shade同坐标点击均只载入一次；Back实际回调五路径只为程序证据。
+
+首轮隔离动效断言因无失败trace未确证原因，测试补MO/RAF观察后保持时序门槛通过；首轮完整旧库preview命中失败未保存遮挡元素，保持未知根因。新专项确有漏恢复入场viewport，已修为恢复真实1440×1100及两原键，并增旧库失败诊断、不改其断言或产品。最终[完整16组](../artifacts/qa/runs/1.26.0-1793592269540/run.json)exit0，旧库全过，36选单布局/264行可达/6单次选择/两来源失败重试/取消零写通过；33自然RAF与MO visible→open229.4ms、closing→closed173.1ms，CSS220/160保持，原96四页边框及26模板/18规则/10推荐/6身份、129冻结源SHA保持。225检查、149模块/298引用及独立审查通过，隔离28样本与最终33分记。
+
+19秒构建，APK4832365字节，SHA256 `fdbfe93514819a3c16b501de80b3be3a7cfa02464bd53aee9fb9d3b5c9126054`；30网页同dist/15图标同1.25.0/原v2/noURL通过。ef473680/M2101K9C install-r Success、COLD640/Wait649；实际0队、两文件原SHA相同，用户原frameIndex3保留。WV96/Android12/393×819九项/当前项/局部blur18px主体none/两组fit-hit无滚动通过，322开合RAF、外部/同项/原标题/DOM-Escape取消、主Play及双文件保持。主控与审查者亲看实际手机图，未选择其他真实战术/写队伍或直接恢复存储，探针及独占转发清理。DOM-Escape不是系统Back，硬件返回/物理手势旋转/原生CRUD待验，任务awaiting_device。详见[HC-050](tasks/HC-050-tactic-picker-release.md)与[审查](reviews/HC-050-tactic-picker-release.md)。
+
 ## 1.25.0训练场完整动画布局（2026-11-02）
 
 新增纯展示training/view，真实战术标题与原select、全步骤点、集中圆形播放和竖横屏布局；原26战术、18推荐规则/10样本、6身份文件与原播放器/存储协议保持。225检查、静态147模块/292引用通过，最终127份源码SHA保持。

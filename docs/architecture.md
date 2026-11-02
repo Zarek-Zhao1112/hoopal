@@ -29,6 +29,8 @@ app.js负责初始化、当前战术/档案来源、保存和后台串行协调�
 
 HC-048的training/view.js只负责真实战术标题、简短讲解、圆形播放图标和全部步骤点；view.css限定训练场内部竖横布局，由全局汇总最后导入。全步骤点击通过onSelectStep交回app原有停止/seek/记录流程，不直接接触存储或时钟。旧步骤分页撤下，人员映射分页和全文面板保持。
 
+HC-050的training/tactic-picker.js提供标题下展玻璃选单，只持有展示、定位、焦点与220/160ms开合状态。原template-picker select隐藏保留options/value/change兼容，真实入口为training-picker-trigger；选择收起后通过onSelect交给app原loadTemplate处理来源清除与持久化，同项/取消不写盘。isOpen贯穿关闭阶段，app用其保护导航、弹窗、键盘、Back和背景flush，明确锁定播放/步骤/倍速/循环/显隐及人员分工；组件不访问存储、平台或播放器，内部滚动不改变主页面。
+
 库预览仍由workspace/library-preview-clock.js管理独立毫秒时钟：2.4秒段、1秒末停，暂停保留当前位置和剩余末停。library-preview.js负责按钮中的真实动画、单RAF、可见性和销毁；它不修改主Play、来源引用或保存进度。library-deck负责单卡展开、九标题布局、忙态锁和离页暂停。进入训练场才沿原清来源→载入→自动播放流程执行。
 
 ## SVG绘制与页面

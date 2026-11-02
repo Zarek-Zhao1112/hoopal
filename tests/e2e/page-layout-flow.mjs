@@ -154,7 +154,7 @@ export async function runPageLayoutFlow({ send, evaluate, wait, waitFor, folder 
       const rect=n=>n?.getBoundingClientRect().toJSON();
       const selector=${JSON.stringify(view === 'lineups' ? '#lineups-panel .lineup-profile-card,#lineups-panel .lineup-main-empty' : view === 'play' ? '.training-panel' : '.library-deck-panel')};
       const card=[...document.querySelectorAll(selector)].find(visible);
-      const controls=[...document.querySelectorAll('.view-nav button,'+${JSON.stringify(view === 'lineups' ? '[data-action="lineup-open-archives"],[data-action="lineup-configure"],[data-action="lineup-recommend"],[data-action="lineup-switch-archive"]' : view === 'play' ? '#mode,#template-picker,#open-menu,.toggle-label,#open-note,#play-toggle,#speed,#timeline-scrub,#restart-play' : '#mode,[data-kind-target],.library-card-heading,.library-card-court,.library-card-play,.library-card-return:not([hidden])')})].filter(visible);
+      const controls=[...document.querySelectorAll('.view-nav button,'+${JSON.stringify(view === 'lineups' ? '[data-action="lineup-open-archives"],[data-action="lineup-configure"],[data-action="lineup-recommend"],[data-action="lineup-switch-archive"]' : view === 'play' ? '#mode,#training-picker-trigger,#open-menu,.toggle-label,#open-note,#play-toggle,#speed,#timeline-scrub,#restart-play' : '#mode,[data-kind-target],.library-card-heading,.library-card-court,.library-card-play,.library-card-return:not([hidden])')})].filter(visible);
       const brand=document.querySelector('#lineup-brand-header');
       return{
         sw:document.documentElement.scrollWidth,sh:document.documentElement.scrollHeight,
@@ -194,7 +194,7 @@ export async function runPageLayoutFlow({ send, evaluate, wait, waitFor, folder 
       assert.ok(control.hit, `${label}: control occluded ${JSON.stringify(control)}`);
       assert.equal(control.disabled, false, `${label}: primary control enabled ${control.id}`);
     }
-    if (view === 'play') assert.ok(value.controls.some(n => n.id === 'play-toggle') && value.controls.some(n => n.id === 'template-picker'), `${label}: primary playback controls exist`);
+    if (view === 'play') assert.ok(value.controls.some(n => n.id === 'play-toggle') && value.controls.some(n => n.id === 'training-picker-trigger'), `${label}: primary playback controls and the real visible tactic trigger exist`);
     if (view === 'lineups') assert.ok(value.controls.some(n => ['lineup-open-archives', 'lineup-configure'].includes(n.id)), `${label}: archive/create path or configure CTA exists`);
     if(view==='library'){
       assert.equal(value.titleCount,stage.startsWith('defense')?4:9,`${label}: entire catalog is present`);

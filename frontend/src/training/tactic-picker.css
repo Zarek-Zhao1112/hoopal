@@ -1,0 +1,38 @@
+/* HC-050: the visible trigger replaces only the native select's hit surface. */
+body.page-layout[data-view=play] .training-title-picker #training-picker-trigger {
+  position:absolute;inset:0;width:100%;height:100%;min-width:0;min-height:0;margin:0;padding:0;border:0;border-radius:8px;background:transparent;box-shadow:none;cursor:pointer;
+}
+body.page-layout[data-view=play] .training-title-picker #training-picker-trigger:hover {filter:none}
+body.page-layout[data-view=play] .training-title-picker[data-picker-disabled=true] .training-title-chevron {opacity:.45}
+body.page-layout[data-view=play] .training-title-picker[data-picker-expanded=true] {z-index:71}
+body.page-layout[data-view=play] .training-title-picker[data-picker-expanded=true] .training-title-chevron {transform:rotate(-90deg)}
+body.page-layout[data-view=play] .training-title-chevron {transition:transform 160ms ease}
+.training-tactic-picker {position:fixed;inset:0;z-index:70;pointer-events:auto}
+.tactic-picker-shade {position:absolute;inset:0;background:transparent;touch-action:none}
+.tactic-picker-panel {
+  position:absolute;display:flex;flex-direction:column;min-width:0;min-height:0;margin:0;padding:7px;border:1px solid #bdd2e2;border-radius:16px;background:linear-gradient(140deg,#f9fcffdf,#eff7fbd6);color:#315b76;box-shadow:inset 0 1px #ffffffef,0 9px 26px #426e8b30,0 2px 5px #527f991a;-webkit-backdrop-filter:blur(18px) saturate(1.1);backdrop-filter:blur(18px) saturate(1.1);transform-origin:top left;transform:translateY(-5px) scale(.985,.96);opacity:0;transition:transform 220ms cubic-bezier(.2,.75,.25,1),opacity 220ms ease;overflow:hidden;
+}
+.training-tactic-picker[data-visible=true] .tactic-picker-panel {transform:translateY(0) scale(1);opacity:1}
+.training-tactic-picker[data-phase=closing] .tactic-picker-panel {transition-duration:160ms;pointer-events:none}
+.tactic-picker-heading {display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:30px;flex-shrink:0;padding:0 7px 6px;border-bottom:1px solid #c8dce680;color:#6087a0;font-size:11px;font-weight:600}
+.tactic-picker-heading>span:last-child {font-size:10px;font-weight:500}
+.tactic-picker-list {position:relative;flex:1;min-height:0;min-width:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:#a7c8dc transparent;outline:none;padding:3px 0}
+.tactic-picker-list::-webkit-scrollbar {width:4px}
+.tactic-picker-list::-webkit-scrollbar-thumb {border-radius:4px;background:#abc9da}
+.tactic-picker-option {position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-width:0;min-height:40px;margin:0;padding:7px 8px;border:0;border-bottom:1px solid #ccdde55e;border-radius:0;background:transparent;color:#355f7c;text-align:left;font-size:13px;line-height:24px;font-weight:550;box-shadow:none;touch-action:pan-y}
+.tactic-picker-option:last-child {border-bottom-color:transparent}
+.tactic-picker-option[aria-selected=true] {border-bottom-color:transparent;border-radius:8px;background:linear-gradient(105deg,#d4eaf8e8,#d5eaf4bb);color:#2d6d94;font-weight:750}
+.tactic-picker-option:not(:disabled):hover {filter:none;background-color:#deedf7a3}
+.tactic-picker-option:focus-visible {outline:2px solid #6daccd;outline-offset:-2px;border-radius:8px}
+.tactic-picker-name {min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tactic-picker-check {flex-shrink:0;visibility:hidden;font-size:19px;font-weight:800;line-height:20px;color:#287fae}
+.tactic-picker-option[aria-selected=true] .tactic-picker-check {visibility:visible}
+.tactic-picker-option:disabled {opacity:1;cursor:default}
+@media(max-height:500px) {
+  .tactic-picker-panel {border-radius:13px;padding:5px}
+  .tactic-picker-heading {min-height:27px;padding:0 7px 4px;font-size:10px}
+  .tactic-picker-option {min-height:38px;padding:6px 8px;font-size:12px}
+}
+@media(prefers-reduced-motion:reduce) {
+  .tactic-picker-panel,body.page-layout[data-view=play] .training-title-chevron {transition:none}
+}

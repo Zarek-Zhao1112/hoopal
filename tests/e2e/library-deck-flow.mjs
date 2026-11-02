@@ -103,11 +103,16 @@ export async function runLibraryDeckFlow({send,evaluate,wait,waitFor,folder}){
       const visible=n=>n.getClientRects().length&&getComputedStyle(n).visibility!=='hidden'&&!n.closest('[hidden]');
       const root=document.querySelector('#template-list'),rect=n=>n.getBoundingClientRect().toJSON();
       const nodes=[...document.querySelectorAll('.library-card-heading,.library-card-court,.library-card-play,.library-card-return:not([hidden]),.view-nav button')].filter(visible);
-      return{width:innerWidth,height:innerHeight,sw:document.documentElement.scrollWidth,sh:document.documentElement.scrollHeight,deck:rect(root),layout:root.dataset.layout,count:Number(root.dataset.count),expanded:root.dataset.expandedId,
-        controls:nodes.map(n=>{const r=n.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return{id:n.dataset.templateId||n.dataset.playTemplate||n.dataset.viewTarget||n.dataset.action||'return',rect:r.toJSON(),disabled:Boolean(n.disabled||n.closest('button')?.disabled),hit:hit===n||n.contains(hit)}}),
+      return{width:innerWidth,height:innerHeight,sw:document.documentElement.scrollWidth,sh:document.documentElement.scrollHeight,deck:rect(root),layout:root.dataset.layout,count:Number(root.dataset.count),expanded:root.dataset.expandedId,transitioning:root.dataset.transitioning,pickerPhase:document.querySelector('#training-tactic-picker')?.dataset.phase,pickerHidden:document.querySelector('#training-tactic-picker')?.hidden,
+        controls:nodes.map(n=>{const r=n.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return{id:n.dataset.templateId||n.dataset.playTemplate||n.dataset.viewTarget||n.dataset.action||'return',rect:r.toJSON(),disabled:Boolean(n.disabled||n.closest('button')?.disabled),hit:hit===n||n.contains(hit),hitElement:hit?.outerHTML.slice(0,400),hitCard:hit?.closest('.library-card')?.dataset.cardId}}),
         cards:[...root.querySelectorAll('.library-card')].map(n=>({id:n.dataset.cardId,rect:rect(n),visible:visible(n),aria:n.getAttribute('aria-hidden'),headingDisabled:n.querySelector('.library-card-heading').disabled,headingTab:n.querySelector('.library-card-heading').tabIndex,playDisabled:n.querySelector('.library-card-play').disabled,playTab:n.querySelector('.library-card-play').tabIndex,bodyHidden:n.querySelector('.library-card-body').hidden})),
         open:[...root.querySelectorAll('.library-card-body:not([hidden])')].map(n=>({body:rect(n),court:rect(n.querySelector('.library-card-court')),cta:rect(n.querySelector('.library-card-play'))}))};
     })()`);
+    if(value.controls.some(n=>!n.hit)){
+      const evidence=`hc050-library-failure-${width}x${height}-${stage}`;
+      await writeFile(path.join(folder,evidence+'.json'),JSON.stringify(value,null,2)+'\n');
+      await screenshot(evidence+'.png');
+    }
     assert.ok(value.sw<=width+2&&value.sh<=height+2,`${stage} page overflow ${JSON.stringify(value)}`);
     assert.ok(['portrait','wide','overlay'].includes(value.layout));assert.equal(value.cards.length,value.count);
     const shown=value.cards.filter(card=>card.visible);

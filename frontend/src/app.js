@@ -13,6 +13,7 @@ import { COURT_COLORS } from './board/appearance.js';
 import { createTrainingCourt } from './board/court-renderer.js';
 import { createTrainingPlayer } from './training/player.js';
 import { createTrainingView } from './training/view.js';
+import { createTacticPicker } from './training/tactic-picker.js';
 import { createLibraryDeck } from './workspace/library-deck.js';
 import { createLibraryPreview } from './workspace/library-preview.js';
 import { startup } from './startup/runtime.js';
@@ -43,7 +44,7 @@ let saveVersion = 0, switching = false;
 const store = new PlayStore(initial);
 let toastTimer;
 let showDefense = true, renderedStep = -1;
-let workspace, libraryDeck, courtRenderer;
+let workspace, libraryDeck, courtRenderer, tacticPicker;
 const svg = $('court');
 const training = createTrainingPlayer({
   frameCount: store.play.frames.length, position: store.play.frameIndex,
@@ -132,7 +133,7 @@ function renderLegend() {
   box.append(heading, rows);
 }
 async function handleLineupAction(kind, payload = {}) {
-  if (lineupBusy || switching) return false;
+  if (lineupBusy || switching || tacticPicker?.isOpen) return false;
   lineupBusy = true; lineupError = '';
   const finishOperation = beginOperation();
   if (training.playing) stop();
@@ -257,21 +258,25 @@ function renderTemplates() {
 }
 function controls() {
   const busy = switching || lineupBusy || Boolean(lineupUI?.isModalOpen);
-  libraryDeck?.setBusy(busy);
+  const blocked = busy || Boolean(tacticPicker?.isOpen);
+  libraryDeck?.setBusy(blocked);
+  tacticPicker?.render({ items: catalogFor(activeKind), activeTemplateId, mode: store.play.mode, kind: activeKind, disabled: training.playing || busy });
   trainingView.render({ title: store.play.title, note: store.board.note, playing: training.playing });
   $('frame-counter').textContent = `${Math.min(Math.floor(training.position) + 1, store.play.frames.length)} / ${store.play.frames.length}`;
   $('timeline-scrub').value = store.play.frames.length > 1 ? training.position / (store.play.frames.length - 1) * 1000 : 0;
-  $('timeline-scrub').disabled = busy || store.play.frames.length < 2;
+  $('timeline-scrub').disabled = blocked || store.play.frames.length < 2;
   $('play-progress').textContent = store.play.frames.length > 1 ? `${Math.round(training.position / (store.play.frames.length - 1) * 100)}%` : '0%';
-  $('prev-frame').disabled = busy || training.position <= 0;
-  $('next-frame').disabled = busy || training.position >= store.play.frames.length - 1;
-  $('play-title').disabled = training.playing || busy;
+  $('prev-frame').disabled = blocked || training.position <= 0;
+  $('next-frame').disabled = blocked || training.position >= store.play.frames.length - 1;
+  $('play-title').disabled = training.playing || blocked;
   $('status').textContent = training.playing ? '正在演练 · 可调整播放速度或拖动进度' : '按步骤观察跑位，点击讲解查看动作分工。';
   svg.classList.toggle('is-playing', training.playing);
-  for (const node of document.querySelectorAll('[data-view-target],#open-menu,#open-note,#play-toggle,#restart-play,#frame-list button')) node.disabled = busy || Boolean(lineupUI?.isModalOpen);
-  $('mode').disabled = training.playing || busy;
-  $('template-picker').disabled = training.playing || busy;
-  for (const button of document.querySelectorAll('[data-kind-target]')) button.disabled = busy;
+  for (const node of document.querySelectorAll('[data-view-target],#open-menu,#open-note,#play-toggle,#restart-play,#frame-list button,#speed,#loop-play,#toggle-defense')) node.disabled = blocked;
+  const legend = paginate(playbackAssignment, legendPage, 2);
+  for (const button of document.querySelectorAll('#lineup-legend button')) button.disabled = blocked || button.id === 'legend-prev' && legend.page === 0 || button.id === 'legend-next' && legend.page >= legend.pages - 1;
+  $('mode').disabled = training.playing || blocked;
+  $('template-picker').disabled = training.playing || blocked;
+  for (const button of document.querySelectorAll('[data-kind-target]')) button.disabled = blocked;
 }
 function renderAll() {
   $('play-title').value = store.play.title;
@@ -292,7 +297,7 @@ function stop(snap = true) {
   renderSteps(); draw(); controls();
 }
 function start() {
-  if (switching || lineupBusy) return;
+  if (switching || lineupBusy || tacticPicker?.isOpen) return;
   workspace?.setView('play');
   persist();
   if (store.play.frames.length < 2) return;
@@ -322,6 +327,7 @@ for (const button of document.querySelectorAll('[data-kind-target]')) button.add
   controls();
 });
 $('template-picker').addEventListener('change', async event => {
+  if (switching || lineupBusy || training.playing || tacticPicker?.isOpen) { syncTemplatePicker(); return; }
   const template = catalogFor(activeKind).find(item => item.id === event.target.value);
   if (template && await loadTemplate(template.id)) toast('内置战术已载入');
   else syncTemplatePicker();
@@ -378,6 +384,11 @@ document.addEventListener('keydown', event => {
     if (event.key === 'Escape') { event.preventDefault(); startup.skip(); }
     return;
   }
+  if (tacticPicker?.isOpen) {
+    if (event.key === 'Escape') { event.preventDefault(); tacticPicker.handleBack(); }
+    return;
+  }
+  if (event.target.closest?.('#training-picker-trigger')) return;
   if (event.key === 'Escape' && workspace?.closeTopDialog()) { event.preventDefault(); return; }
   if (event.key === 'Escape' && lineupUI?.isModalOpen) { event.preventDefault(); lineupUI.handleBack(); return; }
   if (switching || lineupBusy) return;
@@ -390,6 +401,7 @@ document.addEventListener('keydown', event => {
   }
 });
 async function saveBeforeBackground() {
+  tacticPicker?.close({ immediate: true, reason: 'background' });
   libraryDeck?.pause();
   await Promise.all([...pendingOperations]);
   if (training.playing) stop();
@@ -404,7 +416,7 @@ window.addEventListener('pagehide', () => { saveBeforeBackground().catch(error =
 window.addEventListener('halfcourt:platform-error', event => toast(`手机操作失败：${event.detail?.error?.message || '请重试'}`));
 workspace = createWorkspaceController({
   beforeNavigate(next) {
-    if (startup.active || switching || lineupBusy || lineupUI?.isModalOpen) return false;
+    if (startup.active || switching || lineupBusy || lineupUI?.isModalOpen || tacticPicker?.isOpen) return false;
     if (next !== 'library') libraryDeck?.pause();
     if (next !== 'play' && training.playing) stop();
     persist();
@@ -419,7 +431,7 @@ workspace = createWorkspaceController({
     renderTemplates(); libraryDeck?.refreshLayout(); draw(); controls();
   },
   beforeModalOpen() {
-    if (startup.active || switching || lineupBusy) return false;
+    if (startup.active || switching || lineupBusy || tacticPicker?.isOpen) return false;
     libraryDeck?.pause();
     if (training.playing) stop();
     persist();
@@ -432,11 +444,29 @@ libraryDeck = createLibraryDeck({
   root: $('template-list'), visible: workspace.view === 'library',
   makePreview: (template, button) => createLibraryPreview({ template, button }),
   onPlay: async id => {
-    if (switching || lineupBusy) return false;
+    if (switching || lineupBusy || tacticPicker?.isOpen) return false;
     if (!await loadTemplate(id)) return false;
     start();
     return true;
   },
+});
+tacticPicker = createTacticPicker({
+  document,
+  beforeOpen() {
+    if (startup.active || switching || lineupBusy || training.playing || lineupUI?.isModalOpen || workspace.hasOpenDialog || workspace.view !== 'play') return false;
+    workspace.cancelTransition();
+    return true;
+  },
+  async onSelect(id) {
+    if (startup.active || switching || lineupBusy || training.playing || lineupUI?.isModalOpen || workspace.hasOpenDialog || workspace.view !== 'play') return false;
+    const template = catalogFor(activeKind).find(item => item.id === id);
+    if (!template) return false;
+    if (id === activeTemplateId) return true;
+    const loaded = await loadTemplate(id);
+    if (loaded) toast('内置战术已载入');
+    return loaded;
+  },
+  onVisibilityChange() { controls(); },
 });
 renderLineups();
 courtRenderer = createTrainingCourt({ document, svg });
@@ -447,6 +477,7 @@ await setupLifecycle({
   onBackground: saveBeforeBackground,
   onBack: async () => {
     if (startup.active) { startup.skip(); return true; }
+    if (tacticPicker?.handleBack()) return true;
     if (switching || lineupBusy) return true;
     if (workspace.closeTopDialog()) { await persist(); return true; }
     if (lineupUI.isModalOpen) { lineupUI.handleBack(); return true; }

@@ -68,7 +68,8 @@
       <header class="training-header">
         <div class="training-title-picker">
           <h1 id="training-title">载入战术…</h1><svg class="icon training-title-chevron" aria-hidden="true"><use href="#i-right"/></svg>
-          <select id="template-picker" aria-label="选择内置战术"><option value="">选择示例</option></select>
+          <button id="training-picker-trigger" type="button" aria-label="选择内置战术" aria-haspopup="listbox" aria-expanded="false" aria-controls="training-tactic-picker"></button>
+          <select id="template-picker" aria-label="选择内置战术" hidden aria-hidden="true" tabindex="-1"><option value="">选择示例</option></select>
         </div>
         <div id="play-header-controls" class="page-header-controls">
           <label class="sr-only" for="mode">比赛人数</label><select id="mode" aria-label="比赛人数"><option value="3v3">3 对 3</option><option value="4v4">4 对 4</option></select>
