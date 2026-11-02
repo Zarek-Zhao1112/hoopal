@@ -8,6 +8,7 @@
 
 | 编号 | 任务 | 状态 | 负责人 | 下一步 |
 | --- | --- | --- | --- | --- |
+| [HC-058](HC-058-training-library-interactive-preview.md) | 训练场内战术库与二级标题交互网页 | `completed` | ui独立预览、主控QA/启动、review独立审查 | 本地网页已打开；三底栏/真实循环/玻璃面板/卡外标题，独立21项及五尺寸通过，206正式文件SHA保持；不改App/手机 |
 | [HC-057](HC-057-training-library-header-concept.md) | 训练场内战术库与二级标题效果图 | `completed` | 主控视觉/图检/记录 | 两组共四屏已交付：三底栏/训练场库面板、二级标题在主卡上方；仅静态方案，正式1.28保持 |
 | [HC-056](HC-056-body-type-tactic-release.md) | 整体体型挑选战术正式接入 | `awaiting_device` | data分类/校验、ui挑选页、主控存储/接线、独立review | 246检查/完整17组/14类及独立审查通过；1.28已装，真WV三人草稿取消与四人8组浏览通过，真实队员/进度保留；后续偏好变化如实记录，人工体验待验 |
 | [HC-055](HC-055-body-type-tactic-concept.md) | 整体体型挑选战术效果图 | `completed` | 主控视觉/记录 | 三屏纯体型方案已获用户批准；正式接入与设备验收接续HC-056 |

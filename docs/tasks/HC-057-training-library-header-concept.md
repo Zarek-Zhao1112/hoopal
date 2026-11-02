@@ -20,3 +20,5 @@
 - 使用内置imagegen；[图一提示词](../../artifacts/design/training-library-header-concept/prompt-01.txt)、[图一校正](../../artifacts/design/training-library-header-concept/prompt-01-edit.txt)、[图二提示词](../../artifacts/design/training-library-header-concept/prompt-02.txt)留存。图一初稿防守棋子不足，定向补到主场/缩略图各3橙3蓝，未改其余布局。生成路线仍不能作为真实战术站位或动画证据。
 
 本轮仅图片与文档；正式代码/26套数据、1.28.0 APK及手机不变。静态图不能证明面板动效、短屏命中、Back/焦点/底栏交互、取消保进度或旧来源迁移已实现。文档链接和变更范围检查后同步设计记录，图片仍按仓库规则留本机artifacts。
+
+后续用户要求实际体验交互，已由[HC-058](HC-058-training-library-interactive-preview.md)提供独立本地网页。该预览复用真实动画但仅操作内存示例，不表示正式App接入已完成。

@@ -49,6 +49,8 @@ workspace/controller.js管理更衣室(lineups)、训练场(play)、战术库(li
 
 frontend/previews/account-center是独立HTML/CSS/JS原型，不被正式index/app导入，不进入默认Vite/APK打包。仅内存演示个人中心及玻璃登录交互；真实账号、云备份与本地档案的接入不由原型承担。原型源码随Git同步，截图/验收仍进artifacts，范围见[HC-045](tasks/HC-045-account-center-preview.md)。
 
+frontend/previews/training-library同样独立于正式入口，演示三底栏、训练场内玻璃战术库及卡外二级标题。只读复用真实模板、训练播放器、球场绘图和卡片预览时钟，示例球队与偏好只存在内存，不导入storage/platform/app。scripts/preview-training-library.mjs以127.0.0.1本地HTTP提供原生ESM；scripts/qa/check-training-library-preview.mjs用独占临时浏览器检查交互，证据存artifacts/qa/runs。不会进入默认Vite/APK，见[HC-058](tasks/HC-058-training-library-interactive-preview.md)。
+
 lineups/controller.js保留createLineupUI和splitLineupText的公有入口。内部职责：
 - ui.js：已保存状态、当前页、忙态与自有弹层协调，通过onAction提交业务操作。
 - views/：更衣室、档案与基本球队身份的绘制及文字/按钮辅助。

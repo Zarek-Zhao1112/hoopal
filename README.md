@@ -29,6 +29,14 @@ npm start
 
 电脑访问 http://localhost:4173 。手机网页预览使用启动窗口显示的局域网地址；安装后的APK独立运行，无需电脑服务。开发热更新运行 npm run dev。
 
+训练场内战术库与二级标题的独立交互方案可运行：
+
+~~~sh
+node scripts/preview-training-library.mjs
+~~~
+
+打开终端打印的本地URL（默认127.0.0.1:4188）。预览含三底栏、玻璃战术库、真实循环动画、体型选择与球队管理，只使用内存示例；刷新即重置，不读写正式档案，也不进入APK。体验与验收见[HC-058](docs/tasks/HC-058-training-library-interactive-preview.md)。
+
 ## 项目目录
 
 ~~~text
