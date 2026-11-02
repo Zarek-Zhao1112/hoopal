@@ -8,6 +8,7 @@
 
 | 编号 | 任务 | 状态 | 负责人 | 下一步 |
 | --- | --- | --- | --- | --- |
+| [HC-049](HC-049-tactic-picker-concept.md) | 战术标题选择面板视觉讨论 | `completed` | 主控静态概念与记录 | 两方案效果已交付，用户选择A标题下展；待交互细化，手机保持1.25.0 |
 | [HC-048](HC-048-training-viewing-release.md) | 训练场完整动画布局正式接入 | `awaiting_device` | ui布局，engine回归，主控集成/安装，training_review审查 | 两P2修复，225/完整15组/36布局与终审通过；1.25.0已保数据安装，WV96真实循环620样本/暂停及双hash保持，人工体验待确认 |
 | [HC-047](HC-047-training-design-concept.md) | 训练场整套动画视觉讨论 | `completed` | 主控概念图与设计记录 | 竖屏/横屏静态效果已交付，完整动画优先；布局待讨论，正式App和APK保持 |
 | [HC-046](HC-046-account-center-release.md) |「我的」页正式接入与手机更新 | `awaiting_device` | ui真实页面，engine回归，主控构建安装，interaction_design审查 | 225/完整14组/专项36布局20面板及终审通过；1.24.0已安装，双hash同，WV96真实我的/四面板通过；账号云备份尚未开放，人工体验待确认 |
