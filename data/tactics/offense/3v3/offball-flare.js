@@ -1,8 +1,9 @@
+import {withBodyTypes} from '../../body-types-helper.js';
 import {defineRoles} from '../../role-helpers.js';
 import {frame, defineExpansion} from '../../expansion-helpers.js';
 import {run, screen, pass} from '../../helpers.js';
 
-export default defineExpansion({
+export default withBodyTypes(defineExpansion({
   id: 'offball-flare', title: '无球外弹接投', mode: '3v3', category: '无球掩护', difficulty: '基础',
   description: '2 号借 3 号掩护远离持球人向外接球，3 号不是外弹接投者。',
   ...defineRoles('offense', [
@@ -26,4 +27,7 @@ export default defineExpansion({
     frame('2 号右翼持球，1、3 号提供后续传球点。无球外弹制造的是接球位置变化，不保证投篮结果。',
       [[300,600],[800,490],[470,450]], [[160,430],[600,400],[730,350]]),
   ],
+}), {
+  "two-big": "无球外弹借挡接球，先练掩护与传球时机。",
+  "similar": "外弹跑出接球空间，掩护后留作接应。"
 });

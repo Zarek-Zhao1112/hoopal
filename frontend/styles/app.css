@@ -16,4 +16,5 @@
 @import './lineup-frame.css';
 @import '../src/training/view.css';
 @import '../src/training/tactic-picker.css';
-@import '../src/roles/styles.css';
+@import '../src/lineups/wizard/basic-layout.css';
+@import '../src/selection/styles.css';

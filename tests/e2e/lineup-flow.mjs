@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {writeFile} from 'node:fs/promises';
 import path from 'node:path';
 import {createLineup} from '../../shared/lineups.js';
+import {confirmedRolePlan} from './role-fixtures.mjs';
 import {NBA_TEAMS} from '../../data/nba-teams.js';
 import {findLibraryCard} from './library-deck-helpers.mjs';
 import {beginArchiveCreate,selectArchive,openArchiveMenu} from './archive-helpers.mjs';
@@ -103,11 +104,10 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
   await openWizard();assert.equal(await evaluate("document.querySelector('[data-action=lineup-player-name]').value"),'保留的草稿');
   await closeWizard('discard');
   await startTeamPractice();
-  assert.equal(await evaluate("document.querySelector('#lineup-legend').hidden"),false);
+  assert.equal(await evaluate("document.querySelector('#lineup-legend').hidden"),true);
   const template=await evaluate("document.querySelector('#template-picker').value");
-  const context=await evaluate(`${disk}.playbackContext`);
-  assert.equal(context.templateId,template);
-  assert.ok(await evaluate("document.querySelector('#lineup-legend').textContent.includes('球衣')"));
+  assert.equal(await evaluate(`${disk}.playbackContext`),null);
+  assert.equal(await evaluate(`${disk}.profiles[0].bodyType`),'one-big');
   assert.equal(await evaluate("[...document.querySelectorAll('#players-layer [data-player^=\"attack-\"] text')].map(p=>p.textContent).join(',')"),'1,2,3');
   await evaluate("document.querySelector('#restart-play').click()");
   await waitFor("Number(document.querySelector('#timeline-scrub').value)>1");
@@ -115,37 +115,39 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
   await send('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',code:'Escape'});
   assert.equal(await evaluate("document.querySelector('#play-toggle').getAttribute('aria-pressed')"),'false','Escape pauses playback without navigating hidden lineup pages');
   assert.equal(await evaluate("document.querySelector('#lineups-panel').dataset.subview"),'profiles');
-  await send('Page.reload');await waitFor("Boolean(document.body.dataset.lineupContext)&&Boolean(document.querySelector('[data-player]'))");
-  assert.equal(await evaluate(`${disk}.profiles.length`),1);
-  await nav('play');
-  // The same ID is crucial: source equality alone cannot distinguish a plain
-  // library launch from a recommended launch, especially after write failure.
-  await nav('library');await waitFor('!document.body.dataset.pageTransition');
+  // A retired, valid saved source stays protected on disk, but never labels the new numbered demonstration.
+  const legacyProfile=await evaluate(`${disk}.profiles.find(p=>p.id===${disk}.activeProfileId)`),legacyPlan=confirmedRolePlan(legacyProfile,template);
+  const context={source:'role-confirmations',profileId:legacyProfile.id,profileRevision:legacyProfile.revision,templateId:template,roleVersion:1};
+  await evaluate(`(()=>{const s=${disk};s.rolePlans[${JSON.stringify(legacyProfile.id)}]={[${JSON.stringify(template)}]:${JSON.stringify(legacyPlan)}};s.playbackContext=${JSON.stringify(context)};localStorage.setItem('halfcourt-lineups-v1',JSON.stringify(s))})()`);
+  await send('Page.reload');await waitFor("Boolean(document.querySelector('[data-player]'))");
+  assert.equal(await evaluate(`${disk}.profiles.length`),1);assert.equal(await evaluate('document.body.dataset.lineupContext'),'');
+  await nav('play');await nav('library');await waitFor('!document.body.dataset.pageTransition');
   await findLibraryCard({evaluate,waitFor},template);
   await evaluate(`document.querySelector('.library-card-heading[data-template-id="${template}"]').click()`);
-  assert.equal(await evaluate("document.body.dataset.lineupContext"),context.profileId,'previewing the same tactic retains recommendation identity');
+  assert.equal(await evaluate('document.body.dataset.lineupContext'),'');
+  const beforeClear=await evaluate("({archive:localStorage.getItem('halfcourt-lineups-v1'),selection:localStorage.getItem('halfcourt-builtin-selection-v1'),players:document.querySelector('#players-layer').innerHTML,step:document.querySelector('#frame-counter').textContent})");
   await evaluate("window.savedSet=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(k==='halfcourt-lineups-v1'&&JSON.parse(v).playbackContext===null)throw Error('simulated clear failure');return window.savedSet.call(this,k,v)}");
   await evaluate(`document.querySelector('[data-play-template="${template}"]').click()`);
   await waitFor("!document.body.classList.contains('is-loading')");
-  assert.equal(await evaluate("document.body.dataset.lineupContext"),context.profileId,'failed plain transition preserves original recommended session');
+  assert.equal(await evaluate('document.body.dataset.lineupContext'),'','old role source cannot become a new person mapping even on failure');
+  assert.deepEqual(await evaluate("({archive:localStorage.getItem('halfcourt-lineups-v1'),selection:localStorage.getItem('halfcourt-builtin-selection-v1'),players:document.querySelector('#players-layer').innerHTML,step:document.querySelector('#frame-counter').textContent})"),beforeClear,'failed source clear preserves exact archives, old plan, selected play and step');
   assert.equal(await evaluate('document.body.dataset.view'),'library','clear failure cannot navigate or start playback');
   assert.equal(await evaluate("document.querySelector('#template-list').dataset.expandedId"),template,'failed source clear retains expanded card for retry');
-  await evaluate("Storage.prototype.setItem=window.savedSet");
+  await evaluate('Storage.prototype.setItem=window.savedSet');
   await evaluate(`document.querySelector('[data-play-template="${template}"]').click()`);
   await waitFor("!document.body.classList.contains('is-loading')&&!document.body.dataset.lineupContext");
   await waitFor("document.querySelector('#play-toggle').getAttribute('aria-pressed')==='true'");
   await evaluate("document.querySelector('#play-toggle').click()");
   await send('Page.reload');await waitFor("Boolean(document.querySelector('[data-player]'))");
-  assert.equal(await evaluate("document.body.dataset.lineupContext"),'');
+  assert.equal(await evaluate('document.body.dataset.lineupContext'),'');
   await nav('lineups');
   await create('4v4','公司四人队');await configure(4);
   await checkLockerInteraction(4);
   assert.equal(await evaluate(`${disk}.profiles.length`),2);
   await startTeamPractice();
   assert.equal(await evaluate("document.querySelector('#mode').value"),'4v4');
-  const seen=[];
-  for(let i=0;i<2;i++){seen.push(...await evaluate("[...document.querySelectorAll('.legend-row')].map(n=>n.dataset.role)"));if(i===0)await evaluate("document.querySelector('#legend-next').click()")}
-  assert.deepEqual(seen,['1','2','3','4']);
+  assert.equal(await evaluate("document.querySelector('#lineup-legend').hidden"),true);
+  assert.equal(await evaluate("[...document.querySelectorAll('#players-layer [data-player^=\"attack-\"] text')].map(p=>p.textContent).join(',')"),'1,2,3,4');
   for(const [width,height] of [[360,640],[390,844],[844,390],[1024,768],[1280,800],[1440,900]]) {
     await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<1000});
     for(const view of ['play','library','archives','lineups']) {
@@ -197,11 +199,10 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
   await send('Page.reload');await waitFor("Boolean(document.querySelector('[data-action=lineup-configure]'))");
   await startTeamPractice();
   await send('Emulation.setDeviceMetricsOverride',{width:360,height:640,deviceScaleFactor:1,mobile:true});
-  await checkLayout(360,640,'long team legend');
-  const rowTitle=await evaluate("document.querySelector('.legend-row').title");
-  await tap('.legend-row');await waitFor("document.querySelector('#note-dialog').open");
+  await nav('lineups');await checkLayout(360,640,'long team title');
+  await tap('[data-action=lineup-inspect-profile]');await waitFor("document.querySelector('#note-dialog').open");
   const note=[];for(let i=0;i<20;i++){note.push(await evaluate("document.querySelector('#note-preview').textContent"));assert.ok(await evaluate("document.querySelector('#note-preview').scrollHeight<=document.querySelector('#note-preview').clientHeight"));if(await evaluate("document.querySelector('#note-page-next').disabled"))break;await evaluate("document.querySelector('#note-page-next').click()")}
-  assert.equal(note.join(''),rowTitle);await evaluate("document.querySelector('#close-note').click()");
+  assert.equal(note.join(''),longTeam);await evaluate("document.querySelector('#close-note').click()");
   await nav('lineups');await openWizard();
   await send('Emulation.setDeviceMetricsOverride',{width:360,height:540,deviceScaleFactor:1,mobile:true});
   assert.equal(await evaluate("document.querySelectorAll('[data-action=lineup-trait-height]').length"),0);
@@ -219,15 +220,12 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
   assert.ok(await evaluate("document.querySelector('#lineups-panel').textContent.includes('选择 NBA 球队')||document.querySelector('#lineups-panel').textContent.includes('选择NBA球队')"));
 
   async function startTeamPractice(){
-    await action('lineup-conditions');await waitFor("document.body.dataset.roleConditions==='true'&&!document.body.dataset.pageTransition");
-    const mode=await evaluate(`${disk}.profiles.find(p=>p.id===${disk}.activeProfileId).mode`),id=mode==='4v4'?'four-out-cut':'pick-roll';
-    await evaluate(`(()=>{const n=document.querySelector('[data-action=role-template]');n.value=${JSON.stringify(id)};n.dispatchEvent(new Event('change'))})()`);
-    const count=mode==='4v4'?4:3;
-    for(let i=0;i<count;i++){
-      await evaluate(`document.querySelectorAll('[data-action=role-open]')[${i}].click()`);await waitFor("document.querySelector('#role-confirm-dialog').dataset.phase==='open'");
-      await action('role-status','[data-value=available]');await evaluate(`document.querySelectorAll('[data-action=role-member]')[${i}].click()`);await action('role-save');await waitFor("!document.querySelector('#role-confirm-dialog').open&&!document.body.classList.contains('is-loading')");
+    await action('lineup-conditions');await waitFor("document.body.dataset.tacticSelection==='true'&&!document.body.dataset.pageTransition");
+    if(await evaluate("document.querySelector('#tactic-selection-panel').dataset.stage==='body'")){
+      await action('body-type','[data-body-type=one-big]');await action('selection-view');
+      await waitFor("document.querySelector('#tactic-selection-panel').dataset.stage==='tactics'&&document.querySelector('#tactic-selection-panel').getAttribute('aria-busy')==='false'");
     }
-    await action('role-play');await waitFor("document.body.dataset.view==='play'&&Boolean(document.body.dataset.lineupContext)&&!document.body.classList.contains('is-loading')&&!document.body.dataset.pageTransition");
+    await action('selection-play');await waitFor("document.body.dataset.view==='play'&&!document.body.dataset.lineupContext&&!document.body.classList.contains('is-loading')&&!document.body.dataset.pageTransition");
   }
 
   async function checkNbaDrafts(){

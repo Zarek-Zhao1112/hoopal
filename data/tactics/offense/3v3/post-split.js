@@ -1,8 +1,9 @@
+import {withBodyTypes} from '../../body-types-helper.js';
 import {defineRoles} from '../../role-helpers.js';
 import {frame, defineExpansion, defend} from '../../expansion-helpers.js';
 import {run, screen, pass} from '../../helpers.js';
 
-export default defineExpansion({
+export default withBodyTypes(defineExpansion({
   id: 'post-split', title: '低位分切', mode: '3v3', category: '低位策应', difficulty: '进阶',
   description: '1 号传给低位 3 号，再给 2 号无球掩护；2 号切入接低位回传。',
   ...defineRoles('offense', [
@@ -26,4 +27,7 @@ export default defineExpansion({
     frame('2 号近筐持球继续阅读 D2 的回追，1、3 号两侧接应也各有原对位人跟守。本例展示固定盯人下的绕挡与有限补位，不把接球等同于必然得分。',
       [[700,480],[480,235],[210,330]], [[635,425],[535,285],[270,285]]),
   ],
+}), {
+  "one-big": "围绕低位接球策应，另两人掩护后切入。",
+  "two-big": "低位回传与近侧掩护衔接，切入后让出通道。"
 });

@@ -1,8 +1,9 @@
+import {withBodyTypes} from '../../body-types-helper.js';
 import {defineRoles} from '../../role-helpers.js';
 import {frame, defineExpansion} from '../../expansion-helpers.js';
 import {run, dribble, screen, pass} from '../../helpers.js';
 
-export default defineExpansion({
+export default withBodyTypes(defineExpansion({
   id: 'hammer', title: '弱侧锤子配合', mode: '4v4', category: '弱侧掩护', difficulty: '进阶',
   description: '1 号沿底线突破，弱侧 3 号掩护让 2 号沉底角，再横传弱侧。',
   ...defineRoles('offense', [
@@ -27,4 +28,8 @@ export default defineExpansion({
     frame('2 号在弱侧底角持球，其他三人分散接应。参考防守只展示一种站位，接球后仍需判断投、突或传。',
       [[800,420],[145,190],[350,390],[600,600]], [[790,300],[280,325],[385,260],[500,530]]),
   ],
+}), {
+  "one-big": "底线突破与弱侧掩护衔接，观察对侧底角。",
+  "two-big": "弱侧先完成掩护，底线持球者再观察跨侧传球。",
+  "similar": "底线推进时配合弱侧落角，先练传球时机。"
 });

@@ -1,7 +1,8 @@
+import {withBodyTypes} from '../../body-types-helper.js';
 import {defineRoles} from '../../role-helpers.js';
 import {defineTactic, run, screen, pass} from '../../helpers.js';
 
-export default defineTactic({
+export default withBodyTypes(defineTactic({
   id: 'staggered-screens', mode: '4v4', title: '双掩护接球', category: '无球掩护', difficulty: '进阶',
   description: '3 号与 4 号先后站稳掩护，2 号依次借挡接球，并观察顺下接应。',
   ...defineRoles('offense', [
@@ -41,4 +42,7 @@ export default defineTactic({
       holder: 'attack-4', positions: { 'defense-4': [440, 285] }
     }
   ]
+}), {
+  "two-big": "连续两次掩护相继到位，留出借挡接球通道。",
+  "three-big": "两道掩护先后站稳，借挡后观察接投或内传。"
 });

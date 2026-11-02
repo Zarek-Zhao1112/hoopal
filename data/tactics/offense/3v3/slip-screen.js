@@ -1,8 +1,9 @@
+import {withBodyTypes} from '../../body-types-helper.js';
 import {defineRoles} from '../../role-helpers.js';
 import {frame, defineExpansion} from '../../expansion-helpers.js';
 import {run, dribble, pass} from '../../helpers.js';
 
-export default defineExpansion({
+export default withBodyTypes(defineExpansion({
   id: 'slip-screen', title: '假掩护顺下', mode: '3v3', category: '挡拆变式', difficulty: '基础',
   description: '2 号接近挡点但未建立掩护便提前切入，1 号观察后送球。',
   ...defineRoles('offense', [
@@ -24,4 +25,7 @@ export default defineExpansion({
     frame('2 号根据补防决定终结或回传，1、3 号保持两处出口。若提前拆出没有形成窗口，持球者应保留球权。',
       [[650,550],[500,210],[820,220]], [[620,430],[410,330],[740,220]]),
   ],
+}), {
+  "one-big": "识别防守后提前拆出，持球者观察切入窗口。",
+  "similar": "假掩护提前切入，接球后判断终结或回传。"
 });

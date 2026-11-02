@@ -1,7 +1,8 @@
+import {withBodyTypes} from '../../body-types-helper.js';
 import {defineRoles} from '../../role-helpers.js';
 import {defineDefenseTactic} from '../../defense-helpers.js';
 
-export default defineDefenseTactic({
+export default withBodyTypes(defineDefenseTactic({
   id: 'defense-3v3-man-to-man', mode: '3v3', title: '三人半场盯人', category: '半场盯人',
   description: '持球人出防，无球队员兼顾人球，随转移球收缩与恢复。',
   ...defineRoles('defense', [
@@ -23,4 +24,8 @@ export default defineDefenseTactic({
     { note: '蓝方 3 号跟随右翼持球移动，1、2 号维持中路与弱侧接应线的保护。此为半场盯人训练站位，不预设抢断或防守成功。', holder: 3,
       attack: [[500, 600], [240, 300], [760, 320]], defense: [[540, 430], [410, 250], [675, 270]] }
   ]
+}), {
+  "one-big": "随球调整盯人位置，防突破时兼顾各自对位。",
+  "two-big": "对位防守保持间距，协防后及时回收。",
+  "similar": "根据球的位置调整对位，交流帮助与恢复。"
 });

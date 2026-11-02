@@ -1,7 +1,8 @@
+import {withBodyTypes} from '../../body-types-helper.js';
 import {defineRoles} from '../../role-helpers.js';
 import {defineDefenseTactic} from '../../defense-helpers.js';
 
-export default defineDefenseTactic({
+export default withBodyTypes(defineDefenseTactic({
   id: 'defense-4v4-trap', mode: '4v4', title: '四人底角夹击', category: '夹击防守', difficulty: '进阶',
   description: '球入底角再夹击，两人留后分别保护最近出口与篮下。',
   ...defineRoles('defense', [
@@ -24,4 +25,8 @@ export default defineDefenseTactic({
     { note: '蓝方恢复半场平衡：2 号守左侧持球，1 号高位，3 号右翼，4 号弱侧低位。出球后继续防守，不假设夹击已经造成失误。', holder: 2,
       attack: [[500, 610], [210, 320], [810, 400], [850, 170]], defense: [[500, 510], [305, 250], [720, 330], [655, 170]] }
   ]
+}), {
+  "one-big": "球到指定底角再合围，其余队员照看回传出口。",
+  "two-big": "底角合围与出口覆盖同时到位，再交流接管。",
+  "similar": "先练合围时机，再衔接回传出口与弱侧轮转。"
 });

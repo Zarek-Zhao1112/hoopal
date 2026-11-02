@@ -1,8 +1,9 @@
+import {withBodyTypes} from '../../body-types-helper.js';
 import {defineRoles} from '../../role-helpers.js';
 import {frame, defineExpansion} from '../../expansion-helpers.js';
 import {run, dribble, screen, pass} from '../../helpers.js';
 
-export default defineExpansion({
+export default withBodyTypes(defineExpansion({
   id: 'zoom-handoff', title: '下掩护接手递手', mode: '4v4', category: '连续衔接', difficulty: '进阶',
   description: '2 号先借 3 号下掩护上提，再近身接 1 号手递手，随后借挡突破。',
   ...defineRoles('offense', [
@@ -29,4 +30,8 @@ export default defineExpansion({
     frame('4 号底角控球，按回扑情况选择接投或再传。此套的关键顺序是下掩护、近身交球、停稳借挡，再做突破分球。',
       [[490,600],[660,500],[190,430],[820,200]], [[535,350],[430,410],[440,340],[740,220]]),
   ],
+}), {
+  "one-big": "先借下掩护，再接递手推进并观察底角。",
+  "two-big": "下掩护与递手连续衔接，掩护后及时拉开。",
+  "similar": "沿借挡路线接递手，推进后观察分球出口。"
 });

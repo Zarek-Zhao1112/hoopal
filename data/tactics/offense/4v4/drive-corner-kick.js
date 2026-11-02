@@ -1,7 +1,8 @@
+import {withBodyTypes} from '../../body-types-helper.js';
 import {defineRoles} from '../../role-helpers.js';
 import {defineTactic, run, dribble, pass} from '../../helpers.js';
 
-export default defineTactic({
+export default withBodyTypes(defineTactic({
   id: 'drive-corner-kick', mode: '4v4', title: '突破分底角', category: '突破分球',
   description: '球转右翼后突破牵制，底角小幅移动拉开，再接分球。',
   ...defineRoles('offense', [
@@ -41,4 +42,7 @@ export default defineTactic({
       positions: { 'attack-3': [560, 350], 'defense-3': [620, 300], 'defense-4': [760, 210] }
     }
   ]
+}), {
+  "one-big": "突破吸引防守后分底角，弱侧保持回传出口。",
+  "similar": "观察突破与分球窗口，底角接球后判断投射。"
 });

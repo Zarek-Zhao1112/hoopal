@@ -63,7 +63,7 @@ app单独保护非dialog选单：导航、公共弹窗、Space/start、阵容/�
 
 ## APK与实际手机
 
-- 独立读取实际[APK](../../artifacts/apk/hoopal-1.26.0.apk)，4832365字节，SHA256 `fdbfe93514819a3c16b501de80b3be3a7cfa02464bd53aee9fb9d3b5c9126054`。打开ZIP独立逐字节hash核30份网页资源与dist一致、15图标与1.25.0一致，打包配置无server.url且包名/球搭正确，见[独立APK记录](../../artifacts/qa/hc050/review-apk-check.json)。[签名原文](../../artifacts/qa/hc050/apk/signature.txt)显示原v2证书，版本1.26.0/code31见[APK报告](../../artifacts/qa/hc050/apk/apk.json)。
+- 独立读取实际[APK](../../artifacts/apk/archive/hoopal-1.26.0.apk)，4832365字节，SHA256 `fdbfe93514819a3c16b501de80b3be3a7cfa02464bd53aee9fb9d3b5c9126054`。打开ZIP独立逐字节hash核30份网页资源与dist一致、15图标与1.25.0一致，打包配置无server.url且包名/球搭正确，见[独立APK记录](../../artifacts/qa/hc050/review-apk-check.json)。[签名原文](../../artifacts/qa/hc050/apk/signature.txt)显示原v2证书，版本1.26.0/code31见[APK报告](../../artifacts/qa/hc050/apk/apk.json)。
 - [设备前](../../artifacts/qa/hc050/device-before.json)/[设备后](../../artifacts/qa/hc050/device-after.json)为ef473680/M2101K9C，安装-r Success、COLD640ms/Wait649ms原文已核，实际0队，两文件SHA保持。特别核对本轮用户原进度是baseline-backdoor的frameIndex3（4 / 6、60%），选择SHA为`dfa4ce4e079dcd3e3f58e5b3b994d3399dd19aded2e66f2e9c3b90905412493e`，没有拿HC-048的frame0当本轮数据。
 - [实际WebView记录](../../artifacts/qa/hc050/native-picker.json)为Android12/WV96、393×819；两组9项完整可见/命中，选中baseline-backdoor，局部blur18而workspace.filter为none，打开时背景锁且无整页溢出。独立[复算](../../artifacts/qa/hc050/review-native-check.json)核322自然RAF样本恰好四次opening/open/closing/closed序列及真实中间透明度，四类外部/当前项/原标题/DOM-Escape取消后主Play和双文件保持。
 - 已亲看[手机展开](../../artifacts/qa/hc050/native-picker-open.png)与[关闭](../../artifacts/qa/hc050/native-picker-closed.png)截图，当前非零步骤保留。未在真机选择其他战术、植入测试队伍或直接恢复用户存储；程序点击/DOM-Escape不等同物理手指或Android系统Back，原生物理旋转、Back及最终CRUD另待人工验收。源SHA在构建/原生检查后保持，未以浏览器/VM代替手机证据。

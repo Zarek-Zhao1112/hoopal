@@ -1,7 +1,8 @@
+import {withBodyTypes} from '../../body-types-helper.js';
 import {defineRoles} from '../../role-helpers.js';
 import {defineTactic, run, dribble, screen, pass} from '../../helpers.js';
 
-export default defineTactic({
+export default withBodyTypes(defineTactic({
   id: 'spain-pick-roll', mode: '4v4', title: '西班牙挡拆', category: '复合掩护', difficulty: '进阶',
   description: '4 号给持球人掩护，2 号背掩护 4 号的防守者，再向外弹开。',
   ...defineRoles('offense', [
@@ -41,4 +42,7 @@ export default defineTactic({
       positions: { 'attack-1': [820, 470], 'defense-1': [750, 435], 'defense-4': [530, 305] }
     }
   ]
+}), {
+  "two-big": "主挡拆衔接背掩护，顺下和外弹分开通道。",
+  "three-big": "两次掩护按时衔接，留意顺下与外弹的空间。"
 });

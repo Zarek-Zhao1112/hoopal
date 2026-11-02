@@ -1,7 +1,8 @@
+import {withBodyTypes} from '../../body-types-helper.js';
 import {defineRoles} from '../../role-helpers.js';
 import {defineTactic, run, dribble, pass} from '../../helpers.js';
 
-export default defineTactic({
+export default withBodyTypes(defineTactic({
   id: 'baseline-backdoor', title: '底线反跑', category: '空切配合',
   description: '2 号先上提试探，防守封外线时沿底线反跑接球。',
   ...defineRoles('offense', [
@@ -40,4 +41,8 @@ export default defineTactic({
       positions: { 'attack-1': [620, 500], 'attack-3': [810, 520], 'defense-1': [425, 265], 'defense-2': [355, 220] }
     }
   ]
+}), {
+  "one-big": "底线反跑创造接球窗口，其他队员保留传球出口。",
+  "two-big": "底线切入前拉开间距，观察防守身后的窗口。",
+  "similar": "用接球假动作接底线反跑，传球跟上切入。"
 });

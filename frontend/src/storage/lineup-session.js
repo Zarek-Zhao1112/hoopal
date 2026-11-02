@@ -1,5 +1,6 @@
 import { createLineup, validateLineup, MAX_LINEUPS } from '../../../shared/lineups.js';
 import { createRolePlan, getRolePlanState, setRoleResponse, swapRoleMembers } from '../../../shared/tactic-roles.js';
+import { isBodyTypeForMode } from '../../../shared/tactic-body-types.js';
 
 const copy = value => JSON.parse(JSON.stringify(value));
 const plansFor = (state, id) => Object.hasOwn(state.rolePlans, id) ? state.rolePlans[id] : {};
@@ -57,7 +58,7 @@ export function createLineupSession({ repository, builtinRepository, templates, 
         const previous = state.profiles.find(p => p.id === snapshot.id);
         if (!previous || snapshot.mode !== previous.mode) throw new Error('阵容人数不可改变，请另建档案');
         if (snapshot.revision !== previous.revision) throw new Error('档案已更新，请重新打开后再修改');
-        const profile = validateLineup({ ...snapshot, revision: previous.revision + 1, recentTemplateId: previous.recentTemplateId });
+        const profile = validateLineup({ ...snapshot, bodyType: previous.bodyType, revision: previous.revision + 1, recentTemplateId: previous.recentTemplateId });
         const teamPlans = {};
         for (const [id, plan] of Object.entries(plansFor(state, profile.id))) teamPlans[id] = { ...plan, assignments: plan.assignments.map(row => row.memberId && !profile.players.some(p => p.id === row.memberId) ? { ...row, status: 'unknown', memberId: null } : row) };
         let ctx = state.playbackContext;
@@ -74,6 +75,19 @@ export function createLineupSession({ repository, builtinRepository, templates, 
         if (!state.profiles.some(p => p.id === id)) throw new Error('阵容不存在');
         const profiles = state.profiles.filter(p => p.id !== id), rolePlans = { ...state.rolePlans }; delete rolePlans[id];
         return commit({ ...state, profiles, rolePlans, activeProfileId: state.activeProfileId === id ? profiles[0]?.id || null : state.activeProfileId, playbackContext: null });
+      });
+    },
+    setBodyType(payload) {
+      const snapshot = copy(payload), target = identity();
+      return run(async () => {
+        if (locked) throw new Error('阵容读取未成功，请先重试读取，原档案未被覆盖');
+        if (!snapshot || snapshot.profileId !== target.id || !Number.isSafeInteger(snapshot.expectedRevision)) throw new Error('球队或版本无效，请重新选择');
+        const profile = check(target, snapshot.expectedRevision);
+        if (!isBodyTypeForMode(profile.mode, snapshot.bodyType)) throw new Error('请选择该人数的有效体型分类');
+        if (profile.bodyType === snapshot.bodyType) return copy(profile);
+        const nextProfile = { ...profile, bodyType: snapshot.bodyType, revision: profile.revision + 1 };
+        await commit({ ...state, profiles: state.profiles.map(p => p.id === profile.id ? nextProfile : p), playbackContext: null });
+        return copy(nextProfile);
       });
     },
     confirmRole: payload => changePlan(payload, (plan, template, profile, p) => setRoleResponse(plan, p.roleId, { status: p.status, memberId: p.memberId }, template, profile)),

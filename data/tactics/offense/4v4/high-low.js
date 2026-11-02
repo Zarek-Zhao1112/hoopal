@@ -1,7 +1,8 @@
+import {withBodyTypes} from '../../body-types-helper.js';
 import {defineRoles} from '../../role-helpers.js';
 import {defineTactic, run, dribble, pass} from '../../helpers.js';
 
-export default defineTactic({
+export default withBodyTypes(defineTactic({
   id: 'high-low', mode: '4v4', title: '高低位配合', category: '内线配合',
   description: '先经左翼把球送入高位，3 号低位反跑，高位再向篮下传球。',
   ...defineRoles('offense', [
@@ -41,4 +42,7 @@ export default defineTactic({
       positions: { 'attack-3': [510, 190], 'attack-4': [430, 450], 'defense-3': [565, 240], 'defense-4': [480, 365] }
     }
   ]
+}), {
+  "two-big": "高位接球观察低位反跑，外线保留入口传球。",
+  "three-big": "高低位传接时保持纵深，其他队员让出内传通道。"
 });

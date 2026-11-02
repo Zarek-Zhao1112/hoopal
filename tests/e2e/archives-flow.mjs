@@ -92,7 +92,8 @@ export async function runArchivesFlow({ send, evaluate, wait, waitFor, folder })
     const fixtureDiagnostics = await evaluate(`({selectionRaw:localStorage.getItem('${selectionKey}'),archiveRaw:localStorage.getItem('${key}'),archiveContext:JSON.parse(localStorage.getItem('${key}')).playbackContext,picker:document.querySelector('#template-picker').value,source:document.body.dataset.lineupContext,progress:document.querySelector('#timeline-scrub').value,readLocked:document.querySelector('#lineups-panel').dataset.readLocked})`);
     await writeFile(path.join(folder, 'hc033-fixture-diagnostics.json'), JSON.stringify(fixtureDiagnostics, null, 2));
     assert.equal(fixtureDiagnostics.selectionRaw, fixtureSelection, 'incoming fixture progress survives outgoing pagehide persistence');
-    assert.equal(fixtureDiagnostics.source, profiles[0].id, `fixture restores an actual valid confirmed role source: ${JSON.stringify(fixtureDiagnostics)}`);
+    assert.equal(fixtureDiagnostics.source, '', 'valid historical source is preserved on disk but not rendered as current team mapping');
+    assert.equal(fixtureDiagnostics.archiveContext.profileId,profiles[0].id);
     const baseline = await facts();
     for (const [width, height] of [[360,640],[390,844],[844,390],[1024,768],[1280,800],[1440,900]]) {
       await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width < 1000 }); await wait(100); await nav('archives');

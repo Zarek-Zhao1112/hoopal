@@ -1,8 +1,9 @@
+import {withBodyTypes} from '../../body-types-helper.js';
 import {defineRoles} from '../../role-helpers.js';
 import {frame, defineExpansion} from '../../expansion-helpers.js';
 import {run, screen, pass} from '../../helpers.js';
 
-export default defineExpansion({
+export default withBodyTypes(defineExpansion({
   id: 'screen-the-screener', title: '掩护者再获掩护', mode: '4v4', category: '连续无球掩护', difficulty: '进阶',
   description: '2 号先掩护 3 号切入，随后再借 4 号掩护出来，由 1 号送球。',
   ...defineRoles('offense', [
@@ -29,4 +30,8 @@ export default defineExpansion({
     frame('2 号右翼持球，1、3、4 号各有接应位置。示例展示掩护者随后获掩护的顺序，不把跑出接球等同于保证空位。',
       [[350,600],[680,520],[450,240],[520,300]], [[610,620],[380,360],[380,230],[570,375]]),
   ],
+}), {
+  "two-big": "先为队友掩护，再借第二道掩护接球。",
+  "three-big": "两次掩护错时衔接，分别保留空切和内侧接应。",
+  "similar": "掩护者再借挡跑出，先练两次掩护的先后时机。"
 });

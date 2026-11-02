@@ -4,6 +4,7 @@
 
 | 任务 | 范围 | 结论 | 限制 |
 | --- | --- | --- | --- |
+| [HC-056 整体体型挑选战术](HC-056-body-type-tactic-release.md) | 分类/同人数/玻璃选单、schema2偏好与旧计划、预览/来源保护 | 短屏footer P2已独立复验；26/91/155、独立14组/6布局/存储、246项/完整17组/四入口负例、APK及1.28受限原生程序证据终审通过，无未修P1/P2 | 原生探针起止双hash同，后续观察bodyType/revision变化且严格after拒绝，最终档案hash不同；成员/旧plans/进度同，来源未观察，人工体验awaiting_device |
 | [HC-054 战术条件与三态认领](HC-054-role-requirements-release.md) | 26套/91职责、schema2迁移、认领与来源、面板隔离、构建门槛 | 两P2修复独立复验；155帧/迁移/source/真实构建负例、224项、最终17组及APK、1.27安装双hash和WV96无队26/91证据复核，无未修P1/P2 | 手机真实0档案未写fixture；原生认领保存、物理手势/Back/IME/旋转另验，awaiting_device，不能以Chrome代替 |
 | [HC-050 标题下展玻璃选单](HC-050-tactic-picker-release.md) | 220/160ms动效/取消、来源保护、锁/焦点、短屏与原生兼容 | 重复点击已修，无未修P1/P2；16组/36布局/264行可达/6双击/96外框/129源SHA及原APK身份，WV96四开合322样本/非零进度双hash保持独立核验通过 | 33最终与28隔离动效样本分记；两轮失败和诊断边界保留，物理手势/Back/旋转/CRUD仍awaiting_device |
 | [HC-048 训练场完整动画布局](HC-048-training-viewing-release.md) | 真实标题/全步骤/集中播放、推荐映射与短屏、原时钟/来源兼容 | 推荐横屏遮挡/极短屏球场过小两P2已修；225、最终Chrome15组/36布局/96外框与127源SHA、APK与1.25.0手机双hash/实际WV620样本独立复核通过，无未修P1/P2 | 初轮完整及隔离失败保留；手机程序检查为竖屏，物理手势/Back/旋转/CRUD另待验，任务awaiting_device |

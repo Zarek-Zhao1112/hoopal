@@ -1,4 +1,5 @@
 import { getNbaTeam } from '../data/nba-teams.js';
+import { isBodyTypeForMode } from './tactic-body-types.js';
 
 export const MAX_LINEUPS = 20;
 export const SKILLS = Object.freeze([
@@ -57,7 +58,7 @@ export function validateLegacyLineup(value) {
     recentTemplateId: value.recentTemplateId === null ? null : text(value.recentTemplateId, '最近战术ID', 100) };
 }
 
-/** Basic team identity only. Tactical duties are confirmed per builtin tactic. */
+/** Basic team identity and optional whole-team browsing preference. */
 export function validateLineup(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('阵容格式无效');
   const mode = oneOf(value.mode, ['3v3', '4v4'], '人数');
@@ -66,6 +67,8 @@ export function validateLineup(value) {
   if (!Array.isArray(value.players) || value.players.length !== count) throw new Error(`该阵容需要${count}名队员`);
   const nbaTeamId = value.nbaTeamId ?? null;
   if (nbaTeamId !== null && !getNbaTeam(nbaTeamId)) throw new Error('NBA球队无效，请重新选择');
+  const bodyType = value.bodyType ?? null;
+  if (bodyType !== null && !isBodyTypeForMode(mode, bodyType)) throw new Error('球队体型分类无效，请重新选择');
   const ids = new Set(), numbers = new Set();
   const players = value.players.map(player => {
     if (!player || typeof player !== 'object' || Array.isArray(player)) throw new Error('队员格式无效');
@@ -78,14 +81,14 @@ export function validateLineup(value) {
   });
   return { id: text(value.id, '阵容ID', 100), name: text(value.name, '阵容名称', 40), mode,
     crest: oneOf(value.crest, ['ball', 'shield', 'bolt'], '队徽'), color: oneOf(value.color, ['orange', 'blue', 'green'], '主题色'),
-    revision: value.revision, players, nbaTeamId,
+    revision: value.revision, players, nbaTeamId, bodyType,
     recentTemplateId: value.recentTemplateId == null ? null : text(value.recentTemplateId, '最近战术ID', 100) };
 }
 
 export function createLineup(mode = '3v3', options = {}) {
   oneOf(mode, ['3v3', '4v4'], '人数');
   return validateLineup({ id: options.id ?? newId('lineup'), name: options.name ?? (mode === '3v3' ? '三人阵容' : '四人阵容'), mode,
-    crest: options.crest ?? 'ball', color: options.color ?? 'orange', nbaTeamId: options.nbaTeamId ?? null, revision: 1, recentTemplateId: null,
+    crest: options.crest ?? 'ball', color: options.color ?? 'orange', nbaTeamId: options.nbaTeamId ?? null, bodyType: options.bodyType ?? null, revision: 1, recentTemplateId: null,
     players: Array.from({ length: mode === '3v3' ? 3 : 4 }, (_, index) => ({
       id: newId('member'), name: '', number: index + 1
     })) });

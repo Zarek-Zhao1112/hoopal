@@ -77,7 +77,7 @@ export async function runTacticPickerFlow({ send, evaluate, wait, waitFor, folde
     for (const entry of cases) {
       const template = templates.find(t => t.id === entry.id), catalog = templates.filter(t => t.mode === template.mode && t.kind === template.kind);
       await enter(entry); const original = await facts();
-      assert.equal(original.source, entry.profile?.id || '');
+      assert.equal(original.source, '', 'retired source remains on disk, while current practice uses numbered players');
       for (const [width, height] of sizes) {
         await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width < 1000 }); await wait(70); await idle();
         const before = await evaluate(`({card:document.querySelector('.training-panel').getBoundingClientRect().toJSON(),nav:document.querySelector('.view-nav').getBoundingClientRect().toJSON(),locks:[...document.querySelectorAll(${JSON.stringify(backgroundSelector)})].map(n=>({id:n.id||n.dataset.viewTarget,disabled:n.disabled}))})`);

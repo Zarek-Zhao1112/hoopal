@@ -1,3 +1,5 @@
+import { validateTacticBodyTypes } from './tactic-body-types.js';
+
 // Pure tactical requirements. These are actions to confirm for one play, not
 // permanent ability ratings or a claim that a team will succeed in a match.
 export const ROLE_ACTIONS = Object.freeze({
@@ -78,7 +80,7 @@ export function validateTacticCatalog(templates) {
   const ids = new Set();
   for (const template of templates) {
     if (ids.has(template.id)) fail(`战术ID重复：${template.id}`);
-    validateTacticRoles(template); ids.add(template.id);
+    validateTacticRoles(template); validateTacticBodyTypes(template); ids.add(template.id);
   }
   return templates;
 }

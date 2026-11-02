@@ -1,7 +1,8 @@
+import {withBodyTypes} from '../../body-types-helper.js';
 import {defineRoles} from '../../role-helpers.js';
 import {defineTactic, run, dribble, screen, pass} from '../../helpers.js';
 
-export default defineTactic({
+export default withBodyTypes(defineTactic({
   id: 'dribble-handoff', title: '手递手配合', category: '手递手',
   description: '2 号近身接手递手，借 1 号掩护突破，再寻找外弹回传。',
   ...defineRoles('offense', [
@@ -40,4 +41,7 @@ export default defineTactic({
       holder: 'attack-1', positions: { 'defense-1': [535, 340] }
     }
   ]
+}), {
+  "one-big": "近身递手后借掩护推进，交球者外弹接应。",
+  "similar": "先练递手距离，再衔接突破与回传。"
 });

@@ -136,7 +136,7 @@ export function createLibraryDeck({ root, makePreview, onPlay, onConditions, vis
     heading.setAttribute('aria-controls', body.id); heading.setAttribute('aria-expanded', 'false');
     const meta = element('div', 'library-card-meta'), category = element('span', 'library-card-category'), mode = element('span', 'library-card-mode');
     meta.append(category, mode);
-    const conditions = element('button', 'library-card-conditions', '查看条件');
+    const conditions = element('button', 'library-card-conditions', '挑选战术');
     conditions.type = 'button'; conditions.dataset.conditionsTemplate = template.id;
     conditions.hidden = typeof onConditions !== 'function'; conditions.tabIndex = -1;
     meta.append(conditions);

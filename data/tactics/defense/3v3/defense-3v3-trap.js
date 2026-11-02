@@ -1,7 +1,8 @@
+import {withBodyTypes} from '../../body-types-helper.js';
 import {defineRoles} from '../../role-helpers.js';
 import {defineDefenseTactic} from '../../defense-helpers.js';
 
-export default defineDefenseTactic({
+export default withBodyTypes(defineDefenseTactic({
   id: 'defense-3v3-trap', mode: '3v3', title: '三人边线夹击', category: '夹击防守', difficulty: '进阶',
   description: '球入边线再合围，一名留后者优先护筐并兼顾最近出口。',
   ...defineRoles('defense', [
@@ -23,4 +24,7 @@ export default defineDefenseTactic({
     { note: '蓝方恢复可继续防守的半场阵形：3 号控制新持球侧，1 号照看高位接应，2 号补篮下。此示例不预设夹击一定制造失误。', holder: 3,
       attack: [[500, 590], [135, 285], [780, 310]], defense: [[500, 500], [410, 210], [680, 225]] }
   ]
+}), {
+  "one-big": "球到边线后合围，第三人照看主要传球出口。",
+  "similar": "等球进入边线再夹击，合围后注意出口轮转。"
 });

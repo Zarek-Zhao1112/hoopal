@@ -1,7 +1,8 @@
+import {withBodyTypes} from '../../body-types-helper.js';
 import {defineRoles} from '../../role-helpers.js';
 import {defineDefenseTactic} from '../../defense-helpers.js';
 
-export default defineDefenseTactic({
+export default withBodyTypes(defineDefenseTactic({
   id: 'defense-3v3-help-rotation', mode: '3v3', title: '三人协防轮转', category: '协防轮转', difficulty: '进阶',
   description: '突破时一人协防、一人补协防者，出球后轮流扑防并恢复。',
   ...defineRoles('defense', [
@@ -23,4 +24,8 @@ export default defineDefenseTactic({
     { note: '对手外线重新拉开，蓝方通过交流恢复各侧防守：2 号控制左侧球，1 号回高位，3 号恢复右侧。先补空位，再恢复认人。', holder: 2,
       attack: [[500, 590], [230, 310], [810, 230]], defense: [[500, 500], [320, 245], [700, 205]] }
   ]
+}), {
+  "one-big": "突破时及时帮助，再交流补上空出的对位。",
+  "two-big": "协防后先补空位，弱侧随球收缩与恢复。",
+  "similar": "练习帮助、轮转和回收，保持对球与人的观察。"
 });

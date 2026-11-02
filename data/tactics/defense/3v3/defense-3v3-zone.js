@@ -1,7 +1,8 @@
+import {withBodyTypes} from '../../body-types-helper.js';
 import {defineRoles} from '../../role-helpers.js';
 import {defineDefenseTactic} from '../../defense-helpers.js';
 
-export default defineDefenseTactic({
+export default withBodyTypes(defineDefenseTactic({
   id: 'defense-3v3-zone', mode: '3v3', title: '三人一高两低联防', category: '区域联防',
   description: '一高两低的半场区域训练，球入侧区由对应防守人接管。',
   ...defineRoles('defense', [
@@ -23,4 +24,7 @@ export default defineDefenseTactic({
     { note: '右翼持球向内移动，3 号继续控制该区域，1 号补中路，2 号保持弱侧护筐。球再转移时需继续交流与轮转。', holder: 3,
       attack: [[500, 600], [210, 300], [790, 290]], defense: [[610, 390], [500, 175], [690, 230]] }
   ]
+}), {
+  "one-big": "按区域随球交接，球转侧翼后补高位通道。",
+  "two-big": "两侧区域随球出防，弱侧注意收缩护筐。"
 });

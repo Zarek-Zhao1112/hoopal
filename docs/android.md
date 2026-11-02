@@ -2,6 +2,8 @@
 
 ## 运行方式
 
+2026-11-02，1.28.0/code33已覆盖安装指定ef473680/M2101K9C，支持按整体体型「挑选战术」、同人数过滤及局部玻璃选单，取消逐人确认门槛。246检查/完整17组/独立审查通过；原生构建24秒，30网页同dist、15原图标/原v2签名/无server.url通过。install-r Success，COLD846/Wait853。安装前为真实1队3v3及pick-roll第1步，WV96程序验证三人草稿取消和四人异人数8组浏览，不写真实偏好；探针起止双原文同备份。随后复查档案仅体型偏好与revision更新，核心球队/成员/旧plans及进度保持；最终整档hash不同已如实记录，不恢复旧备份，也不推定该变化是人工验收。详见[HC-056](tasks/HC-056-body-type-tactic-release.md)，[1.28 APK](../artifacts/apk/hoopal-1.28.0.apk)可直接发Android平板覆盖安装。
+
 2026-11-02，1.27.0/code32已覆盖安装M2101K9C（ef473680），新战术条件与三态角色认领使用本地schema2。最终APK21秒构建，30网页资源同dist、15图标同1.26、原v2证书及无server.url通过；install-r Success，COLD620ms/Wait630ms。即时备份显示实际0球队、baseline-backdoor第5步（frameIndex4），安装及真实WebView96浏览26套/91职责后两份文件hash均保持；成功读取未强制写回schema1。手机无测试球队，未伪称本队认领保存或真实IME验收；浏览器验证了迁移、完整攻防分工与失败重试，人工手势/Back/输入法/旋转待验。完整证据见[HC-054](tasks/HC-054-role-requirements-release.md)，[1.27.0 APK](../artifacts/apk/hoopal-1.27.0.apk)可直接发Android平板覆盖安装。
 
 2026-11-02，1.26.0/code31已覆盖安装同一新机，新增训练场标题下展玻璃选单。225检查/完整Chrome16组/36选单布局与独立审查通过，19秒构建、30网页同dist/15图标同1.25.0/原v2签名通过。COLD640ms/Wait649ms，实际0队、原非零第4步及双hash保持；WV96竖屏393×819两组九标题/局部玻璃/322开合样本、四类取消与主Play保持通过。硬件Back、物理手指/旋转另待人工验，见[HC-050](tasks/HC-050-tactic-picker-release.md)。
@@ -73,7 +75,7 @@ npm run android:build
 
 脚本会构建网页、同步 Android 资源、运行 `assembleDebug`，再生成 `artifacts/apk/halfcourt-debug.apk`、`hoopal-版本号.apk`及各自的SHA256文件。原始产物在 `android/app/build/outputs/apk/debug/app-debug.apk`。顶层保当前版与一个回退版，更旧包放在`artifacts/apk/archive/`，同步历史文档链接。
 
-当前构建版本为 `1.26.0`（versionCode 31），训练场战术标题采用局部玻璃选单，220/160ms开合及同项/取消保留进度；账号/云备份服务仍尚未开放。安装证据见[HC-050](tasks/HC-050-tactic-picker-release.md)，[1.26.0安装包](../artifacts/apk/hoopal-1.26.0.apk)可直接发Android平板，升级保留档案与进度，不需卸载或电脑服务。[1.25.0](../artifacts/apk/archive/hoopal-1.25.0.apk)保作源码/资源核对与回退参考，更旧[1.24.0](../artifacts/apk/archive/hoopal-1.24.0.apk)及[1.23.0](../artifacts/apk/archive/hoopal-1.23.0.apk)已归档保留，Android降级安装受版本限制。
+当前构建版本为 `1.26.0`（versionCode 31），训练场战术标题采用局部玻璃选单，220/160ms开合及同项/取消保留进度；账号/云备份服务仍尚未开放。安装证据见[HC-050](tasks/HC-050-tactic-picker-release.md)，[1.26.0安装包](../artifacts/apk/archive/hoopal-1.26.0.apk)可直接发Android平板，升级保留档案与进度，不需卸载或电脑服务。[1.25.0](../artifacts/apk/archive/hoopal-1.25.0.apk)保作源码/资源核对与回退参考，更旧[1.24.0](../artifacts/apk/archive/hoopal-1.24.0.apk)及[1.23.0](../artifacts/apk/archive/hoopal-1.23.0.apk)已归档保留，Android降级安装受版本限制。
 
 当前开发机的便携工具放在被忽略的 `.tools/` 中，构建脚本可以自动使用其中的 JDK、SDK 和 Gradle。这些大体积工具不属于项目源码；其他电脑按上面的标准环境变量配置即可。首次构建需要联网下载依赖，安装后的战术应用可离线使用。
 

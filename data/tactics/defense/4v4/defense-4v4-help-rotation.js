@@ -1,7 +1,8 @@
+import {withBodyTypes} from '../../body-types-helper.js';
 import {defineRoles} from '../../role-helpers.js';
 import {defineDefenseTactic} from '../../defense-helpers.js';
 
-export default defineDefenseTactic({
+export default withBodyTypes(defineDefenseTactic({
   id: 'defense-4v4-help-rotation', mode: '4v4', title: '四人协防轮转', category: '协防轮转', difficulty: '进阶',
   description: '先协防突破，再补协防者空位，出球后连续轮转而非追球。',
   ...defineRoles('defense', [
@@ -24,4 +25,9 @@ export default defineDefenseTactic({
     { note: '轮转后 1 号接管底角，3 号照看回到高位的对手 1 号，4 号守右翼，2 号守左侧。先通过交流接住空位，再建立稳定的新对位。', holder: 4,
       attack: [[500, 610], [180, 380], [820, 380], [730, 170]], defense: [[640, 110], [275, 310], [500, 510], [725, 305]] }
   ]
+}), {
+  "one-big": "首防被突破时帮助，其他队员按空位依次轮转。",
+  "two-big": "协防后逐个接管新对位，避免多人停留篮下。",
+  "three-big": "按顺序补空位，最后回收底角与外线出口。",
+  "similar": "用交流完成帮助与轮转，再恢复传球出口防守。"
 });

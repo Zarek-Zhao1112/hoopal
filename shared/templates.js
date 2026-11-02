@@ -3,9 +3,9 @@ import { createPlay, createBoard, ballPosition, validatePlay } from './engine.js
 
 const clone = value => JSON.parse(JSON.stringify(value));
 
-function makeTemplate(id, title, description, steps, mode = '3v3', category = '基础配合', difficulty = '基础', kind = 'offense', roleVersion, roles) {
+function makeTemplate(id, title, description, steps, mode = '3v3', category = '基础配合', difficulty = '基础', kind = 'offense', roleVersion, roles, bodyTypes, bodyTypeNotes) {
   return {
-    id, title, description, mode, category, difficulty, kind, roleVersion, roles,
+    id, title, description, mode, category, difficulty, kind, roleVersion, roles, bodyTypes, bodyTypeNotes,
     build() {
       const play = createPlay(mode);
       play.title = title;
@@ -28,6 +28,6 @@ function makeTemplate(id, title, description, steps, mode = '3v3', category = '�
   };
 }
 
-export const templates = templateDefinitions.map(({ id, title, description, steps, mode, category, difficulty, kind, roleVersion, roles }) =>
-  makeTemplate(id, title, description, steps, mode, category, difficulty, kind, roleVersion, roles)
+export const templates = templateDefinitions.map(({ id, title, description, steps, mode, category, difficulty, kind, roleVersion, roles, bodyTypes, bodyTypeNotes }) =>
+  makeTemplate(id, title, description, steps, mode, category, difficulty, kind, roleVersion, roles, bodyTypes, bodyTypeNotes)
 );

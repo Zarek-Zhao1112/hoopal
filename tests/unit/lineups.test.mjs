@@ -30,7 +30,7 @@ test('invalid roster identities, numbers, metadata and bounds fail instead of si
   const zero=createLineup();zero.players[0].number=0;assert.equal(validateLineup(zero).players[0].number,0);
 });
 
-const legacyProfile=()=>{const p=createLineup();for(const member of p.players)Object.assign(member,{height:'',build:'',mobility:'',strengths:[],weaknesses:[]});return p;};
+const legacyProfile=()=>{const p=createLineup();delete p.bodyType;for(const member of p.players)Object.assign(member,{height:'',build:'',mobility:'',strengths:[],weaknesses:[]});return p;};
 test('schema1 legacy validation remains strict for corruption isolation without changing legacy raw input',()=>{
   const p=legacyProfile(),raw=structuredClone(p);p.players[0].strengths=['passing'];
   assert.deepEqual(validateLegacyLineup(p),p);assert.deepEqual(raw.players[0].strengths,[]);

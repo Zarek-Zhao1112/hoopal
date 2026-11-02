@@ -3,7 +3,7 @@ import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { templates } from '../../shared/templates.js';
 import { createLineup, validateLineup } from '../../shared/lineups.js';
-import {confirmedRoleArchive,explicitRoleAssignments} from './role-fixtures.mjs';
+import {confirmedRoleArchive} from './role-fixtures.mjs';
 
 /** Exercise the real training board in the runner's disposable browser profile. */
 export async function runTrainingViewingFlow({ send, evaluate, wait, waitFor, folder }) {
@@ -55,7 +55,7 @@ export async function runTrainingViewingFlow({ send, evaluate, wait, waitFor, fo
       await documentWith(JSON.stringify(confirmedRoleArchive(profile?[profile]:[],profile?.id||null,template.id)), JSON.stringify({ templateId: template.id, frameIndex: 1 }));
       await nav('play'); const original = await facts();
       assert.equal(original.counter, `2 / ${play.frames.length}`, 'saved nonzero progress restores into the new controls');
-      assert.equal(original.source, profile?.id || '');
+      assert.equal(original.source, '', 'new training keeps generic numbering even with historical role data');
       for (const [width, height] of sizes) {
         await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width < 1000 }); await wait(100); await settled();
         const geometry = await layout(entry, width, height);
@@ -93,7 +93,7 @@ export async function runTrainingViewingFlow({ send, evaluate, wait, waitFor, fo
     assert.deepEqual(result.markers.map(n => n.index), Array.from({ length: count }, (_, i) => i));
     assert.equal(result.markers.filter(n => n.current === 'step').length, 1); assert.equal(result.markers.find(n => n.current === 'step').index, 1);
     assert.ok(result.markers.every(n => n.name.trim()), `${label}: step markers have understandable accessible names`);
-    assert.equal(result.legendVisible, Boolean(entry.profile));
+    assert.equal(result.legendVisible, false);
     for (const control of result.controls) assert.ok(control.fit && control.hit, `${label}: actionable control ${JSON.stringify(control)}`);
     const m = result.courtMatrix, [vbw, vbh] = result.viewBox;
     assert.ok(m.a > 0 && Math.abs(m.a - m.d) < .001 && Math.abs(m.b) < .001 && Math.abs(m.c) < .001, `${label}: SVG keeps uniform court scale`);
@@ -102,21 +102,13 @@ export async function runTrainingViewingFlow({ send, evaluate, wait, waitFor, fo
     return result;
   }
 
-  async function checkLegend(profile, templateId) {
-    const recommendation = {assignments:explicitRoleAssignments(profile,templateId)}, seen = [];
-    while (await evaluate("!document.querySelector('#legend-prev').disabled")) await click('#legend-prev');
-    for (let page = 0; page < Math.ceil(profile.players.length / 2); page++) {
-      seen.push(...await evaluate("[...document.querySelectorAll('.legend-row')].map(n=>({role:Number(n.dataset.role),name:n.querySelector('.legend-name').textContent,task:n.querySelector('.legend-task').textContent}))"));
-      if (page < Math.ceil(profile.players.length / 2) - 1) await click('#legend-next');
-    }
-    for (const assignment of recommendation.assignments) {
-      const row = seen.find(n => n.role === assignment.role), member = profile.players.find(p => p.id === assignment.playerId);
-      assert.ok(row?.name.includes(member.name) && row.name.includes(`球衣 ${member.number} 号`)); assert.equal(row.task, assignment.task);
-      assert.ok(await evaluate(`document.querySelector('#players-layer [data-player="attack-${assignment.role}"] title').textContent.includes(${JSON.stringify(member.name)})`));
-    }
-    await click('.legend-row'); await waitFor("document.querySelector('#note-dialog').open");
-    assert.ok(await evaluate("document.querySelector('#note-preview').textContent.includes('职责')")); await click('#close-note');
-    while (await evaluate("!document.querySelector('#legend-prev').disabled")) await click('#legend-prev');
+  async function checkLegend(profile,templateId) {
+    assert.equal(await evaluate("document.querySelector('#lineup-legend').hidden"),true);
+    const stored=JSON.parse(await evaluate(`localStorage.getItem('${archiveKey}')`));
+    assert.equal(stored.playbackContext.profileId,profile.id,'historical source remains untouched while observing the same tactic');
+    assert.ok(stored.rolePlans[profile.id][templateId]);
+    for(const player of profile.players)assert.ok(!await evaluate(`document.querySelector('#players-layer').textContent.includes(${JSON.stringify(player.name)})`),'old member names are never inferred into new practice');
+    assert.equal(await evaluate("document.body.dataset.lineupContext"),'');
   }
 
   async function exerciseControls(template, original) {

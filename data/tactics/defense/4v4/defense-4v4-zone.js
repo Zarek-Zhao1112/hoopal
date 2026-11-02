@@ -1,7 +1,8 @@
+import {withBodyTypes} from '../../body-types-helper.js';
 import {defineRoles} from '../../role-helpers.js';
 import {defineDefenseTactic} from '../../defense-helpers.js';
 
-export default defineDefenseTactic({
+export default withBodyTypes(defineDefenseTactic({
   id: 'defense-4v4-zone', mode: '4v4', title: '四人二二区域联防', category: '区域联防',
   description: '两高两低分区守半场，按侧翼、底角与回传依次交接。',
   ...defineRoles('defense', [
@@ -24,4 +25,8 @@ export default defineDefenseTactic({
     { note: '右翼对手持球靠内，2 号随区域移动，1 号补中路，3、4 号守低位。按球和区域继续交接，不把联防当成站定不动。', holder: 3,
       attack: [[500, 620], [200, 280], [780, 340], [700, 190]], defense: [[430, 440], [685, 265], [440, 205], [570, 190]] }
   ]
+}), {
+  "two-big": "两层区域随球交接，球侧出防、弱侧收缩。",
+  "three-big": "按区域轮转并保留层次，注意高低位传球。",
+  "similar": "随球移动保持两层区域，及时交流交接。"
 });

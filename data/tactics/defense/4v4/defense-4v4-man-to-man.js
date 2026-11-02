@@ -1,7 +1,8 @@
+import {withBodyTypes} from '../../body-types-helper.js';
 import {defineRoles} from '../../role-helpers.js';
 import {defineDefenseTactic} from '../../defense-helpers.js';
 
-export default defineDefenseTactic({
+export default withBodyTypes(defineDefenseTactic({
   id: 'defense-4v4-man-to-man', mode: '4v4', title: '四人半场盯人', category: '半场盯人',
   description: '四人盯人随球调整，无球侧保持人球兼顾与篮下帮助。',
   ...defineRoles('defense', [
@@ -24,4 +25,9 @@ export default defineDefenseTactic({
     { note: '右翼对手向内运球，3 号随球移动，其他三人保持帮助与认人的平衡。该站位用于讲解半场协作，不预设封住所有进攻选择。', holder: 3,
       attack: [[500, 620], [220, 300], [760, 330], [700, 190]], defense: [[550, 420], [420, 215], [665, 265], [600, 150]] }
   ]
+}), {
+  "one-big": "四人随球调整对位，突破时帮助后再恢复。",
+  "two-big": "保持盯人间距，协防时交流接管空位。",
+  "three-big": "先守住各自对位，轮转时避免集中追球。",
+  "similar": "按球的位置调整盯人，互相提示帮助与回收。"
 });

@@ -1,7 +1,8 @@
+import {withBodyTypes} from '../../body-types-helper.js';
 import {defineRoles} from '../../role-helpers.js';
 import {defineTactic, run, dribble, screen, pass} from '../../helpers.js';
 
-export default defineTactic({
+export default withBodyTypes(defineTactic({
   id: 'pick-pop', title: '挡拆外弹', category: '挡拆配合',
   description: '2 号高位掩护后向外弹开，1 号突破牵制后回传。',
   ...defineRoles('offense', [
@@ -40,4 +41,7 @@ export default defineTactic({
       positions: { 'attack-1': [210, 260], 'defense-1': [275, 305], 'defense-2': [585, 545] }
     }
   ]
+}), {
+  "two-big": "掩护后外弹接球，留意接投与外线空间。",
+  "similar": "借掩护吸引防守后回传，接球者判断投射。"
 });

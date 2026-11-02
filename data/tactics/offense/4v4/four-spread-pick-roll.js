@@ -1,7 +1,8 @@
+import {withBodyTypes} from '../../body-types-helper.js';
 import {defineRoles} from '../../role-helpers.js';
 import {defineTactic, run, dribble, screen, pass} from '../../helpers.js';
 
-export default defineTactic({
+export default withBodyTypes(defineTactic({
   id: 'four-spread-pick-roll', mode: '4v4', title: '挡拆弱侧拉开', category: '挡拆配合',
   description: '4 号高位掩护后顺下，两侧底角拉开，1 号突破后寻找内传。',
   ...defineRoles('offense', [
@@ -41,4 +42,8 @@ export default defineTactic({
       positions: { 'attack-1': [760, 500], 'defense-1': [700, 420] }
     }
   ]
+}), {
+  "one-big": "主掩护后顺下，两侧保持传球出口。",
+  "two-big": "挡拆推进与顺下衔接，弱侧先保持间距。",
+  "similar": "借掩护推进并观察顺下，弱侧接应随球调整。"
 });

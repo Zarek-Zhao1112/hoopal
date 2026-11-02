@@ -4,14 +4,14 @@ import path from 'node:path';
 import { templates } from '../../shared/templates.js';
 import { createLineup, validateLineup } from '../../shared/lineups.js';
 import {waitForWizardMotion} from './wizard-helpers.mjs';
-import {confirmedRolePlan,explicitRoleAssignments} from './role-fixtures.mjs';
+import {confirmedRolePlan} from './role-fixtures.mjs';
 import { ballPosition } from '../../shared/engine.js';
 import { findLibraryCard } from './library-deck-helpers.mjs';
 import { selectArchive } from './archive-helpers.mjs';
 
 const newIds = ['post-split', 'slip-screen', 'offball-flare', 'hammer', 'zoom-handoff', 'screen-the-screener'];
 
-/** Actual app/template/recommendation integration in the runner's isolated profile. */
+/** Actual app/template/body-type selection integration in the runner's isolated profile. */
 export async function runOffenseExpansionFlow({ send, evaluate, wait, waitFor, folder }) {
   const nav = async view => {
     await evaluate(`document.querySelector('[data-view-target=${view}]').click()`);
@@ -33,6 +33,7 @@ export async function runOffenseExpansionFlow({ send, evaluate, wait, waitFor, f
   const profiles = newIds.map((id,index)=>{
     const template=templates.find(item=>item.id===id),profile=createLineup(template.mode,{id:'hc027-'+id,name:'新增配合验证 '+(index+1),nbaTeamId:'GSW'});
     profile.players.forEach((player,roleIndex)=>Object.assign(player,{id:'member-'+roleIndex,name:'实测队员'+(roleIndex+1),number:[7,12,23,30][roleIndex]}));
+    profile.bodyType=template.bodyTypes[0];
     return validateLineup(profile);
   });
   try {
@@ -77,8 +78,7 @@ export async function runOffenseExpansionFlow({ send, evaluate, wait, waitFor, f
       metrics.push({ id, frames });
     }
 
-    // Previously weighted top-three recommendations are retired. Use saved,
-    // explicitly confirmed role plans and check the same real animation mapping.
+    // Historical plans are retained, but the new body-type flow enters numbered practice directly.
     await pause();
     const archive={schemaVersion:2,profiles,activeProfileId:profiles[0].id,rolePlans:Object.fromEntries(profiles.map((p,i)=>[p.id,{[newIds[i]]:confirmedRolePlan(p,newIds[i])}])),playbackContext:null};
     await evaluate(`localStorage.setItem('halfcourt-lineups-v1',${JSON.stringify(JSON.stringify(archive))})`);
@@ -86,16 +86,24 @@ export async function runOffenseExpansionFlow({ send, evaluate, wait, waitFor, f
     for(let index=0;index<profiles.length;index++){
       const profile=profiles[index],id=newIds[index];
       if(index){await nav('lineups');await selectArchive({evaluate,waitFor},profile.id);await waitFor("document.querySelector('#lineups-panel').getAttribute('aria-busy')==='false'");}
-      await action('lineup-conditions');await waitFor("document.body.dataset.roleConditions==='true'&&!document.body.dataset.pageTransition");
-      await evaluate(`(()=>{const s=document.querySelector('[data-action=role-template]');s.value=${JSON.stringify(id)};s.dispatchEvent(new Event('change'))})()`);
-      await action('role-play');await waitFor(`document.body.dataset.view==='play'&&document.body.dataset.lineupContext===${JSON.stringify(profile.id)}&&!document.body.classList.contains('is-loading')`);
+      await action('lineup-conditions');await waitFor("document.body.dataset.tacticSelection==='true'&&!document.body.dataset.pageTransition");
+      assert.equal(await evaluate("document.querySelector('#tactic-selection-panel').dataset.stage"),'tactics');
+      await action('selection-picker');await waitFor("document.querySelector('#selection-tactic-menu').dataset.phase==='open'");
+      const candidates=await evaluate("[...document.querySelectorAll('[data-selection-template]')].map(n=>n.dataset.selectionTemplate)");
+      assert.ok(candidates.includes(id));assert.ok(templates.filter(t=>candidates.includes(t.id)).every(t=>t.mode===profile.mode&&t.bodyTypes.includes(profile.bodyType)));
+      await evaluate(`document.querySelector('[data-selection-template="${id}"]').click()`);await waitFor("document.querySelector('#selection-tactic-menu').dataset.phase==='closed'");
+      await action('selection-play');await waitFor("document.body.dataset.view==='play'&&!document.body.dataset.lineupContext&&!document.body.classList.contains('is-loading')");
       assert.equal(await evaluate("document.querySelector('#template-picker').value"),id);
-      const context=await evaluate("JSON.parse(localStorage.getItem('halfcourt-lineups-v1')).playbackContext");
-      assert.deepEqual(context,{source:'role-confirmations',profileId:profile.id,profileRevision:profile.revision,templateId:id,roleVersion:1});
-      const seen=[];for(let page=0;page<Math.ceil(profile.players.length/2);page++){seen.push(...await evaluate("[...document.querySelectorAll('.legend-row')].map(n=>({role:Number(n.dataset.role),name:n.querySelector('.legend-name').textContent,task:n.querySelector('.legend-task').textContent}))"));if(page+1<Math.ceil(profile.players.length/2))await evaluate("document.querySelector('#legend-next').click()");}
-      const assignments=explicitRoleAssignments(profile,id);assert.equal(seen.length,profile.players.length);
-      for(const assignment of assignments){const row=seen.find(item=>item.role===assignment.role),member=profile.players.find(item=>item.id===assignment.playerId);assert.ok(row.name.includes(member.name)&&row.name.includes('球衣 '+member.number+' 号'));assert.equal(row.task,assignment.task);assert.ok(await evaluate(`document.querySelector('#players-layer [data-player="${assignment.animationId}"] title').textContent.includes(${JSON.stringify(member.name)})`));}
-      metrics.push({id,assignments,legend:seen});if(index===0)await verifySourceFailure(id,profile.id);
+      const stored=await evaluate("JSON.parse(localStorage.getItem('halfcourt-lineups-v1'))");
+      assert.equal(stored.playbackContext,null);assert.deepEqual(stored.rolePlans[profile.id][id],archive.rolePlans[profile.id][id]);
+      assert.equal(await evaluate("document.querySelector('#lineup-legend').hidden"),true);
+      for(const member of profile.players)assert.ok(!await evaluate(`document.querySelector('#players-layer').textContent.includes(${JSON.stringify(member.name)})`));
+      metrics.push({id,bodyType:profile.bodyType,candidates,numberedPractice:true,historicalPlanPreserved:true});
+      if(index===0){
+        const ctx={source:'role-confirmations',profileId:profile.id,profileRevision:profile.revision,templateId:id,roleVersion:1};
+        await evaluate(`(()=>{const s=JSON.parse(localStorage.getItem('halfcourt-lineups-v1'));s.playbackContext=${JSON.stringify(ctx)};localStorage.setItem('halfcourt-lineups-v1',JSON.stringify(s))})()`);
+        await send('Page.reload');await waitFor("Boolean(document.querySelector('#players-layer [data-player]'))");await nav('play');await verifySourceFailure(id,profile.id);
+      }
     }
     await writeFile(path.join(folder, 'hc027-expansion-playback-roles.json'), JSON.stringify(metrics, null, 2) + '\n');
   } finally {
@@ -133,7 +141,8 @@ export async function runOffenseExpansionFlow({ send, evaluate, wait, waitFor, f
       assert.equal(pendingLocked,true,'pending load locks visible overlay return as well as titles and CTA');
       await waitFor("!document.body.classList.contains('is-loading')&&document.querySelector('#template-list').getAttribute('aria-busy')==='false'");
       assert.equal(await evaluate('document.body.dataset.view'), 'library');
-      assert.equal(await evaluate('document.body.dataset.lineupContext'), profileId);
+      assert.equal(await evaluate('document.body.dataset.lineupContext'), '', 'historical source must not relabel numbered practice');
+      assert.equal(await evaluate("JSON.parse(localStorage.getItem('halfcourt-lineups-v1')).playbackContext.profileId"),profileId);
       assert.equal(await evaluate("document.querySelector('#template-list').dataset.paged"), 'false');
       assert.equal(await evaluate("document.querySelectorAll('.library-card-heading').length"), 9);
       assert.equal(await evaluate("document.querySelector('#template-list').dataset.expandedId"), id);

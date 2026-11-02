@@ -1,5 +1,6 @@
 import { validateLineup, validateLegacyLineup, MAX_LINEUPS } from '../../../shared/lineups.js';
 import { validateRolePlan, getRolePlanState } from '../../../shared/tactic-roles.js';
+import { isBodyTypeForMode } from '../../../shared/tactic-body-types.js';
 
 export const LINEUPS_KEY = 'halfcourt-lineups-v1';
 export const emptyLineupState = () => ({ schemaVersion: 2, profiles: [], activeProfileId: null, rolePlans: {}, playbackContext: null });
@@ -36,7 +37,13 @@ export function createLineupRepository({ adapter, templates, makeBackupId = uid 
     let staleRoles = false;
     for (const raw of value.profiles) {
       try {
-        const profile = validateLineup(legacy ? validateLegacyLineup(raw) : raw);
+        let candidate = legacy ? validateLegacyLineup(raw) : raw;
+        if (!legacy && object(candidate) && candidate.bodyType != null && !isBodyTypeForMode(candidate.mode, candidate.bodyType)) {
+          if (!tolerant) throw new Error('球队体型分类无效');
+          candidate = { ...candidate, bodyType: null };
+          warnings.push('一份球队的体型分类已失效，已解除该偏好；原文将在替换前备份');
+        }
+        const profile = validateLineup(candidate);
         if (state.profiles.length >= MAX_LINEUPS) throw new Error('超过档案容量');
         if (state.profiles.some(p => p.id === profile.id)) throw new Error('档案标识重复');
         if (profile.recentTemplateId && !sameMode(profile.recentTemplateId, profile.mode)) {

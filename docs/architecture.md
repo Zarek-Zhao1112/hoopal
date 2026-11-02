@@ -13,7 +13,7 @@ main → startup/runtime → app
                        └─ storage/lineup-session → repositories → platform
 
 shared/templates → data/templates → 一套一文件的战术定义
-roles/ui → shared/tactic-roles + shared/templates
+selection/ui → shared/tactic-body-types + shared/templates + library-preview
 storage/lineup-session → shared/tactic-roles + shared/lineups
 
 Vite → dist → Android APK（离线）
@@ -82,13 +82,15 @@ kind、类别和难度属于模板元数据，不进入Play导出。shared/engin
 
 HC-054退役体型/能力自评、加权排名与自动分工代码；旧算法仅留[历史说明](../data/recommendations/README.md)。现26套战术的roleVersion和roles与各自定义共置，含稳定职责ID、动画棋子ID、整套任务和具体actionIds。shared/tactic-roles.js管理校验、三态计划、唯一成员、显式交换和不同动作候选，不生成跑位或胜率。
 
-roles/ui.js只负责战术条件主卡与玻璃确认层，调用app的onAction提交；主卡替换战术库内部内容，不增加底栏路由。仅角色浮层隔离背景，取消不写盘。未确认/缺条件仍可通用示范，全部职责确认为不同成员才可按本队演练，防守绑定defense-N、进攻绑定attack-N；图例从已保存有效计划读取，不运行旧算法。
+HC-056用selection/ui.js替换旧角色界面，首选整体体型，再浏览对应mode/kind/bodyType候选。各单套提供bodyTypes/bodyTypeNotes，shared/tactic-body-types.js提供纯分类、校验与说明；构建checker额外保证14种组合可达。selection/picker.js管理220/160ms局部玻璃列表、关闭锁和焦点，复用library-preview独立真实循环，离页/后台/弹层暂停并销毁旧RAF。主卡仍替换库内部内容，不增加底栏；旧roles UI已退役，建队聚焦/短屏修复移到wizard/basic-layout.css保留。
+
+app区分球队入口与独立库：前者锁当前球队人数，后者可浏览另一人数但不写错队偏好。body-type动作交session，play-tactic只在可靠清除旧ctx后载入原编号演练；旧rolePlans保留兼容而不再显示为新成员映射。不需要逐人确认即可进入训练场。
 
 ## 存储与平台
 
 storage/builtins.js只记录内置ID/合法步骤，并执行用户授权的旧个人数据定向清理；lineups.js单独保存阵容；lineup-session.js协调档案版本、来源和两键切换。platform提供浏览器localStorage或Android私有文件、系统分享与生命周期。
 
-存储键保持：halfcourt-builtin-selection-v1为模板ID/步骤；halfcourt-lineups-v1升级为schemaVersion2，保存profiles、activeProfileId、按球队/战术索引的rolePlans与可空playbackContext。新来源含source=role-confirmations、profileId/revision、templateId/roleVersion，必须对应完整有效计划。改姓名/号码保稳定ID关联，换成员解除相关认领，认领修改增加档案revision并解除来源，排队操作校验调用时的球队身份。
+存储键保持：halfcourt-builtin-selection-v1为模板ID/步骤；halfcourt-lineups-v1为schemaVersion2，保存profiles、activeProfileId、兼容旧rolePlans及playbackContext。HC-056给profile增加可选bodyType，缺省null；坏类别只隔离字段，原文覆盖前备份，不丢队伍和计划。setBodyType校验显式profileId/revision及调用时当前队，成功保存偏好并增revision/清旧ctx，相同值无写入；普通update沿用previous.bodyType，防旧向导草稿覆盖新偏好。选择体型卡仅在UI，查看成功才持久化。旧source=role-confirmations仍按旧完整计划合法性读取，不由新训练展示姓名或自动复用。
 
 schema1读入只在内存迁移，保球队/成员/号码/NBA身份，旧标签和自动来源不转为确认；首次schema2写前将精确旧原文存到独立migration-v1备份键，失败禁止覆盖。过期角色版本原计划保留且不可演练，首次后续写前保role-version原文备份，用户明确重置后重新确认。未知schema锁写；降级至1.26时也会保护schema2未知格式，不会静默删新分工。
 
