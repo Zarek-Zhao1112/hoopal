@@ -3,7 +3,7 @@ import { layoutLibraryDeck } from './library-deck-state.js';
 let deckSequence = 0;
 
 /** Browsing is local UI state. Only the explicit play button calls onPlay. */
-export function createLibraryDeck({ root, makePreview, onPlay, visible = true }) {
+export function createLibraryDeck({ root, makePreview, onPlay, onConditions, visible = true }) {
   if (!root || typeof makePreview !== 'function' || typeof onPlay !== 'function') throw new TypeError('战术卡片需要 root、makePreview 和 onPlay');
   const document = root.ownerDocument, window = document.defaultView;
   const instance = ++deckSequence;
@@ -34,6 +34,7 @@ export function createLibraryDeck({ root, makePreview, onPlay, visible = true })
       entry.heading.disabled = disabled || !isVisible || entry.concealed;
       entry.heading.tabIndex = entry.concealed ? -1 : 0;
       entry.play.disabled = disabled || !isVisible || entry.concealed || expanded !== entry.id;
+      entry.conditions.disabled = entry.play.disabled;
       entry.court.disabled = disabled || !isVisible || entry.concealed || expanded !== entry.id || !entry.preview;
       entry.play.textContent = pending?.id === entry.id ? '正在载入…' : '进入训练场';
     }
@@ -78,6 +79,7 @@ export function createLibraryDeck({ root, makePreview, onPlay, visible = true })
       entry.card.style.visibility = entry.concealed ? 'hidden' : 'visible';
       entry.card.style.pointerEvents = entry.concealed ? 'none' : '';
       entry.play.tabIndex = isOpen ? 0 : -1;
+      entry.conditions.tabIndex = isOpen ? 0 : -1;
       entry.court.tabIndex = isOpen ? 0 : -1;
       entry.back.hidden = !(result.layout === 'overlay' && isOpen);
       entry.heading.setAttribute('aria-label', result.layout === 'overlay' && isOpen ? `${entry.template.title}，收起并返回全部${entries.length}张标题` : entry.template.title);
@@ -134,16 +136,23 @@ export function createLibraryDeck({ root, makePreview, onPlay, visible = true })
     heading.setAttribute('aria-controls', body.id); heading.setAttribute('aria-expanded', 'false');
     const meta = element('div', 'library-card-meta'), category = element('span', 'library-card-category'), mode = element('span', 'library-card-mode');
     meta.append(category, mode);
+    const conditions = element('button', 'library-card-conditions', '查看条件');
+    conditions.type = 'button'; conditions.dataset.conditionsTemplate = template.id;
+    conditions.hidden = typeof onConditions !== 'function'; conditions.tabIndex = -1;
+    meta.append(conditions);
     const court = element('button', 'library-card-court'), summary = element('p', 'library-card-summary');
     court.type = 'button'; court.dataset.action = 'toggle-preview'; court.disabled = true; court.tabIndex = -1;
     const playButton = element('button', 'library-card-play', '进入训练场'); playButton.type = 'button'; playButton.dataset.playTemplate = template.id; playButton.tabIndex = -1;
     body.append(meta, court, summary, playButton); card.append(heading, body); root.append(card);
-    const entry = { id: template.id, template, card, heading, title, back, body, category, mode, court, summary, play: playButton, preview: null, generation, concealed: false };
+    const entry = { id: template.id, template, card, heading, title, back, body, category, mode, court, summary, play: playButton, conditions, preview: null, generation, concealed: false };
     court.addEventListener('click', event => {
       if (!isVisible || externalBusy || pending || court.disabled || entry.concealed || !isCurrent(entry) || entry.id !== expanded) event.stopImmediatePropagation();
     }, true);
     heading.addEventListener('click', () => toggle(entry));
     playButton.addEventListener('click', () => { void play(entry); });
+    conditions.addEventListener('click', () => {
+      if (!conditions.disabled && isVisible && !externalBusy && !pending && isCurrent(entry) && entry.id === expanded) onConditions?.(entry.id);
+    });
     return entry;
   }
   function updateEntries() {
@@ -161,7 +170,7 @@ export function createLibraryDeck({ root, makePreview, onPlay, visible = true })
   function rebuild() {
     ++generation; expanded = '';
     for (const entry of entries) {
-      entry.heading.disabled = entry.play.disabled = entry.court.disabled = true;
+      entry.heading.disabled = entry.play.disabled = entry.conditions.disabled = entry.court.disabled = true;
       entry.preview?.destroy(); entry.card.remove();
     }
     syncCatalog();

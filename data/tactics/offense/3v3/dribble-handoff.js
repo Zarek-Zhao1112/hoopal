@@ -1,8 +1,14 @@
+import {defineRoles} from '../../role-helpers.js';
 import {defineTactic, run, dribble, screen, pass} from '../../helpers.js';
 
 export default defineTactic({
   id: 'dribble-handoff', title: '手递手配合', category: '手递手',
   description: '2 号近身接手递手，借 1 号掩护突破，再寻找外弹回传。',
+  ...defineRoles('offense', [
+  ["交球掩护外弹者","近身手递手交球给2号后站稳掩护，再外弹接2号回传并判断投射。",["handoff-give","stationary-screen","catch-shoot"]],
+  ["接递手突破者","靠近接手递手，等1号停稳后借挡突破，吸引协防并回传外弹者。",["handoff-receive","use-ball-screen","drive-pass"]],
+  ["底角接应者","底角拉开空间，准备接球投射或继续转移。",["space-outlet","catch-shoot"]],
+]),
   steps: [
     {
       note: '1 号中路持球，2 号从右翼靠近，3 号留在左底角。两人先缩短交球距离，不远距离冒充手递手。',

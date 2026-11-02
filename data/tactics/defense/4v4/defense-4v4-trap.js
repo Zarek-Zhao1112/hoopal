@@ -1,8 +1,15 @@
+import {defineRoles} from '../../role-helpers.js';
 import {defineDefenseTactic} from '../../defense-helpers.js';
 
 export default defineDefenseTactic({
   id: 'defense-4v4-trap', mode: '4v4', title: '四人底角夹击', category: '夹击防守', difficulty: '进阶',
   description: '球入底角再夹击，两人留后分别保护最近出口与篮下。',
+  ...defineRoles('defense', [
+  ["近端出口留后者","夹击发生时优先照看右翼最近回传出口，传出夹击后恢复高位。",["outlet-coverage","help-recover"]],
+  ["弱侧护筐留后者","夹击时守篮下兼顾远端，球传到左翼后扑防接球人并控制该侧。",["protect-rim","outlet-coverage","closeout"]],
+  ["下压夹击者","先出防右翼并引导，球到底角再向下合围；传出后解夹回右翼。",["contain-ball","trap-timing","trap-spacing","help-recover"]],
+  ["底线夹击者","先守右低位，球到底角时控制内侧与3号分边夹击，出球后退篮下帮助。",["trap-timing","trap-spacing","protect-rim"]],
+]),
   steps: [
     { note: '蓝方按半场站位防守，等待球进入右侧。3 号照看右翼，4 号照看右低位，1、2 号准备在夹击发生时承担留后责任。', holder: 1,
       attack: [[500, 610], [180, 390], [810, 400], [840, 180]], defense: [[500, 510], [270, 345], [735, 330], [745, 150]] },

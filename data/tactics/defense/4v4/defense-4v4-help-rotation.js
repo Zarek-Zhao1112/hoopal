@@ -1,8 +1,15 @@
+import {defineRoles} from '../../role-helpers.js';
 import {defineDefenseTactic} from '../../defense-helpers.js';
 
 export default defineDefenseTactic({
   id: 'defense-4v4-help-rotation', mode: '4v4', title: '四人协防轮转', category: '协防轮转', difficulty: '进阶',
   description: '先协防突破，再补协防者空位，出球后连续轮转而非追球。',
+  ...defineRoles('defense', [
+  ["首防补底角者","先守弧顶，突破后回追再转外侧，球续传底角时补位接管并建立新对位。",["contain-ball","rotation-exchange","closeout"]],
+  ["弱侧护筐者","突破发生时从弱侧补篮下，连续出球时保护弱侧，再恢复左侧对位。",["protect-rim","rotation-exchange","help-recover"]],
+  ["协防接突破者","从右侧协防阻挡突破，出球后继续照看原突破人，再接管其高位新位置。",["stop-drive","rotation-exchange","contain-ball"]],
+  ["补右翼接管者","协防发生时补3号原右翼空位，球出右翼后出防；续传底角后回右翼帮助。",["rotation-exchange","closeout","help-recover"]],
+]),
   steps: [
     { note: '蓝方 1 号守弧顶，3 号在右侧准备帮助，4 号照看右低位，2 号在弱侧。突破出现时需要同时安排帮助者与补帮助者。', holder: 1,
       attack: [[500, 610], [180, 380], [820, 380], [760, 190]], defense: [[500, 510], [275, 330], [730, 330], [650, 180]], via: { 1: [[450, 530], [470, 610], [605, 575]] } },

@@ -1,9 +1,15 @@
+import {defineRoles} from '../../role-helpers.js';
 import {frame, defineExpansion} from '../../expansion-helpers.js';
 import {run, dribble, pass} from '../../helpers.js';
 
 export default defineExpansion({
   id: 'slip-screen', title: '假掩护顺下', mode: '3v3', category: '挡拆变式', difficulty: '基础',
   description: '2 号接近挡点但未建立掩护便提前切入，1 号观察后送球。',
+  ...defineRoles('offense', [
+  ["观察内传者","弧顶控球，等待2号提前拆出窗口，送出内传后调整外线接应。",["read-cut-pass","space-outlet"]],
+  ["提前拆出者","靠近挡点但未建立接触便提前顺下，接球向近筐推进并判断终结或回传。",["slip-before-contact","cut-finish"]],
+  ["弱侧接应者","弱侧保持空间，保留接投与回传出口。",["space-outlet","catch-shoot"]],
+]),
   steps: [
     frame('1 号弧顶持球，2 号从左侧向可能的挡点靠近；3 号弱侧拉开。这里只准备接近，尚未形成掩护接触。',
       [[500,580],[240,390],[820,220]], [[500,490],[300,320],[740,220]], [run(2,[240,390],[310,440],[400,465])]),

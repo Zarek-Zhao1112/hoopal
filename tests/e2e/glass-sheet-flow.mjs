@@ -28,10 +28,9 @@ export async function runGlassSheetFlow({send,evaluate,wait,waitFor,folder}) {
   assert.equal(await evaluate(`localStorage.getItem('${key}')`),saved,'second step is draft only');
   const ids=await evaluate("[...document.querySelectorAll('#lineup-wizard-dialog [data-action=lineup-player]')].map(n=>n.dataset.playerId)");assert.equal(ids.length,4);
   for(let i=0;i<4;i++){
-   await action('lineup-player',`[data-index="${i}"]`);await action('lineup-edit-section','[data-section=identity]');await input('lineup-player-name','新队员'+(i+1));await input('lineup-player-number',i+11);await action('lineup-edit-section','[data-section=traits]');
-   for(const [trait,value] of [['height','medium'],['build','medium'],['mobility','average']])await action('lineup-trait-'+trait,`[data-value=${value}]`);
+   await action('lineup-player',`[data-index="${i}"]`);await input('lineup-player-name','新队员'+(i+1));await input('lineup-player-number',i+11);
   }
-  await action('lineup-wizard-step','[data-step="1"]');await action('lineup-mode','[data-value="3v3"]');await action('lineup-mode','[data-value="4v4"]');await action('lineup-wizard-step','[data-step="3"]');await action('lineup-player','[data-index="3"]');await action('lineup-edit-section','[data-section=identity]');assert.equal(await evaluate("document.querySelector('[data-action=lineup-player-name]').value"),'新队员4','mode roundtrip keeps fourth member');
+  await action('lineup-wizard-step','[data-step="1"]');await action('lineup-mode','[data-value="3v3"]');await action('lineup-mode','[data-value="4v4"]');await action('lineup-wizard-step','[data-step="3"]');await action('lineup-player','[data-index="3"]');assert.equal(await evaluate("document.querySelector('[data-action=lineup-player-name]').value"),'新队员4','mode roundtrip keeps fourth member');
   await evaluate(`(()=>{window.hc021OriginalSetItem=Storage.prototype.setItem;window.hc021Attempts=0;Storage.prototype.setItem=function(k,v){if(k==='${key}'){window.hc021Attempts++;throw Error('HC021 simulated write failure');}return window.hc021OriginalSetItem.call(this,k,v)};})()`);
   await action('lineup-create-save');await waitFor("document.querySelector('#lineups-panel').getAttribute('aria-busy')==='false'&&document.querySelector('.lineup-wizard-error').textContent.includes('HC021')");
   assert.equal(await evaluate(`localStorage.getItem('${key}')`),saved,'failed final save never leaves an empty profile');assert.ok(await evaluate(`document.querySelector('${dialog}').open`));
@@ -40,7 +39,7 @@ export async function runGlassSheetFlow({send,evaluate,wait,waitFor,folder}) {
   await evaluate('Storage.prototype.setItem=window.hc021OriginalSetItem');
   await evaluate("document.querySelector('[data-action=lineup-create-save]').click();document.querySelector('[data-action=lineup-create-save]')?.click()");await closed();
   await waitFor("document.body.dataset.view==='lineups'&&!document.body.dataset.pageTransition");
-  const archive=await evaluate(`JSON.parse(localStorage.getItem('${key}'))`),p=archive.profiles.find(p=>p.name==='完整创建与重试');assert.equal(archive.profiles.length,(saved?JSON.parse(saved).profiles.length:0)+1);assert.equal(p.players.length,4);assert.deepEqual(p.players.map(p=>p.id),ids);assert.ok(p.players.every(p=>p.height&&p.build&&p.mobility));
+  const archive=await evaluate(`JSON.parse(localStorage.getItem('${key}'))`),p=archive.profiles.find(p=>p.name==='完整创建与重试');assert.equal(archive.profiles.length,(saved?JSON.parse(saved).profiles.length:0)+1);assert.equal(p.players.length,4);assert.deepEqual(p.players.map(p=>p.id),ids);assert.ok(p.players.every(p=>Number.isInteger(p.number)));
   await action('lineup-configure');await wait(520);await input('lineup-player-name','未保存且可保留');
   await send('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});await send('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
   assert.ok(await evaluate("Boolean(document.querySelector('#lineup-wizard-dialog [data-action=lineup-draft-keep]'))"));await action('lineup-draft-keep');await closed();await action('lineup-configure');await wait(520);assert.equal(await evaluate("document.querySelector('[data-action=lineup-player-name]').value"),'未保存且可保留');

@@ -1,8 +1,14 @@
+import {defineRoles} from '../../role-helpers.js';
 import {defineDefenseTactic} from '../../defense-helpers.js';
 
 export default defineDefenseTactic({
   id: 'defense-3v3-trap', mode: '3v3', title: '三人边线夹击', category: '夹击防守', difficulty: '进阶',
   description: '球入边线再合围，一名留后者优先护筐并兼顾最近出口。',
+  ...defineRoles('defense', [
+  ["回传侧夹击者","球入左边线后从回传侧靠近，与2号分边夹击；传出后解夹恢复高位。",["trap-timing","trap-spacing","help-recover"]],
+  ["内侧夹击者","先控制边线球的中路入口，再从内侧夹击；球传出后退守中路并补篮下。",["contain-ball","trap-spacing","help-recover"]],
+  ["留后护筐者","夹击时优先护筐兼顾最近出口，球传右侧时出防新持球人，不承诺封住所有出口。",["protect-rim","outlet-coverage","closeout"]],
+]),
   steps: [
     { note: '蓝方保持半场防守，等待球进入左侧边线区域。2 号负责引导持球方向，1 号准备支援，3 号保留篮下帮助距离。', holder: 1,
       attack: [[500, 590], [145, 390], [810, 340]], defense: [[500, 500], [235, 340], [695, 290]] },

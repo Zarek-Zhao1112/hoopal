@@ -7,7 +7,8 @@ import { paginate } from './workspace/state.js';
 import { createWorkspaceController } from './workspace/controller.js';
 import { createLineupRepository } from './storage/lineups.js';
 import { createLineupSession } from './storage/lineup-session.js';
-import { recommendLineup } from '../../shared/recommendations.js';
+import { getRolePlanState } from '../../shared/tactic-roles.js';
+import { createTacticRolesUI } from './roles/ui.js';
 import { createLineupUI } from './lineups/controller.js';
 import { COURT_COLORS } from './board/appearance.js';
 import { createTrainingCourt } from './board/court-renderer.js';
@@ -44,7 +45,7 @@ let saveVersion = 0, switching = false;
 const store = new PlayStore(initial);
 let toastTimer;
 let showDefense = true, renderedStep = -1;
-let workspace, libraryDeck, courtRenderer, tacticPicker;
+let workspace, libraryDeck, courtRenderer, tacticPicker, rolesUI, rolePlayPending = false;
 const svg = $('court');
 const training = createTrainingPlayer({
   frameCount: store.play.frames.length, position: store.play.frameIndex,
@@ -85,24 +86,27 @@ function activeLineup() {
   return state.profiles.find(profile => profile.id === state.activeProfileId);
 }
 function renderLineups() {
-  const profile = activeLineup();
-  lineupUI?.render({ state: lineupSession.state, recommendations: profile ? recommendLineup(profile) : null, busy: lineupBusy, error: lineupError, writeLocked: lineupSession.writeLocked });
+  const options = { state: lineupSession.state, busy: lineupBusy, error: lineupError, writeLocked: lineupSession.writeLocked };
+  lineupUI?.render(options);
+  rolesUI?.render(options);
 }
 function renderLegend() {
   const box = $('lineup-legend');
   if (!box) return;
   const state = lineupSession.state, ctx = state.playbackContext;
   const profile = state.profiles.find(p => p.id === ctx?.profileId && p.id === state.activeProfileId && p.revision === ctx.profileRevision && p.mode === store.play.mode);
-  const result = profile && ctx.templateId === activeTemplateId && activeKind === 'offense' ? recommendLineup(profile) : null;
-  const recommendation = result?.ready && result.recommendations.find(r => r.templateId === activeTemplateId);
-  playbackAssignment = recommendation ? recommendation.assignments.map(a => {
-    const player = profile.players.find(p => p.id === a.playerId);
-    return { ...a, player, name: player.name || `队员 ${String.fromCharCode(65 + profile.players.indexOf(player))}` };
+  const template = templates.find(t => t.id === activeTemplateId);
+  const plan = profile && Object.hasOwn(state.rolePlans, profile.id) ? state.rolePlans[profile.id][activeTemplateId] : undefined;
+  const result = profile && ctx.source === 'role-confirmations' && ctx.templateId === activeTemplateId && ctx.roleVersion === template.roleVersion ? getRolePlanState(plan, template, profile) : null;
+  const ready = result?.ready;
+  playbackAssignment = ready ? result.roles.map(a => {
+    const player = profile.players.find(p => p.id === a.memberId);
+    return { ...a, role: a.number, player, name: player.name || `队员 ${String.fromCharCode(65 + profile.players.indexOf(player))}` };
   }) : [];
-  document.body.dataset.lineupContext = recommendation ? profile.id : '';
-  box.hidden = !recommendation;
+  document.body.dataset.lineupContext = ready ? profile.id : '';
+  box.hidden = !ready;
   box.replaceChildren();
-  if (!recommendation) return;
+  if (!ready) return;
   const page = paginate(playbackAssignment, legendPage, 2);
   legendPage = page.page;
   const heading = html('div', 'legend-heading');
@@ -133,17 +137,17 @@ function renderLegend() {
   box.append(heading, rows);
 }
 async function handleLineupAction(kind, payload = {}) {
+  if (kind === 'conditions') return openConditions(payload.templateId);
   if (lineupBusy || switching || tacticPicker?.isOpen) return false;
   lineupBusy = true; lineupError = '';
   const finishOperation = beginOperation();
   if (training.playing) stop();
   renderLineups(); controls();
-  let openPlay = false;
   try {
     if (kind === 'create') { await lineupSession.create(payload); toast('阵容已创建并保存在本机'); }
     else if (kind === 'update') { await lineupSession.update(payload.profile); toast('阵容已保存在本机'); }
     else if (kind === 'select') {
-      // Reopening the current team preserves its valid recommendation identity.
+      // Reopening the current team preserves its confirmed identity.
       if (payload.id !== lineupSession.state.activeProfileId) await lineupSession.select(payload.id);
     }
     else if (kind === 'delete') { await lineupSession.remove(payload.id); toast('阵容档案已删除'); }
@@ -151,11 +155,6 @@ async function handleLineupAction(kind, payload = {}) {
       const result = await lineupSession.reload();
       if (result.writeLocked) throw new Error(result.warnings.join('；'));
       lineupError = result.warnings.join('；');
-    } else if (kind === 'play') {
-      await lineupSession.play(payload.templateId);
-      legendPage = 0;
-      if (!await loadTemplate(payload.templateId, { fromRecommendation: true })) return false;
-      openPlay = true;
     } else throw new Error('无法识别的阵容操作');
     return true;
   } catch (error) {
@@ -165,9 +164,40 @@ async function handleLineupAction(kind, payload = {}) {
   } finally {
     lineupBusy = false;
     renderLineups(); renderLegend(); draw(); controls();
-    if (openPlay) workspace.setView('play');
     finishOperation();
   }
+}
+function openConditions(templateId) {
+  if (startup.active || switching || lineupBusy || lineupUI?.isModalOpen || rolesUI?.isModalOpen || tacticPicker?.isOpen) return false;
+  const profile = activeLineup();
+  const template = templates.find(t => t.id === templateId) || templates.find(t => t.id === profile?.recentTemplateId && t.mode === profile.mode) || templates.find(t => t.mode === (profile?.mode || catalogMode));
+  if (!template) return false;
+  if (!workspace.setView('library') && workspace.view !== 'library') return false;
+  catalogKind = template.kind || 'offense'; catalogMode = template.mode;
+  if (training.playing) stop();
+  rolesUI.open(template.id);
+  libraryDeck?.setVisible(false);
+  renderTemplates(); renderLineups(); controls();
+  return true;
+}
+async function handleRoleAction(kind, payload = {}) {
+  if (kind === 'choose-team') { rolesUI.close(); workspace.setView('archives'); return true; }
+  if (lineupBusy || switching || tacticPicker?.isOpen) return false;
+  lineupBusy = true; lineupError = '';
+  const finishOperation = beginOperation();
+  renderLineups(); controls();
+  try {
+    if (kind === 'confirm-role') await lineupSession.confirmRole(payload);
+    else if (kind === 'swap-roles') await lineupSession.swapRoles(payload);
+    else if (kind === 'reset-role-plan') await lineupSession.resetRolePlan(payload);
+    else if (kind === 'play-roles' || kind === 'play-generic') {
+      if (kind === 'play-roles') await lineupSession.play(payload.templateId);
+      if (!await loadTemplate(payload.templateId, { fromRolePlan: kind === 'play-roles', navigate: false })) return false;
+      legendPage = 0; rolePlayPending = true;
+    } else throw new Error('无法识别的战术条件操作');
+    return true;
+  } catch (error) { lineupError = `操作未完成：${error.message}`; toast(lineupError); return false; }
+  finally { lineupBusy = false; renderLineups(); renderLegend(); draw(); controls(); finishOperation(); }
 }
 function setStorageStatus(message) {
   const status = $('storage-status');
@@ -187,7 +217,7 @@ async function persist() {
     return false;
   }
 }
-async function loadTemplate(templateId, { fromRecommendation = false } = {}) {
+async function loadTemplate(templateId, { fromRolePlan = false, navigate = true } = {}) {
   if (switching) return false;
   const template = templates.find(t => t.id === templateId);
   if (!template) return false;
@@ -198,7 +228,7 @@ async function loadTemplate(templateId, { fromRecommendation = false } = {}) {
   document.body.classList.add('is-loading');
   for (const container of document.querySelectorAll('.app-header,.workspace')) container.inert = true;
   try {
-    if (!fromRecommendation) await lineupSession.clearContext();
+    if (!fromRolePlan) await lineupSession.clearContext();
     store.load(template.build());
     activeTemplateId = templateId;
     activeKind = template.kind || 'offense';
@@ -217,7 +247,7 @@ async function loadTemplate(templateId, { fromRecommendation = false } = {}) {
     switching = false;
     document.body.classList.remove('is-loading');
     for (const container of document.querySelectorAll('.app-header,.workspace')) container.inert = false;
-    if (loaded) {
+    if (loaded && navigate) {
       while (workspace?.closeTopDialog()) { /* Close any source dialog after a successful load. */ }
       workspace?.setView('play');
     }
@@ -227,7 +257,7 @@ async function loadTemplate(templateId, { fromRecommendation = false } = {}) {
 }
 function draw(board = store.board, ballVisible) {
   courtRenderer.draw(board, { kind: activeKind, showOpponent: showDefense, ballVisible, playerTitle(player) {
-    const assignment = player.team === 'attack' && playbackAssignment.find(a => a.role === player.number);
+    const assignment = player.team === focusTeam() && playbackAssignment.find(a => a.playerId === player.id);
     return assignment ? `职责 ${player.number}：${assignment.name} · 球衣 ${assignment.player.number} 号 · ${assignment.task}` : `${player.team === 'attack' ? '进攻' : '防守'} ${player.number} 号`;
   } });
 }
@@ -257,7 +287,7 @@ function renderTemplates() {
   syncTemplatePicker();
 }
 function controls() {
-  const busy = switching || lineupBusy || Boolean(lineupUI?.isModalOpen);
+  const busy = switching || lineupBusy || Boolean(lineupUI?.isModalOpen) || Boolean(rolesUI?.isModalOpen);
   const blocked = busy || Boolean(tacticPicker?.isOpen);
   libraryDeck?.setBusy(blocked);
   tacticPicker?.render({ items: catalogFor(activeKind), activeTemplateId, mode: store.play.mode, kind: activeKind, disabled: training.playing || busy });
@@ -297,7 +327,7 @@ function stop(snap = true) {
   renderSteps(); draw(); controls();
 }
 function start() {
-  if (switching || lineupBusy || tacticPicker?.isOpen) return;
+  if (switching || lineupBusy || tacticPicker?.isOpen || rolesUI?.isModalOpen) return;
   workspace?.setView('play');
   persist();
   if (store.play.frames.length < 2) return;
@@ -389,6 +419,7 @@ document.addEventListener('keydown', event => {
     return;
   }
   if (event.target.closest?.('#training-picker-trigger')) return;
+  if (event.key === 'Escape' && rolesUI?.isOpen) { event.preventDefault(); rolesUI.handleBack(); return; }
   if (event.key === 'Escape' && workspace?.closeTopDialog()) { event.preventDefault(); return; }
   if (event.key === 'Escape' && lineupUI?.isModalOpen) { event.preventDefault(); lineupUI.handleBack(); return; }
   if (switching || lineupBusy) return;
@@ -416,7 +447,8 @@ window.addEventListener('pagehide', () => { saveBeforeBackground().catch(error =
 window.addEventListener('halfcourt:platform-error', event => toast(`手机操作失败：${event.detail?.error?.message || '请重试'}`));
 workspace = createWorkspaceController({
   beforeNavigate(next) {
-    if (startup.active || switching || lineupBusy || lineupUI?.isModalOpen || tacticPicker?.isOpen) return false;
+    if (startup.active || switching || lineupBusy || lineupUI?.isModalOpen || rolesUI?.isModalOpen || tacticPicker?.isOpen) return false;
+    if (next !== 'library' && rolesUI?.isOpen) rolesUI.close({ immediate: true });
     if (next !== 'library') libraryDeck?.pause();
     if (next !== 'play' && training.playing) stop();
     persist();
@@ -425,13 +457,13 @@ workspace = createWorkspaceController({
   onViewChange(next) {
     if (next === 'lineups' || next === 'archives') lineupUI?.setView(next);
     if (next === 'library') libraryDeck?.reset();
-    libraryDeck?.setVisible(next === 'library');
+    libraryDeck?.setVisible(next === 'library' && !rolesUI?.isOpen);
     placeModeControl(next);
     $('mode').value = next === 'library' ? catalogMode : store.play.mode;
     renderTemplates(); libraryDeck?.refreshLayout(); draw(); controls();
   },
   beforeModalOpen() {
-    if (startup.active || switching || lineupBusy || tacticPicker?.isOpen) return false;
+    if (startup.active || switching || lineupBusy || rolesUI?.isModalOpen || tacticPicker?.isOpen) return false;
     libraryDeck?.pause();
     if (training.playing) stop();
     persist();
@@ -439,10 +471,16 @@ workspace = createWorkspaceController({
   },
   getNote: () => store.board.note,
 });
-lineupUI = createLineupUI({ root: $('lineups-panel'), onAction: handleLineupAction, onNavigate: view => workspace.setView(view), onInspect: ({ title, text }) => workspace.openText(title, text), onModalChange(open) { if (open) { workspace.cancelTransition(); if (training.playing) stop(); } controls(); } });
+lineupUI = createLineupUI({ root: $('lineups-panel'), onAction: handleLineupAction, onNavigate: view => view === 'roles' ? openConditions() : workspace.setView(view), onInspect: ({ title, text }) => workspace.openText(title, text), onModalChange(open) { if (open) { workspace.cancelTransition(); if (training.playing) stop(); } controls(); } });
+rolesUI = createTacticRolesUI({ document, root: $('role-requirements-panel'), onAction: handleRoleAction,
+  onInspect: ({ title, text }) => workspace.openText(title, text),
+  onModalChange(open) { if (open) { workspace.cancelTransition(); libraryDeck?.pause(); if (training.playing) stop(); } controls(); },
+  onClose() { libraryDeck?.setVisible(workspace.view === 'library'); libraryDeck?.refreshLayout(); if (rolePlayPending) { rolePlayPending = false; workspace.setView('play'); } controls(); },
+});
 libraryDeck = createLibraryDeck({
   root: $('template-list'), visible: workspace.view === 'library',
   makePreview: (template, button) => createLibraryPreview({ template, button }),
+  onConditions: id => openConditions(id),
   onPlay: async id => {
     if (switching || lineupBusy || tacticPicker?.isOpen) return false;
     if (!await loadTemplate(id)) return false;
@@ -453,7 +491,7 @@ libraryDeck = createLibraryDeck({
 tacticPicker = createTacticPicker({
   document,
   beforeOpen() {
-    if (startup.active || switching || lineupBusy || training.playing || lineupUI?.isModalOpen || workspace.hasOpenDialog || workspace.view !== 'play') return false;
+    if (startup.active || switching || lineupBusy || training.playing || lineupUI?.isModalOpen || rolesUI?.isModalOpen || workspace.hasOpenDialog || workspace.view !== 'play') return false;
     workspace.cancelTransition();
     return true;
   },
@@ -480,6 +518,7 @@ await setupLifecycle({
     if (tacticPicker?.handleBack()) return true;
     if (switching || lineupBusy) return true;
     if (workspace.closeTopDialog()) { await persist(); return true; }
+    if (rolesUI?.handleBack()) return true;
     if (lineupUI.isModalOpen) { lineupUI.handleBack(); return true; }
     if (training.playing) { stop(); await persist(); return true; }
     const focused = document.activeElement;

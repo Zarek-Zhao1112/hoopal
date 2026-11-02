@@ -1,8 +1,15 @@
+import {defineRoles} from '../../role-helpers.js';
 import {defineDefenseTactic} from '../../defense-helpers.js';
 
 export default defineDefenseTactic({
   id: 'defense-4v4-man-to-man', mode: '4v4', title: '四人半场盯人', category: '半场盯人',
   description: '四人盯人随球调整，无球侧保持人球兼顾与篮下帮助。',
+  ...defineRoles('defense', [
+  ["高位盯防者","先控制弧顶持球人，球转侧翼后退到可帮助与恢复的位置，回传时再出防。",["contain-ball","help-recover"]],
+  ["左翼盯防者","左翼接球时出防并侧向跟进，转移后收弱侧且兼顾原对手。",["contain-ball","closeout","help-recover"]],
+  ["右翼盯防者","弱侧先补中路，球转右翼时出防并控制持球推进，保持人球兼顾。",["contain-ball","closeout","help-recover"]],
+  ["底线护筐者","兼顾底线对手与篮下，随球侧变化收缩和恢复，避免漏掉身后接应。",["protect-rim","help-recover","outlet-coverage"]],
+]),
   steps: [
     { note: '蓝方 1 号控制弧顶持球人，2、3 号看护侧翼，4 号照看底线对手并帮助篮下。球即将转侧，四人都要观察人和球。', holder: 1,
       attack: [[500, 620], [180, 400], [820, 400], [700, 190]], defense: [[500, 510], [270, 360], [730, 360], [620, 210]] },

@@ -1,9 +1,15 @@
+import {defineRoles} from '../../role-helpers.js';
 import {frame, defineExpansion, defend} from '../../expansion-helpers.js';
 import {run, screen, pass} from '../../helpers.js';
 
 export default defineExpansion({
   id: 'post-split', title: '低位分切', mode: '3v3', category: '低位策应', difficulty: '进阶',
   description: '1 号传给低位 3 号，再给 2 号无球掩护；2 号切入接低位回传。',
+  ...defineRoles('offense', [
+  ["传球后掩护者","先传给低位3号，再向中路站稳为2号设无球掩护，结束后退出接应。",["post-entry-pass","stationary-screen","space-outlet"]],
+  ["借挡切入者","等待1号停稳后借无球掩护切入，接低位3号回传近筐终结。",["use-offball-screen","cut-finish"]],
+  ["低位策应者","低位接球保护球权，观察2号切入后回传，随后补到侧翼接应。",["post-protect","read-cut-pass","space-outlet"]],
+]),
   steps: [
     frame('1 号左翼持球，先传给低位 3 号，2 号留在右上方。防守固定人盯人：D1 看 1、D2 看 2，D3 保持篮侧低位对抗；本例不换防。',
       [[230,470],[650,500],[350,260]], [[320,445],[610,420],[385,180]], [pass(1,[230,470],[350,260])]),

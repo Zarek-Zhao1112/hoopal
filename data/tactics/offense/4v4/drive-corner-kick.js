@@ -1,8 +1,15 @@
+import {defineRoles} from '../../role-helpers.js';
 import {defineTactic, run, dribble, pass} from '../../helpers.js';
 
 export default defineTactic({
   id: 'drive-corner-kick', mode: '4v4', title: '突破分底角', category: '突破分球',
   description: '球转右翼后突破牵制，底角小幅移动拉开，再接分球。',
+  ...defineRoles('offense', [
+  ["初始转移者","先转移球给3号，留在外线平衡站位并保留回传接应。",["perimeter-transfer","space-outlet"]],
+  ["弱侧接应者","弱侧保持空间，准备接球转移或接投。",["space-outlet","catch-shoot"]],
+  ["突破分球者","接球持球突破，吸引协防后把球分给4号底角。",["drive-pass"]],
+  ["底角接投者","底角保持空间，接3号突破分球并判断投射。",["space-outlet","catch-shoot"]],
+]),
   steps: [
     {
       note: '1 号弧顶向右翼 3 号转移球，传球后向左保持平衡。2 号在左底角，4 号在右底角拉开。',

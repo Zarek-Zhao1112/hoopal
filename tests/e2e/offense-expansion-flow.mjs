@@ -4,8 +4,7 @@ import path from 'node:path';
 import { templates } from '../../shared/templates.js';
 import { createLineup, validateLineup } from '../../shared/lineups.js';
 import {waitForWizardMotion} from './wizard-helpers.mjs';
-import { recommendLineup } from '../../shared/recommendations.js';
-import { offenseRules } from '../../data/recommendations/offense.js';
+import {confirmedRolePlan,explicitRoleAssignments} from './role-fixtures.mjs';
 import { ballPosition } from '../../shared/engine.js';
 import { findLibraryCard } from './library-deck-helpers.mjs';
 import { selectArchive } from './archive-helpers.mjs';
@@ -30,20 +29,11 @@ export async function runOffenseExpansionFlow({ send, evaluate, wait, waitFor, f
   assert.deepEqual(templates.slice(20).map(template => template.id), newIds, 'old twenty IDs keep their original order before the six additions');
   assert.equal(templates.slice(20).reduce((sum,template)=>sum+template.build().frames.length,0),43);
 
-  // These are valid real profiles derived from the public rule's role weights,
-  // not injected recommendations or forced membership in the top three.
-  const profiles = newIds.map((id, index) => {
-    const template = templates.find(item => item.id === id), rule = offenseRules.find(item => item.templateId === id);
-    assert.ok(rule, `${id} has a real production recommendation rule`);
-    const profile = createLineup(template.mode, { id: `hc027-${id}`, name: `新增配合验证 ${index + 1}`, nbaTeamId: 'GSW' });
-    profile.players.forEach((player, roleIndex) => Object.assign(player, {
-      id: `member-${roleIndex}`, name: `实测队员${roleIndex + 1}`, number: [7, 12, 23, 30][roleIndex],
-      height: 'medium', build: 'medium', mobility: 'agile',
-      strengths: Object.entries(rule.roles[roleIndex].weights).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([skill]) => skill), weaknesses: [],
-    }));
-    validateLineup(profile);
-    assert.ok(recommendLineup(profile).recommendations.some(item => item.templateId === id), `${id} must naturally enter the actual top three`);
-    return profile;
+  // Explicit saved member identities; every role is separately confirmed in this fixture.
+  const profiles = newIds.map((id,index)=>{
+    const template=templates.find(item=>item.id===id),profile=createLineup(template.mode,{id:'hc027-'+id,name:'新增配合验证 '+(index+1),nbaTeamId:'GSW'});
+    profile.players.forEach((player,roleIndex)=>Object.assign(player,{id:'member-'+roleIndex,name:'实测队员'+(roleIndex+1),number:[7,12,23,30][roleIndex]}));
+    return validateLineup(profile);
   });
   try {
     await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
@@ -87,47 +77,27 @@ export async function runOffenseExpansionFlow({ send, evaluate, wait, waitFor, f
       metrics.push({ id, frames });
     }
 
-    // Switch through real saved profiles, choose the actual recommendation tab,
-    // then verify every paged role/name/jersey/task against its public result.
+    // Previously weighted top-three recommendations are retired. Use saved,
+    // explicitly confirmed role plans and check the same real animation mapping.
     await pause();
-    const archive = { schemaVersion: 1, profiles, activeProfileId: profiles[0].id, playbackContext: null };
+    const archive={schemaVersion:2,profiles,activeProfileId:profiles[0].id,rolePlans:Object.fromEntries(profiles.map((p,i)=>[p.id,{[newIds[i]]:confirmedRolePlan(p,newIds[i])}])),playbackContext:null};
     await evaluate(`localStorage.setItem('halfcourt-lineups-v1',${JSON.stringify(JSON.stringify(archive))})`);
-    await send('Page.reload');
-    await waitFor("Boolean(document.querySelector('[data-action=lineup-recommend]'))");
-    for (let index = 0; index < profiles.length; index++) {
-      const profile = profiles[index], id = newIds[index];
-      if (index) {
-        await nav('lineups');
-        if (await evaluate("document.querySelector('#lineups-panel').dataset.subview==='recommendations'")) await action('lineup-back');
-        await selectArchive({evaluate,waitFor},profile.id);
-        await waitFor(`JSON.parse(localStorage.getItem('halfcourt-lineups-v1')).activeProfileId===${JSON.stringify(profile.id)}&&!document.body.classList.contains('is-loading')`);
-        await waitFor("document.querySelector('#lineups-panel').getAttribute('aria-busy')==='false'");
-      }
-      await action('lineup-recommend');
-      await action('lineup-candidate', `[data-template-id="${id}"]`);
-      const recommendation = recommendLineup(profile).recommendations.find(item => item.templateId === id);
-      assert.ok(recommendation);
-      await action('lineup-play');
-      await waitFor(`document.body.dataset.view==='play'&&document.body.dataset.lineupContext===${JSON.stringify(profile.id)}&&!document.body.classList.contains('is-loading')`);
-      assert.equal(await evaluate("document.querySelector('#template-picker').value"), id);
-      const context = await evaluate("JSON.parse(localStorage.getItem('halfcourt-lineups-v1')).playbackContext");
-      assert.deepEqual(context, { profileId: profile.id, profileRevision: profile.revision, templateId: id });
-      const seen = [];
-      for (let page = 0; page < Math.ceil(profile.players.length / 2); page++) {
-        seen.push(...await evaluate("[...document.querySelectorAll('.legend-row')].map(n=>({role:Number(n.dataset.role),name:n.querySelector('.legend-name').textContent,task:n.querySelector('.legend-task').textContent}))"));
-        if (page + 1 < Math.ceil(profile.players.length / 2)) await evaluate("document.querySelector('#legend-next').click()");
-      }
-      assert.equal(seen.length, profile.players.length);
-      for (const assignment of recommendation.assignments) {
-        const row = seen.find(item => item.role === assignment.role), member = profile.players.find(item => item.id === assignment.playerId);
-        assert.ok(row.name.includes(member.name) && row.name.includes(`球衣 ${member.number} 号`));
-        assert.equal(row.task, assignment.task);
-        assert.ok(await evaluate(`document.querySelector('#players-layer [data-player="attack-${assignment.role}"] title').textContent.includes(${JSON.stringify(member.name)})`), 'court role title uses the same actual mapping');
-      }
-      metrics.push({ id, recommendation, legend: seen });
-      if (index === 0) await verifySourceFailure(id, profile.id);
+    await send('Page.reload');await waitFor("Boolean(document.querySelector('[data-action=lineup-conditions]'))");
+    for(let index=0;index<profiles.length;index++){
+      const profile=profiles[index],id=newIds[index];
+      if(index){await nav('lineups');await selectArchive({evaluate,waitFor},profile.id);await waitFor("document.querySelector('#lineups-panel').getAttribute('aria-busy')==='false'");}
+      await action('lineup-conditions');await waitFor("document.body.dataset.roleConditions==='true'&&!document.body.dataset.pageTransition");
+      await evaluate(`(()=>{const s=document.querySelector('[data-action=role-template]');s.value=${JSON.stringify(id)};s.dispatchEvent(new Event('change'))})()`);
+      await action('role-play');await waitFor(`document.body.dataset.view==='play'&&document.body.dataset.lineupContext===${JSON.stringify(profile.id)}&&!document.body.classList.contains('is-loading')`);
+      assert.equal(await evaluate("document.querySelector('#template-picker').value"),id);
+      const context=await evaluate("JSON.parse(localStorage.getItem('halfcourt-lineups-v1')).playbackContext");
+      assert.deepEqual(context,{source:'role-confirmations',profileId:profile.id,profileRevision:profile.revision,templateId:id,roleVersion:1});
+      const seen=[];for(let page=0;page<Math.ceil(profile.players.length/2);page++){seen.push(...await evaluate("[...document.querySelectorAll('.legend-row')].map(n=>({role:Number(n.dataset.role),name:n.querySelector('.legend-name').textContent,task:n.querySelector('.legend-task').textContent}))"));if(page+1<Math.ceil(profile.players.length/2))await evaluate("document.querySelector('#legend-next').click()");}
+      const assignments=explicitRoleAssignments(profile,id);assert.equal(seen.length,profile.players.length);
+      for(const assignment of assignments){const row=seen.find(item=>item.role===assignment.role),member=profile.players.find(item=>item.id===assignment.playerId);assert.ok(row.name.includes(member.name)&&row.name.includes('球衣 '+member.number+' 号'));assert.equal(row.task,assignment.task);assert.ok(await evaluate(`document.querySelector('#players-layer [data-player="${assignment.animationId}"] title').textContent.includes(${JSON.stringify(member.name)})`));}
+      metrics.push({id,assignments,legend:seen});if(index===0)await verifySourceFailure(id,profile.id);
     }
-    await writeFile(path.join(folder, 'hc027-expansion-playback-recommendations.json'), JSON.stringify(metrics, null, 2) + '\n');
+    await writeFile(path.join(folder, 'hc027-expansion-playback-roles.json'), JSON.stringify(metrics, null, 2) + '\n');
   } finally {
     await pause();
     await evaluate(`(()=>{for(const[k,v]of Object.entries(${JSON.stringify({ 'halfcourt-lineups-v1': backup.archive, 'halfcourt-builtin-selection-v1': backup.selection })})){if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}})()`);

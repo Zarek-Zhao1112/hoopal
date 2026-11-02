@@ -69,3 +69,15 @@
 HC-051的全26套/91职责位覆盖、稳定身份、进攻/防守阵营和未来新增构建检查目标继续有效；本轮不恢复旧擅长/弱项打分，不动真实推荐/存储或APK。
 
 已交付[条件→确认→试练三屏图](../../artifacts/design/tactic-requirements-concept/overview-v1.png)，[提示词](../../artifacts/design/tactic-requirements-concept/prompt.txt)保留。该候选已表达三态和具体动作，尚未获用户对最终交互的批准；生成球场/小刻度不能作为人数或模板数据验收。HC-051“整体替换”仍指旧能力自评及自动分工流程，后续以本节继续讨论保留按具体条件帮助选战术的用途。
+
+## HC-054 · 已批准的正式实现
+
+2026-11-02用户以“可以”批准HC-053，任务进入[HC-054](../tasks/HC-054-role-requirements-release.md)。本节替代上文设计阶段的“未实现/待批准”状态。现行流程是基本建队→选战术→逐项具体条件→三态与成员认领→本队演练，不跨战术自动确认。
+
+所有26套/91位职责已与单套战术定义共置，roleVersion=1；data/templates统一注册，npm build和Android构建入口都校验人数、稳定ID、阵营及每帧棋子。shared/tactic-roles.js只处理角色与三态，未选状态是unknown；available必须有唯一现有成员，missing和unknown不绑定。旧标签和自动加权排名实现及专属排名测试退役，保留原动画、读写保护和新增替代测试。
+
+条件主卡替换战术库内部区域，底栏不增加页。更衣室“找适合本队的战术”与展开战术卡“查看条件”都可进入；条件页可选择全部攻防战术，无同人数球队时明确引导选队，仍可通用示范。角色面板450ms浮起，三态、具体动作和未占用队员选择均在其中；确认失败保输入，成功才关，取消无写盘。交换需明确确认双方新的动作要求。暂无人员时按缺少动作找同人数同攻防且不含这些动作的其他候选，标明仍需确认；没有候选不虚构兜底排名。
+
+持久化沿用halfcourt-lineups-v1键，schemaVersion升级2：profiles/activeProfileId/rolePlans/playbackContext。每队每套计划含templateId/roleVersion/assignments[{roleId,status,memberId}]。来源source=role-confirmations，包含球队ID/revision和模板ID/roleVersion，必须完整有效。确认、交换、重置捕获调用时球队身份及expectedRevision，串行成功才更新状态并递增revision、清旧来源。基本改名/号码保成员ID关联与合法来源，替换成员解除相关位；换队或手选战术可靠解除旧来源后才能切换。
+
+schema1成功读取后只内存迁移，不立即写盘；首次新版写入前精确备份旧原文，失败不覆盖；保球队及成员ID、姓名、号码、NBA风格，旧标签不转新确认、旧自动来源清空。过期roleVersion原计划保留待用户显式重置，首次后续写前备份原文；未知schema和读取失败锁写，损坏条目隔离并保原文，保存快照/队列/重试保持。完整证据及设备边界以任务和独立审查为准。

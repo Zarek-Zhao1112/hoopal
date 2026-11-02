@@ -1,8 +1,14 @@
+import {defineRoles} from '../../role-helpers.js';
 import {defineDefenseTactic} from '../../defense-helpers.js';
 
 export default defineDefenseTactic({
   id: 'defense-3v3-zone', mode: '3v3', title: '三人一高两低联防', category: '区域联防',
   description: '一高两低的半场区域训练，球入侧区由对应防守人接管。',
+  ...defineRoles('defense', [
+  ["高位区域者","弧顶出防，球转侧翼后补高位通道，回传时重新接管高位并交流交接。",["zone-handoff","contain-ball","help-recover"]],
+  ["左低位区域者","球到左翼时上前接管并跟到左低位，转到右侧时回收弱侧护筐。",["zone-handoff","closeout","protect-rim"]],
+  ["右低位区域者","左侧有球时收篮下帮助，球转右翼后出防并控制该区域。",["zone-handoff","closeout","protect-rim"]],
+]),
   steps: [
     { note: '蓝方 1 号在高位，2、3 号分守两侧低位。按球所在区域分工，这是训练用站位，不代表所有比赛或年龄组的通用规则。', holder: 1,
       attack: [[500, 600], [190, 390], [810, 390]], defense: [[500, 490], [365, 260], [635, 260]] },

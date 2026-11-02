@@ -1,9 +1,16 @@
+import {defineRoles} from '../../role-helpers.js';
 import {frame, defineExpansion} from '../../expansion-helpers.js';
 import {run, screen, pass} from '../../helpers.js';
 
 export default defineExpansion({
   id: 'screen-the-screener', title: '掩护者再获掩护', mode: '4v4', category: '连续无球掩护', difficulty: '进阶',
   description: '2 号先掩护 3 号切入，随后再借 4 号掩护出来，由 1 号送球。',
+  ...defineRoles('offense', [
+  ["弧顶传球者","先观察3号空切，等待2号借第二道掩护绕出，再向其输送传球。",["read-cut-pass"]],
+  ["先掩护后借挡者","先站稳掩护让3号切入，再借4号掩护绕到右翼，接球判断投射。",["stationary-screen","use-offball-screen","catch-shoot"]],
+  ["第一道借挡切入者","借2号站稳的第一道无球掩护切入近筐，保留终结威胁与内线接应。",["use-offball-screen","cut-finish"]],
+  ["第二道掩护者","为刚掩护过人的2号站稳设挡，待其绕出后再向内侧接应。",["stationary-screen","space-outlet"]],
+]),
   steps: [
     frame('1 号弧顶持球，2 号向左侧无球掩护点移动，3 号低位准备切入，4 号留在右侧等下一段动作。',
       [[500,630],[320,390],[180,210],[620,390]], [[500,550],[350,500],[250,210],[690,340]], [run(2,[320,390],[290,360],[270,330])]),

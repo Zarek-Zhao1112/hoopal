@@ -4,12 +4,11 @@ import {getTeamLogoUrl} from './components/team-assets.js';
 import {createLineupSheet} from './components/sheet.js';
 import {createWizardMotion} from './components/wizard-motion.js';
 import {createLineupDrafts} from './wizard/drafts.js';
-import {playerName,skillLabel,splitLineupText} from './views/text.js';
+import {playerName,splitLineupText} from './views/text.js';
 import {createLineupWizardController} from './wizard/controller.js';
 import {createLineupWizardView} from './wizard/view.js';
 import {createLockerView} from './views/locker.js';
 import {createArchivesView} from './views/archives.js';
-import {createRecommendationsView} from './views/recommendations.js';
 import {createArchiveMenu} from './components/archive-menu.js';
 import {createAccountSheet} from './components/account-sheet.js';
 export {splitLineupText} from './views/text.js';
@@ -19,9 +18,7 @@ export function createLineupUI({root,onAction,onInspect,onModalChange,onNavigate
  // Saved state arrives through render(); draftStore remains independent of it.
  const model = {
    state: { profiles: [], activeProfileId: null, playbackContext: null },
-   results: { ready: false, summary: [], recommendations: [] },
    route: 'profiles', section: 'lineups', profilePage: 0,
-   recommendationIndex: 0, recommendationSection: 'reasons', textPage: 0,
    pending: false, externalBusy: false, externalError: false, readLocked: false,
    feedback: '', confirmation: null, inspection: null, afterSheetNavigation: null,
  };
@@ -94,19 +91,6 @@ export function createLineupUI({root,onAction,onInspect,onModalChange,onNavigate
     const name = node('strong');
     name.append(button(playerName(player, index), 'lineup-inspect-player', () => inspect('队员资料', `${playerName(player, index)}\n球衣 ${player.number} 号`), { className: 'lineup-text-link' }));
     wrap.append(svg, name);
-    if (!compact) {
-      const tags = node('div', 'lineup-player-skills');
-      const labels = player.strengths.slice(0, 2).map(skillLabel);
-      for (const weakness of player.weaknesses) {
-        if (labels.length >= 2) break;
-        labels.push(`弱·${skillLabel(weakness)}`);
-      }
-      if (!labels.length) labels.push('未标擅长');
-      if (labels.length < 2) labels.push('其余一般');
-      const description = `${playerName(player, index)}\n擅长：${player.strengths.length ? player.strengths.map(skillLabel).join('、') : '未标注，按一般处理'}\n弱项：${player.weaknesses.length ? player.weaknesses.map(skillLabel).join('、') : '未标注'}`;
-      labels.forEach(label => tags.append(button(label, 'lineup-inspect-skills', () => inspect('队员能力标签', description), { className: 'lineup-player-skill' })));
-      wrap.append(tags);
-    }
     wrap.title = playerName(player, index);
     return wrap;
   }
@@ -182,6 +166,7 @@ export function createLineupUI({root,onAction,onInspect,onModalChange,onNavigate
   }
 
   function navigate(view) {
+    if (view === 'roles') { onNavigate?.(view); return; }
     model.section = view; model.route = 'profiles';
     onNavigate?.(view); draw();
   }
@@ -248,7 +233,6 @@ export function createLineupUI({root,onAction,onInspect,onModalChange,onNavigate
       root.append(node('p', 'lineup-inspection', model.inspection.pages[model.inspection.page]));
       root.append(pager(model.inspection.pages.length, model.inspection.page, page => { model.inspection.page = page; draw(); }, 'lineup-inspect'));
     } else if (model.confirmation && !draftStore.wizard) confirmationView();
-    else if (model.route === 'recommendations' && model.section === 'lineups') recommendationsPageView();
     else if (model.section === 'archives') archivesPageView();
     else profilePageView();
     if (!draftStore.wizard) {
@@ -311,18 +295,15 @@ export function createLineupUI({root,onAction,onInspect,onModalChange,onNavigate
  const {profilePageView, destroyLocker}=lockerModule;
  const archivesModule=createArchivesView(context);
  const {archivesPageView}=archivesModule;
- const recommendationsModule=createRecommendationsView(context);
- const {recommendationsPageView}=recommendationsModule;
  const menuModule=createArchiveMenu(context);
  const {refreshMenuIsolation,restoreMenuFocus,closeArchiveMenu,openArchiveMenu,editFromMenu,renderArchiveMenu}=menuModule;
   return {
-    render({ state: nextState, recommendations, busy = false, error = '', writeLocked = false }) {
+    render({ state: nextState, busy = false, error = '', writeLocked = false }) {
       model.state = nextState || { profiles: [], activeProfileId: null, playbackContext: null };
       for (const [profileId, playerId] of selectedByProfile) {
         const profile = model.state.profiles.find(item => item.id === profileId);
         if (!profile || !profile.players.some(player => player.id === playerId)) selectedByProfile.delete(profileId);
       }
-      model.results = recommendations || { ready: false, summary: [], recommendations: [] };
       model.externalBusy = Boolean(busy);
       model.externalError = Boolean(error);
       model.readLocked = Boolean(writeLocked);

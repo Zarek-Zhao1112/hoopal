@@ -50,7 +50,7 @@ export function createLineupSheet({ document, onRequestClose, onModalChange, id 
       timer = setTimeout(() => { if (phase === 'opening') { phase = 'open'; dialog.dataset.phase = phase; } }, reduced() ? 0 : 450);
     }));
   }
-  function close() {
+  function close({ immediate = false } = {}) {
     if (phase === 'closed' || phase === 'closing') return;
     clearTimeout(timer); phase = 'closing'; dialog.dataset.phase = phase; delete dialog.dataset.visible;
     for (const control of panel.querySelectorAll('button,input,select,textarea')) control.disabled = true;
@@ -70,7 +70,7 @@ export function createLineupSheet({ document, onRequestClose, onModalChange, id 
       const restored = [...document.querySelectorAll('[data-action]')].find(el => el.dataset.action === triggerAction && (!triggerProfileId || el.dataset.profileId === triggerProfileId) && visible(el));
       const target = visible(trigger) ? trigger : restored || [...document.querySelectorAll('[data-action="lineup-create-empty"],[data-action="lineup-create"],[data-action="lineup-configure"]')].find(visible);
       target?.focus({ preventScroll: true }); trigger = null; triggerAction = ''; triggerProfileId = '';
-    }, reduced() ? 0 : 450);
+    }, immediate || reduced() ? 0 : 450);
   }
   shade.addEventListener('click', () => { if (phase !== 'closing') onRequestClose(); });
   dialog.addEventListener('cancel', event => { event.preventDefault(); onRequestClose(); });

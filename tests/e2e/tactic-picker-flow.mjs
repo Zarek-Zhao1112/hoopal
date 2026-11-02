@@ -3,8 +3,7 @@ import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { templates } from '../../shared/templates.js';
 import { createLineup, validateLineup } from '../../shared/lineups.js';
-import { recommendLineup } from '../../shared/recommendations.js';
-import { offenseRules } from '../../data/recommendations/offense.js';
+import {confirmedRoleArchive,explicitRoleAssignments} from './role-fixtures.mjs';
 
 /** Actual app interaction in the runner's disposable Chrome profile. */
 export async function runTacticPickerFlow({ send, evaluate, wait, waitFor, folder }) {
@@ -52,11 +51,10 @@ export async function runTacticPickerFlow({ send, evaluate, wait, waitFor, folde
     await phase('closed'); await idle(); return { doubleClickEvidence };
   }
   function profileFor(templateId) {
-    const template = templates.find(t => t.id === templateId), rule = offenseRules.find(r => r.templateId === templateId);
+    const template = templates.find(t => t.id === templateId);
     const profile = createLineup(template.mode, { id: `hc050-${templateId}`, name: `玻璃选单${template.mode}球队`, nbaTeamId: 'BOS' });
-    profile.players.forEach((member, i) => Object.assign(member, { name: ['小王', '大李', '阿杰', '小陈'][i], number: [7, 12, 23, 30][i], height: 'medium', build: 'medium', mobility: 'agile', strengths: Object.entries(rule.roles[i].weights).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([skill]) => skill), weaknesses: [] }));
+    profile.players.forEach((member, i) => Object.assign(member, { name: ['小王', '大李', '阿杰', '小陈'][i], number: [7, 12, 23, 30][i] }));
     validateLineup(profile);
-    assert.ok(recommendLineup(profile).recommendations.some(r => r.templateId === templateId));
     return profile;
   }
   async function documentWith(archive, selection) {
@@ -68,7 +66,7 @@ export async function runTacticPickerFlow({ send, evaluate, wait, waitFor, folde
   }
   async function enter(entry) {
     const profile = entry.profile;
-    await documentWith(JSON.stringify({ schemaVersion: 1, profiles: profile ? [profile] : [], activeProfileId: profile?.id || null, playbackContext: profile ? { profileId: profile.id, profileRevision: profile.revision, templateId: entry.id } : null }), JSON.stringify({ templateId: entry.id, frameIndex: 1 }));
+    await documentWith(JSON.stringify(confirmedRoleArchive(profile?[profile]:[],profile?.id||null,entry.id)), JSON.stringify({ templateId: entry.id, frameIndex: 1 }));
     await click('[data-view-target=play]'); await idle();
     await evaluate(`(()=>{window.__hc050Writes=[];window.__hc050SelectChanges=0;window.__hc050LoadStarts=0;const observer=new MutationObserver(records=>{for(const r of records)if(!String(r.oldValue).split(/\\s+/).includes('is-loading')&&document.body.classList.contains('is-loading'))window.__hc050LoadStarts++});observer.observe(document.body,{attributes:true,attributeOldValue:true,attributeFilter:['class']});const original=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(['${archiveKey}','${selectionKey}'].includes(k))window.__hc050Writes.push({key:k,value:v});return original.call(this,k,v)};window.__hc050RestoreAudit=()=>{Storage.prototype.setItem=original;observer.disconnect();delete window.__hc050RestoreAudit};document.querySelector('#template-picker').addEventListener('change',()=>window.__hc050SelectChanges++)})()`);
     assert.equal(await evaluate("document.querySelector('#template-picker').hidden&&document.querySelector('#template-picker').getClientRects().length===0"), true, 'legacy select preserves the data interface without remaining a second visible control');

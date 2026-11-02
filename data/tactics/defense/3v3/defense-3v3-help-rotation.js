@@ -1,8 +1,14 @@
+import {defineRoles} from '../../role-helpers.js';
 import {defineDefenseTactic} from '../../defense-helpers.js';
 
 export default defineDefenseTactic({
   id: 'defense-3v3-help-rotation', mode: '3v3', title: '三人协防轮转', category: '协防轮转', difficulty: '进阶',
   description: '突破时一人协防、一人补协防者，出球后轮流扑防并恢复。',
+  ...defineRoles('defense', [
+  ["首防转侧翼者","弧顶首防后回追突破，再接管右侧外线；转弱侧后回中路，最后恢复高位。",["contain-ball","rotation-exchange","closeout"]],
+  ["弱侧补位者","突破时从弱侧补篮下，转弱侧时扑防接球人，随后恢复左侧对位。",["protect-rim","rotation-exchange","closeout"]],
+  ["协防接管者","从右侧帮助阻挡突破，出球后照看原突破人与篮下，最后恢复右侧对位。",["stop-drive","rotation-exchange","protect-rim"]],
+]),
   steps: [
     { note: '蓝方 1 号守中路持球，3 号负责右侧对手，2 号在弱侧兼顾篮下。准备以帮助与补帮助的方式处理突破，而不是三人一起追球。', holder: 1,
       attack: [[500, 590], [190, 370], [810, 230]], defense: [[500, 500], [285, 330], [700, 205]], via: { 1: [[450, 500], [465, 580], [560, 550]] } },

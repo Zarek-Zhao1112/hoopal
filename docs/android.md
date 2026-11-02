@@ -2,6 +2,8 @@
 
 ## 运行方式
 
+2026-11-02，1.27.0/code32已覆盖安装M2101K9C（ef473680），新战术条件与三态角色认领使用本地schema2。最终APK21秒构建，30网页资源同dist、15图标同1.26、原v2证书及无server.url通过；install-r Success，COLD620ms/Wait630ms。即时备份显示实际0球队、baseline-backdoor第5步（frameIndex4），安装及真实WebView96浏览26套/91职责后两份文件hash均保持；成功读取未强制写回schema1。手机无测试球队，未伪称本队认领保存或真实IME验收；浏览器验证了迁移、完整攻防分工与失败重试，人工手势/Back/输入法/旋转待验。完整证据见[HC-054](tasks/HC-054-role-requirements-release.md)，[1.27.0 APK](../artifacts/apk/hoopal-1.27.0.apk)可直接发Android平板覆盖安装。
+
 2026-11-02，1.26.0/code31已覆盖安装同一新机，新增训练场标题下展玻璃选单。225检查/完整Chrome16组/36选单布局与独立审查通过，19秒构建、30网页同dist/15图标同1.25.0/原v2签名通过。COLD640ms/Wait649ms，实际0队、原非零第4步及双hash保持；WV96竖屏393×819两组九标题/局部玻璃/322开合样本、四类取消与主Play保持通过。硬件Back、物理手指/旋转另待人工验，见[HC-050](tasks/HC-050-tactic-picker-release.md)。
 
 2026-11-02，1.25.0/code30已将训练场完整动画布局覆盖安装指定新机。225检查、完整Chrome15组、36专项布局及独立审查通过；27秒构建，30网页同dist/15图标同1.24.0/原v2签名通过。COLD985ms/Wait991ms，实际0球队及战术进度双hash保持；WebView96竖屏393×819的真实训练页面/620循环样本/暂停与几何检查通过，物理手势和旋转另待验，见[HC-048](tasks/HC-048-training-viewing-release.md)。
@@ -18,7 +20,7 @@
 
 1.11.0 / code13 已覆盖安装同一新机并冷启，战术库接入默认全收起的标题卡，逐卡开合与明确开始演练；浏览人数/攻防不改当前演练。143检查、六屏Chrome、独立审查及27资源哈希通过，原1份阵容字节保留。实际WebView96程序标题开合/换卡/命中通过，原生CTA/物理操作待验，见 [HC-016](tasks/HC-016-library-title-cards.md)。
 
-APK 内包含前端页面、动画引擎、阵容推荐规则和内置 3v3 / 4v4 战术。安装后，档案配置、推荐计算、播放与保存均在手机本地完成，无需启动电脑上的 Node 服务。应用最低 Android 版本为 7.0（API 24）；需要可运行当前 JavaScript 的 Android System WebView。
+APK 内包含前端页面、动画引擎、战术职责条件和内置 3v3 / 4v4 战术。安装后，档案配置、三态认领、播放与保存均在手机本地完成，无需启动电脑上的 Node 服务。应用最低 Android 版本为 7.0（API 24）；需要可运行当前 JavaScript 的 Android System WebView。
 
 1.12.0/code14已更新到同一新机，用户批准的库里卡通图标在系统详情与实际MIUI桌面显示确认；启动图标引用同步、网页favicon同源。28网页资源与15编译图标验证、独立审查通过，本次升级前实际0档案，前后文件hash一致。图标母版、导出脚本和真实显示证据见[HC-017](tasks/HC-017-curry-app-icon.md)。
 
@@ -71,7 +73,7 @@ npm run android:build
 
 脚本会构建网页、同步 Android 资源、运行 `assembleDebug`，再生成 `artifacts/apk/halfcourt-debug.apk`、`hoopal-版本号.apk`及各自的SHA256文件。原始产物在 `android/app/build/outputs/apk/debug/app-debug.apk`。顶层保当前版与一个回退版，更旧包放在`artifacts/apk/archive/`，同步历史文档链接。
 
-当前构建版本为 `1.26.0`（versionCode 31），训练场战术标题采用局部玻璃选单，220/160ms开合及同项/取消保留进度；账号/云备份服务仍尚未开放。安装证据见[HC-050](tasks/HC-050-tactic-picker-release.md)，[1.26.0安装包](../artifacts/apk/hoopal-1.26.0.apk)可直接发Android平板，升级保留档案与进度，不需卸载或电脑服务。[1.25.0](../artifacts/apk/hoopal-1.25.0.apk)保作源码/资源核对与回退参考，更旧[1.24.0](../artifacts/apk/archive/hoopal-1.24.0.apk)及[1.23.0](../artifacts/apk/archive/hoopal-1.23.0.apk)已归档保留，Android降级安装受版本限制。
+当前构建版本为 `1.26.0`（versionCode 31），训练场战术标题采用局部玻璃选单，220/160ms开合及同项/取消保留进度；账号/云备份服务仍尚未开放。安装证据见[HC-050](tasks/HC-050-tactic-picker-release.md)，[1.26.0安装包](../artifacts/apk/hoopal-1.26.0.apk)可直接发Android平板，升级保留档案与进度，不需卸载或电脑服务。[1.25.0](../artifacts/apk/archive/hoopal-1.25.0.apk)保作源码/资源核对与回退参考，更旧[1.24.0](../artifacts/apk/archive/hoopal-1.24.0.apk)及[1.23.0](../artifacts/apk/archive/hoopal-1.23.0.apk)已归档保留，Android降级安装受版本限制。
 
 当前开发机的便携工具放在被忽略的 `.tools/` 中，构建脚本可以自动使用其中的 JDK、SDK 和 Gradle。这些大体积工具不属于项目源码；其他电脑按上面的标准环境变量配置即可。首次构建需要联网下载依赖，安装后的战术应用可离线使用。
 

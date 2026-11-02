@@ -1,8 +1,14 @@
+import {defineRoles} from '../../role-helpers.js';
 import {defineDefenseTactic} from '../../defense-helpers.js';
 
 export default defineDefenseTactic({
   id: 'defense-3v3-man-to-man', mode: '3v3', title: '三人半场盯人', category: '半场盯人',
   description: '持球人出防，无球队员兼顾人球，随转移球收缩与恢复。',
+  ...defineRoles('defense', [
+  ["高位盯防者","先控制弧顶持球人，传到侧翼后退到帮助位置，球回弧顶再出防并随球恢复。",["contain-ball","help-recover"]],
+  ["左翼盯防者","左翼接球时出防，侧向跟住突破；球转移后回收弱侧，兼顾原对手。",["contain-ball","closeout","help-recover"]],
+  ["右翼盯防者","弱侧先收缩中路，球转右翼时出防并跟随持球移动，保持人球兼顾。",["contain-ball","closeout","help-recover"]],
+]),
   steps: [
     { note: '蓝方 1 号守中路持球人，2、3 号兼顾各自对手与篮下。球将传向左翼，所有人随球调整，而非只让一人追球。', holder: 1,
       attack: [[500, 600], [190, 390], [810, 390]], defense: [[500, 480], [270, 365], [730, 365]] },

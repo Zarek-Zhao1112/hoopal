@@ -20,6 +20,7 @@ function run(binary, args, cwd = root) {
   });
 }
 
+await run(process.execPath, [resolve('scripts/qa/check-tactic-roles.mjs')]);
 await build({ configFile: resolve('vite.config.js') });
 const cli = resolve('node_modules/@capacitor/cli/bin/capacitor');
 if (!await exists(resolve('android'))) await run(process.execPath, [cli, 'add', 'android']);

@@ -21,7 +21,7 @@ export function createArchivesView(context){
     model.profilePage = Math.max(0, Math.min(pages - 1, model.profilePage));
     if (!model.state.profiles.length) {
       const empty = node('div', 'lineup-archives-empty');
-      empty.append(node('h2', '', '还没有球队档案'), node('p', '', '从球队名字、喜欢的球衣开始，\n再为队员选好真实特点。'));
+      empty.append(node('h2', '', '还没有球队档案'), node('p', '', '从球队名字、喜欢的球衣开始，\n再为队友填好昵称和号码。'));
       list.append(empty);
     }
     for (const profile of model.state.profiles.slice(model.profilePage * 3, model.profilePage * 3 + 3)) {

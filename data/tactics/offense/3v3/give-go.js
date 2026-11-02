@@ -1,3 +1,4 @@
+import {defineRoles} from '../../role-helpers.js';
 import {defineTemplate, line} from '../../legacy-helpers.js';
 
 export default defineTemplate('give-go', '传切配合', '1 号传球后切入，2 号观察并回传。', [
@@ -5,4 +6,8 @@ export default defineTemplate('give-go', '传切配合', '1 号传球后切入�
   { note: '1 号传球给 2 号后，先向右做假动作，再从防守人身后切向篮下。', positions: { 'attack-1': [550, 485], 'defense-1': [510, 450] }, holder: 'attack-2', paths: [line('run', 'attack-1', [[550, 485], [620, 370], [520, 200]])] },
   { note: '2 号抓住切入窗口回传。若路线被封锁，保持球权重新组织。', positions: { 'attack-1': [520, 200], 'defense-1': [570, 290], 'defense-2': [265, 350] }, paths: [line('pass', 'attack-2', [[200, 390], [520, 200]])] },
   { note: '1 号接球终结，2 号与 3 号保持外线接应。', positions: {}, holder: 'attack-1' }
-]);
+], '3v3', defineRoles('offense', [
+  ["传切终结者","弧顶传球给2号后切入篮下，观察回传并接球近筐终结。",["pass-cut","cut-finish"]],
+  ["翼侧回传者","翼侧接住1号传球，保护球权，观察切入时机将球回传篮下。",["read-cut-pass"]],
+  ["弱侧接应者","弱侧保持空间，随球调整站位并保留传球出口。",["space-outlet"]],
+]));

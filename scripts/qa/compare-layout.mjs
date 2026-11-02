@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import {createLineup} from '../../shared/lineups.js';
 import {createBrowserSession} from './browser-session.mjs';
 
-const baselineRoot=process.argv[2],currentRoot=process.argv[3];if(!baselineRoot)throw Error('Usage: node scripts/qa/compare-layout.mjs <baseline-dist> [current-dist]');
+const baselineRoot=process.argv[2],currentRoot=process.argv[3];if(!baselineRoot)throw Error('Usage: node scripts/qa/compare-layout.mjs <baseline-dist> [current-dist]. Both bundles must implement HC-054 or later; older UI/ability pages were intentionally replaced.');
 const folder=path.resolve('artifacts/qa',`layout-parity-${Date.now()}`);await mkdir(folder,{recursive:true});
 const sessions=[],report={passed:false,normalization:'Same fixtures, reduced motion, settled panels, blurred focus and dismissed transient toast. Wizard states cover existing-profile edit; creation and full animation are checked by the complete suite.',cases:[]};
 const hash=source=>createHash('sha256').update(source).digest('hex');
@@ -13,8 +13,8 @@ async function imageAssets(root){const out={};async function walk(dir){for(const
 async function facts(s){return s.evaluate(`(()=>{const clean=v=>String(v).replaceAll(location.origin,'$ORIGIN');const css=n=>Object.fromEntries([...n].sort().map(k=>[k,clean(n.getPropertyValue(k))]));return [...document.body.querySelectorAll('*')].filter(n=>{const r=n.getBoundingClientRect(),c=getComputedStyle(n);return r.width>0&&r.height>0&&c.display!=='none'&&c.visibility!=='hidden'&&Number(c.opacity)>0&&!n.closest('defs,[hidden],#toast-live')}).map(n=>{const r=n.getBoundingClientRect(),c=getComputedStyle(n),pseudos={};for(const p of ['::before','::after']){const x=getComputedStyle(n,p);if(!['none','normal'].includes(x.content))pseudos[p]=css(x)}return{tag:n.tagName,classes:n.getAttribute('class')||'',rect:[r.x,r.y,r.width,r.height].map(v=>Math.round(v*10000)/10000),text:[...n.childNodes].filter(c=>c.nodeType===3).map(c=>c.textContent).join(''),style:css(c),pseudos,value:'value'in n?String(n.value):null,checked:'checked'in n?n.checked:null,image:n.tagName==='IMG'?{path:new URL(n.currentSrc||n.src).pathname,width:n.naturalWidth,height:n.naturalHeight}:null,svg:n.namespaceURI==='http://www.w3.org/2000/svg'?Object.fromEntries([...n.attributes].filter(a=>!['id','class'].includes(a.name)&&!a.name.startsWith('data-')).map(a=>[a.name,clean(a.value)])):null}})})()`)}
 function archive(mode){
  const p=createLineup(mode,{id:'parity-'+mode,name:mode+' 同框球队',nbaTeamId:'BOS'});
- p.players.forEach((v,i)=>Object.assign(v,{id:'member-'+i,name:i===0?'队长阿明':'球员'+(i+1),number:11+i,height:i===2?'tall':'medium',build:i===2?'strong':'medium',mobility:i===1?'agile':'average',strengths:[['handling','passing'],['finishing'],['screening','passing'],['shooting']][i]}));
- return{schemaVersion:1,profiles:[p],activeProfileId:p.id,playbackContext:null};
+ p.players.forEach((v,i)=>Object.assign(v,{id:'member-'+i,name:i===0?'队长阿明':'球员'+(i+1),number:11+i}));
+ return{schemaVersion:2,profiles:[p],activeProfileId:p.id,rolePlans:{},playbackContext:null};
 }
 async function seed(s,mode){
  if(s.seedToken)await s.send('Page.removeScriptToEvaluateOnNewDocument',{identifier:s.seedToken});
@@ -51,8 +51,8 @@ try{
    for(const s of sessions){assert.equal(await s.evaluate("document.querySelector('#template-picker').value"),mode==='3v3'?'post-split':'four-out-cut');assert.equal(await s.evaluate("document.querySelector('#mode').value"),mode)}
    await compare('training-'+mode,width,height);
   }
-  for(const s of sessions){await seed(s,'3v3');await click(s,'[data-action=lineup-recommend]')};await compare('recommendations',width,height);
-  for(const s of sessions){await click(s,'[data-action=lineup-back]');await click(s,'[data-action=lineup-configure]');await s.waitFor("document.querySelector('#lineup-wizard-dialog').dataset.phase==='open'")};
+  for(const s of sessions){await seed(s,'3v3');await click(s,'[data-action=lineup-conditions]')};await compare('conditions',width,height);
+  for(const s of sessions){await click(s,'[data-action=role-close]');await click(s,'[data-view-target=lineups]');await click(s,'[data-action=lineup-configure]');await s.waitFor("document.querySelector('#lineup-wizard-dialog').dataset.phase==='open'")};
   for(const step of [1,2,3]){for(const s of sessions){await click(s,`[data-action=lineup-wizard-step][data-step="${step}"]`);await s.waitFor("document.querySelector('.lineup-sheet-content').dataset.transitioning!=='true'")};await compare('wizard-'+step,width,height)}
  }
  report.passed=true;report.allPixelsEqual=report.cases.every(x=>x.exactPixelMatch);console.log(JSON.stringify({passed:true,cases:report.cases.length,allLayoutFactsEqual:true,allPixelsEqual:report.allPixelsEqual,folder}));

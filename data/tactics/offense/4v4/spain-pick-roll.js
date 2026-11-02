@@ -1,8 +1,15 @@
+import {defineRoles} from '../../role-helpers.js';
 import {defineTactic, run, dribble, screen, pass} from '../../helpers.js';
 
 export default defineTactic({
   id: 'spain-pick-roll', mode: '4v4', title: '西班牙挡拆', category: '复合掩护', difficulty: '进阶',
   description: '4 号给持球人掩护，2 号背掩护 4 号的防守者，再向外弹开。',
+  ...defineRoles('offense', [
+  ["持球发起者","借4号主掩护突破，观察顺下与2号外弹两处出口并分球。",["use-ball-screen","drive-pass"]],
+  ["背掩护外弹者","为顺下者的防守人站稳背掩护，释放后外弹准备接球投射。",["stationary-screen","catch-shoot"]],
+  ["弱侧底角接应者","弱侧底角保持空间，准备接球投射或继续转移。",["space-outlet","catch-shoot"]],
+  ["主掩护顺下者","为持球者站稳主掩护，释放后顺下接球近筐终结。",["stationary-screen","roll-finish"]],
+]),
   steps: [
     {
       note: '1 号弧顶持球，4 号上提准备挡拆；2 号到内侧准备背掩护，3 号在左底角保持弱侧空间。',

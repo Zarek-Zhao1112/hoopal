@@ -47,7 +47,7 @@ export async function runStartupFlow({ send, evaluate, wait, folder }) {
   const fixtures=['empty','3v3','4v4'].map(mode=>{
     const profile=mode==='empty'?null:createLineup(mode,{id:`hc041-${mode}`,name:`启动${mode}球队`,nbaTeamId:mode==='3v3'?'BOS':'LAL'});
     profile?.players.forEach((member,index)=>Object.assign(member,{id:`hc041-${mode}-${index}`,name:`启动${mode}队员${index+1}`,number:index+11,height:'medium',build:'medium',mobility:'average'}));
-    return {mode,profile,name:profile?.players[0].name||'等待入队',archive:JSON.stringify({schemaVersion:1,profiles:profile?[profile]:[],activeProfileId:profile?.id||null,playbackContext:null}),selection:JSON.stringify({templateId:mode==='4v4'?'four-out-cut':'pick-roll',frameIndex:1})};
+    return {mode,profile,name:profile?.players[0].name||'等待入队',archive:JSON.stringify({schemaVersion:2,profiles:profile?[profile]:[],activeProfileId:profile?.id||null,rolePlans:{},playbackContext:null}),selection:JSON.stringify({templateId:mode==='4v4'?'four-out-cut':'pick-roll',frameIndex:1})};
   });
   let script=null;
   const reports=[],failures=[],controls={};

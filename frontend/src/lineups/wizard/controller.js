@@ -2,7 +2,6 @@ import { NBA_TEAMS } from '../../../../data/nba-teams.js';
 import { getNbaTeam } from '../../../../data/nba-teams.js';
 import { validateLineup } from '../../../../shared/lineups.js';
 import { copy } from './drafts.js';
-import { isLineupReady } from '../../../../shared/lineups.js';
 
 /** Draft navigation and explicit commit policy; persistence stays with onAction. */
 export function createLineupWizardController(context){
@@ -34,7 +33,7 @@ function closeWizard(discard = false) {
     if (discard) {
       draftStore.discard(source);
     }
-    draftStore.wizard = null; model.confirmation = null; model.feedback = ''; model.section = source.originSection || model.section; model.route = source.originRoute === 'recommendations' ? 'recommendations' : 'profiles'; destroyTeamCarousel(); sheet.close(); draw();
+    draftStore.wizard = null; model.confirmation = null; model.feedback = ''; model.section = source.originSection || model.section; model.route = 'profiles'; destroyTeamCarousel(); sheet.close(); draw();
   }
 
 function requestWizardClose() {
@@ -52,7 +51,7 @@ function wizardStep(step) {
     const draft = wizardDraft();
     if (step > 1 && !draft.name.trim()) { model.feedback = '请先填写阵容名称。'; draftStore.wizard.step = 1; draw(); return; }
     if (step > 2 && draftStore.wizard.kind === 'create' && !getNbaTeam(draft.nbaTeamId)) { model.feedback = '请先选择一支 NBA 球队。'; draftStore.wizard.step = 2; draw(); return; }
-    if (step === 3 && draftStore.wizard.kind === 'create' && !draftStore.wizard.playersVisited) { draftStore.editSection = 'traits'; draftStore.wizard.playersVisited = true; }
+    if (step === 3) draftStore.editSection = 'identity';
     if (step !== draftStore.wizard.step) draftStore.wizardMotionIntent = { kind: 'step', forward: step > draftStore.wizard.step };
     draftStore.wizard.step = step; model.feedback = ''; draw();
   }
@@ -72,10 +71,6 @@ function saveWizard() {
       if (source.kind === 'create' && !getNbaTeam(draft.nbaTeamId)) { draftStore.wizard.step = 2; throw new Error('请选择一支 NBA 球队。'); }
       if (draft.players.some(member => member.number === '')) throw new Error('请填写每名队员的球衣号码。');
       profile = validateLineup(copy(draft));
-      if (source.kind === 'create' && !isLineupReady(profile)) {
-        draftStore.playerIndex = profile.players.findIndex(member => !member.height || !member.build || !member.mobility); draftStore.editSection = 'traits';
-        throw new Error('请为每名队员选择身高、体格和移动特点。弱项可以留空。');
-      }
     } catch (error) { model.feedback = error.message; draw(); return; }
     perform(source.kind === 'create' ? 'create' : 'update', source.kind === 'create' ? profile : { profile }, () => {
       if (source.kind === 'create') { draftStore.createDraft = null; draftStore.createMembers = null; }
@@ -83,14 +78,14 @@ function saveWizard() {
       const savedId = source.kind === 'create' ? model.state.activeProfileId : source.id;
       const index = model.state.profiles.findIndex(item => item.id === savedId); if (index >= 0) model.profilePage = Math.floor(index / 3);
       model.section = source.originSection || model.section;
-      draftStore.wizard = null; model.confirmation = null; model.route = source.originRoute === 'recommendations' ? 'recommendations' : 'profiles'; model.feedback = '配置已保存。'; destroyTeamCarousel();
+      draftStore.wizard = null; model.confirmation = null; model.route = 'profiles'; model.feedback = '配置已保存。'; destroyTeamCarousel();
       if (source.kind === 'create') model.afterSheetNavigation = 'lineups';
       sheet.close();
     });
   }
 
 function wizardMemberReady(player, draft) {
-    return Boolean(player.height && player.build && player.mobility && Number.isInteger(player.number) && player.number >= 0 && player.number <= 99 && draft.players.every(other => other.id === player.id || other.number !== player.number));
+    return Boolean(Number.isInteger(player.number) && player.number >= 0 && player.number <= 99 && draft.players.every(other => other.id === player.id || other.number !== player.number));
   }
 
 function selectWizardPlayer(index) {

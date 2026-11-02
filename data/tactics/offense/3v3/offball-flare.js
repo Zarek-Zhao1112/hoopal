@@ -1,9 +1,15 @@
+import {defineRoles} from '../../role-helpers.js';
 import {frame, defineExpansion} from '../../expansion-helpers.js';
 import {run, screen, pass} from '../../helpers.js';
 
 export default defineExpansion({
   id: 'offball-flare', title: '无球外弹接投', mode: '3v3', category: '无球掩护', difficulty: '基础',
   description: '2 号借 3 号掩护远离持球人向外接球，3 号不是外弹接投者。',
+  ...defineRoles('offense', [
+  ["左翼传球者","持球等待2号借无球掩护向外跑出，再向右翼输送传球。",["read-cut-pass"]],
+  ["借挡外弹者","借3号站稳的无球掩护，远离持球侧向外弹，接球判断投射。",["use-offball-screen","catch-shoot"]],
+  ["无球掩护接应者","为2号站稳掩护，释放后避开传球通道并补中路接应。",["stationary-screen","space-outlet"]],
+]),
   steps: [
     frame('1 号左翼持球，2 号在中路，3 号从右侧移动到无球掩护点。2 号先等 3 号站稳，不提前挤向球。',
       [[240,510],[500,430],[650,420]], [[160,430],[500,330],[730,350]], [run(3,[650,420],[640,490])]),

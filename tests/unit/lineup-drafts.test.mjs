@@ -48,11 +48,11 @@ test('discarding creation and editing keeps the unrelated session draft', () => 
 });
 
 test('opening a non-current member binds the edit to that profile and member', () => {
-  const h = harness(); h.model.route = 'recommendations';
+  const h = harness(); h.model.route = 'profiles';
   h.selectedByProfile.set(h.saved.id, h.saved.players[2].id);
   h.controller.beginEdit(h.saved);
   assert.equal(h.draftStore.editorId, h.saved.id); assert.equal(h.draftStore.playerIndex, 2);
-  assert.equal(h.draftStore.wizard.originSection, 'archives'); assert.equal(h.draftStore.wizard.originRoute, 'recommendations');
+  assert.equal(h.draftStore.wizard.originSection, 'archives'); assert.equal(h.draftStore.wizard.originRoute, 'profiles');
   assert.equal(h.draftStore.wizard.step, 3); assert.equal(h.commits.length, 0);
 });
 
@@ -65,17 +65,17 @@ test('discard close binds to the active wizard, not another retained draft', () 
   assert.equal(h.draftStore.createDraft.name, '留下创建'); assert.equal(h.draftStore.drafts.has(h.saved.id), false);
 });
 
-test('new creation rejects neutral team and incomplete traits before committing', () => {
+test('new creation requires an NBA team but basic member names/numbers need no ability ratings', () => {
   const h = harness(); h.controller.beginCreate(); const draft = h.draftStore.createDraft; draft.name = '新建阵容';
   h.controller.saveWizard(); assert.equal(h.commits.length, 0); assert.equal(h.draftStore.wizard.step, 2);
   draft.nbaTeamId = 'BOS'; h.draftStore.wizard.step = 3; h.controller.saveWizard();
-  assert.equal(h.commits.length, 0); assert.equal(h.draftStore.editSection, 'traits'); assert.match(h.model.feedback, /每名队员/);
+  assert.equal(h.commits.length, 1); assert.equal(h.commits[0].kind, 'create');
+  assert.ok(h.commits[0].payload.players.every(player=>!Object.hasOwn(player,'height')&&!Object.hasOwn(player,'strengths')));
 });
 
 test('save sends one complete isolated snapshot and only success clears that draft', () => {
   const h = harness(); h.controller.beginCreate(); const draft = h.draftStore.createDraft;
   draft.name = '完整新建'; draft.nbaTeamId = 'BOS';
-  for (const player of draft.players) Object.assign(player, { height: 'medium', build: 'medium', mobility: 'average' });
   h.controller.saveWizard(); assert.equal(h.commits.length, 1);
   const call = h.commits[0]; assert.equal(call.kind, 'create'); assert.equal(call.payload.id, draft.id);
   assert.equal(call.payload.players.length, 3); assert.deepEqual(call.payload.players.map(p => p.id), draft.players.map(p => p.id));
@@ -86,7 +86,7 @@ test('save sends one complete isolated snapshot and only success clears that dra
   assert.equal(h.draftStore.createDraft, null); assert.equal(h.closes, 1); assert.equal(h.model.afterSheetNavigation, 'lineups');
 });
 
-test('legacy neutral incomplete edit saves without creation-only rules or revision rewrites', () => {
+test('legacy neutral basic edit saves without creation-only rules or revision rewrites', () => {
   const h = harness(); h.saved.nbaTeamId = null; h.controller.beginEdit(h.saved);
   const draft = h.draftStore.drafts.get(h.saved.id); draft.players[0].name = '旧队新昵称';
   h.controller.saveWizard(); assert.equal(h.commits.length, 1); assert.equal(h.commits[0].kind, 'update');

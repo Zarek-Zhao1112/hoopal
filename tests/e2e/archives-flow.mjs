@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createLineup } from '../../shared/lineups.js';
-import { recommendLineup } from '../../shared/recommendations.js';
+import {confirmedRoleArchive} from './role-fixtures.mjs';
 import { findArchiveCard } from './archive-helpers.mjs';
 import {waitForWizardMotion} from './wizard-helpers.mjs';
 
@@ -48,12 +48,12 @@ export async function runArchivesFlow({ send, evaluate, wait, waitFor, folder })
 
     const profiles = Array.from({ length: 7 }, (_, i) => {
       const p = createLineup(i % 2 ? '4v4' : '3v3', { id: `hc033-profile-${i}`, name: `档案验收球队 ${i + 1}`, nbaTeamId: ['BOS', 'LAL', 'CHI', 'MIA', 'NYK', 'BKN', 'MIL'][i] });
-      p.players.forEach((member, j) => Object.assign(member, { id: `hc033-${i}-member-${j}`, name: `球队${i + 1}成员${j + 1}`, number: j + 11, height: 'medium', build: 'medium', mobility: 'average' }));
+      p.players.forEach((member, j) => Object.assign(member, { id: `hc033-${i}-member-${j}`, name: `球队${i + 1}成员${j + 1}`, number: j + 11 }));
       return p;
     });
-    const templateId = recommendLineup(profiles[0]).recommendations[0].templateId;
+    const templateId = 'pick-roll';
     profiles[0].recentTemplateId = templateId;
-    const archive = { schemaVersion: 1, profiles, activeProfileId: profiles[0].id, playbackContext: { profileId: profiles[0].id, profileRevision: 1, templateId } };
+    const archive = confirmedRoleArchive(profiles,profiles[0].id,templateId);
     const fixtureSelection = JSON.stringify({ templateId, frameIndex: 1 });
     await evaluate(`localStorage.setItem('${key}',${JSON.stringify(JSON.stringify(archive))})`);
     const unreadRaw = await evaluate(`localStorage.getItem('${key}')`);
@@ -92,7 +92,7 @@ export async function runArchivesFlow({ send, evaluate, wait, waitFor, folder })
     const fixtureDiagnostics = await evaluate(`({selectionRaw:localStorage.getItem('${selectionKey}'),archiveRaw:localStorage.getItem('${key}'),archiveContext:JSON.parse(localStorage.getItem('${key}')).playbackContext,picker:document.querySelector('#template-picker').value,source:document.body.dataset.lineupContext,progress:document.querySelector('#timeline-scrub').value,readLocked:document.querySelector('#lineups-panel').dataset.readLocked})`);
     await writeFile(path.join(folder, 'hc033-fixture-diagnostics.json'), JSON.stringify(fixtureDiagnostics, null, 2));
     assert.equal(fixtureDiagnostics.selectionRaw, fixtureSelection, 'incoming fixture progress survives outgoing pagehide persistence');
-    assert.equal(fixtureDiagnostics.source, profiles[0].id, `fixture restores an actual valid recommendation source: ${JSON.stringify(fixtureDiagnostics)}`);
+    assert.equal(fixtureDiagnostics.source, profiles[0].id, `fixture restores an actual valid confirmed role source: ${JSON.stringify(fixtureDiagnostics)}`);
     const baseline = await facts();
     for (const [width, height] of [[360,640],[390,844],[844,390],[1024,768],[1280,800],[1440,900]]) {
       await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width < 1000 }); await wait(100); await nav('archives');
@@ -111,13 +111,13 @@ export async function runArchivesFlow({ send, evaluate, wait, waitFor, folder })
 
     await findArchiveCard(context, profiles[0].id); await click(`[data-action=lineup-select][data-profile-id="${profiles[0].id}"]`);
     await waitFor("document.body.dataset.view==='lineups'&&!document.body.dataset.pageTransition");
-    assert.deepEqual(await facts(), baseline, 'selecting the already active archive preserves its valid recommendation source');
+    assert.deepEqual(await facts(), baseline, 'selecting the already active archive preserves its valid confirmed role source');
     const target = profiles[4]; await findArchiveCard(context, target.id);
     await evaluate(`(()=>{window.hc033SetItem=Storage.prototype.setItem;window.hc033Attempts=0;Storage.prototype.setItem=function(k,v){if(k==='${key}'){window.hc033Attempts++;throw Error('HC033 selection blocked')}return window.hc033SetItem.call(this,k,v)}})()`);
     await click(`[data-action=lineup-select][data-profile-id="${target.id}"]`);
     await waitFor("document.querySelector('#lineups-panel').getAttribute('aria-busy')==='false'&&document.querySelector('#lineups-panel').textContent.includes('HC033 selection blocked')");
     assert.equal(await evaluate('document.body.dataset.view'), 'archives');
-    assert.deepEqual(await facts(), baseline, 'failed select preserves original raw storage, play and recommendation source');
+    assert.deepEqual(await facts(), baseline, 'failed select preserves original raw storage, play and confirmed role source');
     assert.ok(await evaluate(`Boolean(document.querySelector('.lineup-archive-card[data-profile-id="${target.id}"]'))`), 'failed select stays on its archive page');
     await evaluate('Storage.prototype.setItem=window.hc033SetItem');
     await click(`[data-action=lineup-select][data-profile-id="${target.id}"]`); await waitFor("document.body.dataset.view==='lineups'&&!document.body.dataset.pageTransition"); await settled();

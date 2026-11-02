@@ -1,8 +1,15 @@
+import {defineRoles} from '../../role-helpers.js';
 import {defineTactic, run, dribble, screen, pass} from '../../helpers.js';
 
 export default defineTactic({
   id: 'four-spread-pick-roll', mode: '4v4', title: '挡拆弱侧拉开', category: '挡拆配合',
   description: '4 号高位掩护后顺下，两侧底角拉开，1 号突破后寻找内传。',
+  ...defineRoles('offense', [
+  ["持球发起者","借4号高位掩护突破，读协防并向顺下者传球。",["use-ball-screen","drive-pass"]],
+  ["左底角接应者","左底角拉开空间，准备接分球投射或继续转移。",["space-outlet","catch-shoot"]],
+  ["右底角接应者","右底角拉开空间，准备接分球投射或继续转移。",["space-outlet","catch-shoot"]],
+  ["掩护顺下者","高位站稳掩护后顺下，接球近筐终结或回传。",["stationary-screen","roll-finish"]],
+]),
   steps: [
     {
       note: '1 号弧顶持球，4 号从右侧上提。2 号左底角与 3 号右底角保持宽度，不提前切进挡拆区域。',

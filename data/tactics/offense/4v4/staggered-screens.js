@@ -1,8 +1,15 @@
+import {defineRoles} from '../../role-helpers.js';
 import {defineTactic, run, screen, pass} from '../../helpers.js';
 
 export default defineTactic({
   id: 'staggered-screens', mode: '4v4', title: '双掩护接球', category: '无球掩护', difficulty: '进阶',
   description: '3 号与 4 号先后站稳掩护，2 号依次借挡接球，并观察顺下接应。',
+  ...defineRoles('offense', [
+  ["弧顶传球者","持球观察2号连续借挡的时机，将球传给绕出的2号。",["read-cut-pass"]],
+  ["连续借挡接球者","依次借3、4号两道掩护接球，判断接投或继续传给顺下的4号。",["use-offball-screen","catch-shoot","read-cut-pass"]],
+  ["第一道掩护者","先站稳第一道无球掩护，释放后拉开并保留接应。",["stationary-screen","space-outlet"]],
+  ["第二道掩护顺下者","站稳第二道无球掩护后顺下，接2号传球近筐终结。",["stationary-screen","roll-finish"]],
+]),
   steps: [
     {
       note: '1 号弧顶控球，2 号左侧低位准备绕出。3 号与 4 号分别移动到前后两个掩护点，先站稳再让 2 号通过。',

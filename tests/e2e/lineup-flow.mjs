@@ -46,7 +46,8 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
     assert.equal(await evaluate("localStorage.getItem('halfcourt-lineups-v1')"),before,'NBA selection remains a draft');
     await action('lineup-wizard-next');
     assert.equal(await evaluate("document.querySelector('.lineup-glass-sheet').dataset.step"),'3');
-    // Final submission still refuses an incomplete roster and does not persist it.
+    // Basic setup allows optional names, but never an empty/duplicate jersey.
+    await input('lineup-player-number','');
     await action('lineup-create-save');
     assert.equal(await evaluate("document.querySelector('#lineup-wizard-dialog').open"),true);
     assert.equal(await evaluate("localStorage.getItem('halfcourt-lineups-v1')"),before,'incomplete members never leave a preliminary archive');
@@ -57,13 +58,9 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
     await step(3);
     for(let i=0;i<count;i++) {
       await action('lineup-player',`[data-index="${i}"]`);
-      await action('lineup-edit-section','[data-section="identity"]');
+
       await input('lineup-player-name',['小王','大李','阿杰','小陈'][i]);
       await input('lineup-player-number',[7,12,23,30][i]);
-      await action('lineup-edit-section','[data-section="traits"]');
-      for(const [key,value] of [['height',i===1?'tall':'medium'],['build',i===1?'strong':'medium'],['mobility',i===1?'average':'agile']]) await action(`lineup-trait-${key}`,`[data-value="${value}"]`);
-      await action('lineup-edit-section','[data-section="strengths"]');
-      for(const skill of [['shooting','handling','passing'],['screening','finishing'],['driving','passing'],['shooting','passing']][i])await action('lineup-strengths',`[data-value="${skill}"]`);
     }
     const memberIds=await evaluate("[...document.querySelectorAll('#lineup-wizard-dialog [data-action=lineup-player]')].map(n=>n.dataset.playerId)");
     if(kind==='create')assert.equal(await evaluate("localStorage.getItem('halfcourt-lineups-v1')"),await evaluate('window.creationDiskBefore'),'member tasks remain entirely in memory');
@@ -73,7 +70,7 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
       assert.equal(await evaluate('window.creationWrites.length'),1,'one complete creation write, with no empty-then-update sequence');
       const saved=await evaluate(`${disk}.profiles.find(p=>p.id===${disk}.activeProfileId)`);
       assert.deepEqual(saved.players.map(player=>player.id),memberIds,'draft member identity survives final save');
-      assert.ok(saved.players.every(player=>player.height&&player.build&&player.mobility));
+      assert.ok(saved.players.every(player=>Number.isInteger(player.number)));assert.ok(saved.players.every(player=>!('height' in player)&&!('strengths' in player)));
       await evaluate('Storage.prototype.setItem=window.creationSetItem;delete window.creationSetItem;delete window.creationWrites;delete window.creationDiskBefore');
     }
     await wait(40);
@@ -91,12 +88,9 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
   await checkLockerInteraction(3);
   await screenshot('manager-roster-3v3-phone.png');
   assert.equal(await evaluate(`${disk}.profiles.length`),1);
-  assert.deepEqual(await evaluate(`Object.keys(${disk}).sort()`),['activeProfileId','playbackContext','profiles','schemaVersion']);
+  assert.deepEqual(await evaluate(`Object.keys(${disk}).sort()`),['activeProfileId','playbackContext','profiles','rolePlans','schemaVersion']);
   await openWizard();
-  await action('lineup-edit-section','[data-section="weaknesses"]');
-  await action('lineup-weaknesses','[data-value="shooting"]');
-  assert.ok(await evaluate("document.querySelector('.lineup-wizard-error').textContent.includes('不能同时')"));
-  await action('lineup-edit-section','[data-section="identity"]');
+  await input('lineup-player-number',12);await action('lineup-save');assert.ok(await evaluate("document.querySelector('.lineup-wizard-error').textContent.includes('重复')"));await input('lineup-player-number',7);
   await input('lineup-player-name','保留的草稿');
   await nav('play');await nav('lineups');
   assert.equal(await evaluate('document.body.dataset.view'),'lineups','modal blocks background navigation');
@@ -108,15 +102,7 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
   await nav('lineups');
   await openWizard();assert.equal(await evaluate("document.querySelector('[data-action=lineup-player-name]').value"),'保留的草稿');
   await closeWizard('discard');
-  await action('lineup-recommend');
-  assert.equal(await evaluate("document.querySelectorAll('[data-action=lineup-candidate]').length"),3);
-  assert.ok(!await evaluate("/recommended|conditional/.test(document.querySelector('.lineup-fit').textContent)"));
-  for(const section of ['summary','reasons','assignments','cautions']) {
-    await action('lineup-detail',`[data-section="${section}"]`);
-    assert.ok(await evaluate("document.querySelector('.lineup-recommendation-detail').textContent.length>0"));
-  }
-  await action('lineup-play');
-  await waitFor("document.body.dataset.view==='play'&&Boolean(document.body.dataset.lineupContext)&&!document.body.classList.contains('is-loading')");
+  await startTeamPractice();
   assert.equal(await evaluate("document.querySelector('#lineup-legend').hidden"),false);
   const template=await evaluate("document.querySelector('#template-picker').value");
   const context=await evaluate(`${disk}.playbackContext`);
@@ -128,7 +114,7 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
   await send('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape'});
   await send('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',code:'Escape'});
   assert.equal(await evaluate("document.querySelector('#play-toggle').getAttribute('aria-pressed')"),'false','Escape pauses playback without navigating hidden lineup pages');
-  assert.equal(await evaluate("document.querySelector('#lineups-panel').dataset.subview"),'recommendations');
+  assert.equal(await evaluate("document.querySelector('#lineups-panel').dataset.subview"),'profiles');
   await send('Page.reload');await waitFor("Boolean(document.body.dataset.lineupContext)&&Boolean(document.querySelector('[data-player]'))");
   assert.equal(await evaluate(`${disk}.profiles.length`),1);
   await nav('play');
@@ -155,8 +141,7 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
   await create('4v4','公司四人队');await configure(4);
   await checkLockerInteraction(4);
   assert.equal(await evaluate(`${disk}.profiles.length`),2);
-  await action('lineup-recommend');await action('lineup-play');
-  await waitFor("document.body.dataset.view==='play'&&Boolean(document.body.dataset.lineupContext)");
+  await startTeamPractice();
   assert.equal(await evaluate("document.querySelector('#mode').value"),'4v4');
   const seen=[];
   for(let i=0;i<2;i++){seen.push(...await evaluate("[...document.querySelectorAll('.legend-row')].map(n=>n.dataset.role)"));if(i===0)await evaluate("document.querySelector('#legend-next').click()")}
@@ -169,7 +154,7 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
     }
     if(await evaluate("document.querySelector('#lineups-panel').dataset.subview!=='profiles'")) await action('lineup-back');
     await openWizard();
-    for(const section of ['identity','traits','strengths','weaknesses']){await action('lineup-edit-section',`[data-section="${section}"]`);await checkLayout(width,height,`editor ${section}`)}
+    await checkLayout(width,height,'editor basic identity');
     if(width===390)await screenshot('lineup-configure-phone.png');
     await step(1);await checkLayout(width,height,'editor team basics');
     assert.ok(await evaluate("[...document.querySelectorAll('#lineup-wizard-dialog [data-action=lineup-mode]')].every(n=>n.disabled)"),'saved roster size cannot silently change');
@@ -187,15 +172,6 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
     assert.deepEqual(teams.sort(),NBA_TEAMS.map(team=>team.id).sort(),'all 30 teams and official logos are reachable');
     await action('lineup-carousel-all-close');
     await closeWizard('discard');
-    await action('lineup-recommend');
-    for(const section of ['summary','reasons','assignments','cautions']) {
-      await action('lineup-detail',`[data-section="${section}"]`);
-      const visited=[];let more=true;
-      while(more){visited.push(await evaluate("document.querySelector('.lineup-recommendation-detail').textContent"));await checkLayout(width,height,`recommendation ${section}`);more=await evaluate("!document.querySelector('[data-action=lineup-detail-next]').disabled");if(more)await action('lineup-detail-next')}
-      assert.ok(visited.length>0);
-    }
-    if(width===390)await screenshot('lineup-recommend-phone.png');
-    await action('lineup-back');
     await checkRoster(width,height,4);
     await screenshot(`manager-roster-4v4-${width}-${height}.png`);
     if(width===390)await screenshot('lineup-profiles-phone.png');
@@ -219,27 +195,16 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
   const longName='长'.repeat(10)+'🏀'.repeat(7),longTeam='阵容'.repeat(20);
   await evaluate(`(()=>{let s=${disk},p=s.profiles.find(p=>p.id===s.activeProfileId);p.name=${JSON.stringify(longTeam)};p.players[0].name=${JSON.stringify(longName)};p.players[1].name=${JSON.stringify('队员\n带换行昵称')};p.revision++;s.playbackContext=null;localStorage.setItem('halfcourt-lineups-v1',JSON.stringify(s))})()`);
   await send('Page.reload');await waitFor("Boolean(document.querySelector('[data-action=lineup-configure]'))");
-  await action('lineup-recommend');
-  for(const [width,height] of [[360,640],[844,390]]) {
-    await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});
-    for(const section of ['reasons','assignments','cautions']) {
-      await action('lineup-detail',`[data-section="${section}"]`);
-      for(let i=0;i<50;i++){await checkLayout(width,height,`long names ${section}`);if(await evaluate("document.querySelector('[data-action=lineup-detail-next]').disabled"))break;await action('lineup-detail-next')}
-    }
-  }
-  await action('lineup-play');await waitFor("document.body.dataset.view==='play'&&Boolean(document.body.dataset.lineupContext)");
+  await startTeamPractice();
   await send('Emulation.setDeviceMetricsOverride',{width:360,height:640,deviceScaleFactor:1,mobile:true});
   await checkLayout(360,640,'long team legend');
   const rowTitle=await evaluate("document.querySelector('.legend-row').title");
   await tap('.legend-row');await waitFor("document.querySelector('#note-dialog').open");
   const note=[];for(let i=0;i<20;i++){note.push(await evaluate("document.querySelector('#note-preview').textContent"));assert.ok(await evaluate("document.querySelector('#note-preview').scrollHeight<=document.querySelector('#note-preview').clientHeight"));if(await evaluate("document.querySelector('#note-page-next').disabled"))break;await evaluate("document.querySelector('#note-page-next').click()")}
   assert.equal(note.join(''),rowTitle);await evaluate("document.querySelector('#close-note').click()");
-  await nav('lineups');await action('lineup-back');await openWizard();
+  await nav('lineups');await openWizard();
   await send('Emulation.setDeviceMetricsOverride',{width:360,height:540,deviceScaleFactor:1,mobile:true});
-  await tap('[data-action=lineup-edit-section][data-section=traits]');
-  await tap('[data-action=lineup-trait-height][data-value=short]');
-  assert.equal(await evaluate("document.querySelector('[data-action=lineup-trait-height][data-value=short]').getAttribute('aria-pressed')"),'true');
-  await action('lineup-edit-section','[data-section="identity"]');
+  assert.equal(await evaluate("document.querySelectorAll('[data-action=lineup-trait-height]').length"),0);
   await send('Emulation.setDeviceMetricsOverride',{width:360,height:400,deviceScaleFactor:1,mobile:true});
   await tap('[data-action=lineup-player-name]');
   assert.equal(await evaluate("document.activeElement.dataset.action"),'lineup-player-name');
@@ -252,6 +217,18 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
   await send('Page.reload');await waitFor("Boolean(document.querySelector('[data-action=lineup-configure]'))");
   assert.equal(await evaluate("localStorage.getItem('halfcourt-lineups-v1')"),beforeLegacy,'reading legacy profiles does not rewrite archive');
   assert.ok(await evaluate("document.querySelector('#lineups-panel').textContent.includes('选择 NBA 球队')||document.querySelector('#lineups-panel').textContent.includes('选择NBA球队')"));
+
+  async function startTeamPractice(){
+    await action('lineup-conditions');await waitFor("document.body.dataset.roleConditions==='true'&&!document.body.dataset.pageTransition");
+    const mode=await evaluate(`${disk}.profiles.find(p=>p.id===${disk}.activeProfileId).mode`),id=mode==='4v4'?'four-out-cut':'pick-roll';
+    await evaluate(`(()=>{const n=document.querySelector('[data-action=role-template]');n.value=${JSON.stringify(id)};n.dispatchEvent(new Event('change'))})()`);
+    const count=mode==='4v4'?4:3;
+    for(let i=0;i<count;i++){
+      await evaluate(`document.querySelectorAll('[data-action=role-open]')[${i}].click()`);await waitFor("document.querySelector('#role-confirm-dialog').dataset.phase==='open'");
+      await action('role-status','[data-value=available]');await evaluate(`document.querySelectorAll('[data-action=role-member]')[${i}].click()`);await action('role-save');await waitFor("!document.querySelector('#role-confirm-dialog').open&&!document.body.classList.contains('is-loading')");
+    }
+    await action('role-play');await waitFor("document.body.dataset.view==='play'&&Boolean(document.body.dataset.lineupContext)&&!document.body.classList.contains('is-loading')&&!document.body.dataset.pageTransition");
+  }
 
   async function checkNbaDrafts(){
     const before=await evaluate(`${disk}.profiles[0]`);

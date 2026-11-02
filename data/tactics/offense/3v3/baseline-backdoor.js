@@ -1,8 +1,14 @@
+import {defineRoles} from '../../role-helpers.js';
 import {defineTactic, run, dribble, pass} from '../../helpers.js';
 
 export default defineTactic({
   id: 'baseline-backdoor', title: '底线反跑', category: '空切配合',
   description: '2 号先上提试探，防守封外线时沿底线反跑接球。',
+  ...defineRoles('offense', [
+  ["侧翼传球者","持球观察2号底线反跑窗口，保护球权并向切入者送球。",["read-cut-pass"]],
+  ["底线反跑者","先做外线接球假动作，再沿底线反跑切入，接球近筐终结。",["backdoor-cut","cut-finish"]],
+  ["右翼接应者","右翼保持空间，随球保留安全回传出口。",["space-outlet"]],
+]),
   steps: [
     {
       note: '1 号中路持球，2 号在左底角，3 号在右翼。2 号先向左翼上提，观察防守是否跟出。',

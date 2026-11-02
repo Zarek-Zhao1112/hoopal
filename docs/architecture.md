@@ -13,7 +13,8 @@ main → startup/runtime → app
                        └─ storage/lineup-session → repositories → platform
 
 shared/templates → data/templates → 一套一文件的战术定义
-shared/recommendations → shared/lineups + data/recommendations
+roles/ui → shared/tactic-roles + shared/templates
+storage/lineup-session → shared/tactic-roles + shared/lineups
 
 Vite → dist → Android APK（离线）
              └─ backend（电脑和局域网静态预览）
@@ -38,7 +39,7 @@ HC-050的training/tactic-picker.js提供标题下展玻璃选单，只持有展�
 board/court-renderer.js提供三种现有画面的共用绘制：
 - createTrainingCourt：主球场、路线、球员、球和角色title，保原DOM ID与导出结构。
 - createLibraryCourt：卡内独立SVG/棋子与逐帧更新，保原data属性与独立surface前缀。
-- createTacticPreview：推荐卡静态缩略图。
+- createTacticPreview：可复用的只读静态缩略图接口，旧推荐视图已退役。
 
 appearance.js提供显式SVG木地板、颜色与棋子；hit-test.js处理阵营/球的可见性。共用绘制保留主场、库卡和缩略图已有差异，不合并它们的播放或保存策略。
 
@@ -50,7 +51,7 @@ frontend/previews/account-center是独立HTML/CSS/JS原型，不被正式index/a
 
 lineups/controller.js保留createLineupUI和splitLineupText的公有入口。内部职责：
 - ui.js：已保存状态、当前页、忙态与自有弹层协调，通过onAction提交业务操作。
-- views/：更衣室、档案和推荐结果的绘制及文字/按钮辅助。
+- views/：更衣室、档案与基本球队身份的绘制及文字/按钮辅助。
 - wizard/drafts.js：按档案ID隔离编辑草稿、创建草稿、基线和成员选择；仅驻内存。
 - wizard/controller.js：进入配置、步骤导航、保存/放弃与返回来源页策略。
 - wizard/view.js：三步配置内容、输入与成员交互的绘制。
@@ -64,7 +65,7 @@ HC-046将archives视图显示名更新为「我的」，内部路由和真实档
 
 frontend/styles/app.css只汇总组件、tokens、base、framework、navigation、dialogs、responsive和功能框架样式。组件样式随组件。拆分保留旧import、选择器、声明和媒体查询顺序；WebView96的焦点/disabled隔离、滤镜前缀、dialog降级和短视口规则保持。
 
-## 战术与推荐数据
+## 战术与角色数据
 
 data/tactics/offense/{3v3,4v4}和defense/{3v3,4v4}中每套战术一文件。helpers、legacy-helpers、expansion-helpers和defense-helpers提供数据构造；显式绕行优先，不能被自动直线覆盖。原分组文件保留为顺序稳定的薄索引，legacy.js仍承载最初四套战术的聚合入口。
 
@@ -79,13 +80,17 @@ Path: id / type / points[] / playerId（可选）
 
 kind、类别和难度属于模板元数据，不进入Play导出。shared/engine.js负责建立、校验、状态与路线插值；通用历史API本轮保留，当前界面仍无战术编辑或个人Play保存入口。
 
-data/recommendations/offense.js定义18套进攻的职责、权重和执行条件；shared/recommendations.js枚举一对一分工，输出稳定排名、原因和缺口。同人数最多三套，防守不参与。体型只辅助已声明能力，推荐不生成新跑位或修改原Play。规则依据见[推荐说明](../data/recommendations/README.md)。
+HC-054退役体型/能力自评、加权排名与自动分工代码；旧算法仅留[历史说明](../data/recommendations/README.md)。现26套战术的roleVersion和roles与各自定义共置，含稳定职责ID、动画棋子ID、整套任务和具体actionIds。shared/tactic-roles.js管理校验、三态计划、唯一成员、显式交换和不同动作候选，不生成跑位或胜率。
+
+roles/ui.js只负责战术条件主卡与玻璃确认层，调用app的onAction提交；主卡替换战术库内部内容，不增加底栏路由。仅角色浮层隔离背景，取消不写盘。未确认/缺条件仍可通用示范，全部职责确认为不同成员才可按本队演练，防守绑定defense-N、进攻绑定attack-N；图例从已保存有效计划读取，不运行旧算法。
 
 ## 存储与平台
 
 storage/builtins.js只记录内置ID/合法步骤，并执行用户授权的旧个人数据定向清理；lineups.js单独保存阵容；lineup-session.js协调档案版本、来源和两键切换。platform提供浏览器localStorage或Android私有文件、系统分享与生命周期。
 
-存储键/格式保持：halfcourt-builtin-selection-v1为模板ID/步骤；halfcourt-lineups-v1为schemaVersion、多档案、activeProfileId与可空playbackContext。推荐和人员映射重算，不持久化旧结果。
+存储键保持：halfcourt-builtin-selection-v1为模板ID/步骤；halfcourt-lineups-v1升级为schemaVersion2，保存profiles、activeProfileId、按球队/战术索引的rolePlans与可空playbackContext。新来源含source=role-confirmations、profileId/revision、templateId/roleVersion，必须对应完整有效计划。改姓名/号码保稳定ID关联，换成员解除相关认领，认领修改增加档案revision并解除来源，排队操作校验调用时的球队身份。
+
+schema1读入只在内存迁移，保球队/成员/号码/NBA身份，旧标签和自动来源不转为确认；首次schema2写前将精确旧原文存到独立migration-v1备份键，失败禁止覆盖。过期角色版本原计划保留且不可演练，首次后续写前保role-version原文备份，用户明确重置后重新确认。未知schema锁写；降级至1.26时也会保护schema2未知格式，不会静默删新分工。
 
 先读后写、未知schema锁写、损坏原文覆盖前备份、串行快照保存与失败重试保持。手选战术或换档案先成功解除旧来源；中途失败宁可恢复普通演练，不能误套姓名。后台等待当前操作及两仓flush。
 

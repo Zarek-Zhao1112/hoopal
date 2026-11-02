@@ -108,6 +108,7 @@ export async function runTeamCarouselFlow({ send, evaluate, wait, waitFor, folde
     await send('Emulation.setEmulatedMedia', { features: [] });
     await action('lineup-wizard-close'); await action('lineup-draft-discard'); await closed();
     const legacy = createLineup('3v3', { name: '中性旧档案 · 转盘验收', nbaTeamId: null });
+    legacy.players.forEach(member=>Object.assign(member,{height:'',build:'',mobility:'',strengths:[],weaknesses:[]}));
     await evaluate(`localStorage.setItem('${key}',${JSON.stringify(JSON.stringify({ schemaVersion: 1, profiles: [legacy], activeProfileId: legacy.id, playbackContext: null }))})`); await reload();
     await action('lineup-configure'); await modalStable(); await action('lineup-wizard-step', '[data-step="2"]'); await settled(); assert.equal((await state()).teamId, '', 'legacy null remains neutral');
     await evaluate("window.hc025StaleNext=document.querySelector('[data-action=lineup-carousel-next]');window.hc025StaleAll=document.querySelector('[data-action=lineup-carousel-all-open]')");

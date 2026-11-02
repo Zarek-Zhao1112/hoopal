@@ -1,9 +1,16 @@
+import {defineRoles} from '../../role-helpers.js';
 import {frame, defineExpansion} from '../../expansion-helpers.js';
 import {run, dribble, screen, pass} from '../../helpers.js';
 
 export default defineExpansion({
   id: 'hammer', title: '弱侧锤子配合', mode: '4v4', category: '弱侧掩护', difficulty: '进阶',
   description: '1 号沿底线突破，弱侧 3 号掩护让 2 号沉底角，再横传弱侧。',
+  ...defineRoles('offense', [
+  ["底线突破传球者","右翼沿底线突破并保护球权，观察弱侧掩护后跨底线传给2号。",["drive-pass","cross-baseline-pass"]],
+  ["弱侧借挡接投者","等3号掩护站稳后借挡沉到底角，接跨侧分球判断接投。",["use-offball-screen","catch-shoot"]],
+  ["弱侧掩护者","弱侧为2号站稳掩护，待其落到底角后再退出接应。",["stationary-screen","space-outlet"]],
+  ["弧顶接应者","弧顶拉开并保留出口，避免挤入底线突破通道。",["space-outlet"]],
+]),
   steps: [
     frame('1 号右翼持球，2、3 号在左侧弱侧，4 号弧顶拉开。1 号先沿右侧底线方向推进，弱侧暂不抢跑。',
       [[800,430],[220,420],[310,250],[500,620]], [[720,430],[280,325],[385,260],[500,530]], [dribble(1,[800,430],[850,330],[850,190],[760,190])]),

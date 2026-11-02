@@ -28,7 +28,7 @@ function skills(value, max, label) {
 }
 
 /** Validate and return only the supported fields; incomplete traits are valid saved drafts. */
-export function validateLineup(value) {
+export function validateLegacyLineup(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('阵容格式无效');
   const mode = oneOf(value.mode, ['3v3', '4v4'], '人数');
   const count = mode === '3v3' ? 3 : 4;
@@ -57,17 +57,42 @@ export function validateLineup(value) {
     recentTemplateId: value.recentTemplateId === null ? null : text(value.recentTemplateId, '最近战术ID', 100) };
 }
 
+/** Basic team identity only. Tactical duties are confirmed per builtin tactic. */
+export function validateLineup(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('阵容格式无效');
+  const mode = oneOf(value.mode, ['3v3', '4v4'], '人数');
+  if (!Number.isSafeInteger(value.revision) || value.revision < 1) throw new Error('阵容版本无效');
+  const count = mode === '3v3' ? 3 : 4;
+  if (!Array.isArray(value.players) || value.players.length !== count) throw new Error(`该阵容需要${count}名队员`);
+  const nbaTeamId = value.nbaTeamId ?? null;
+  if (nbaTeamId !== null && !getNbaTeam(nbaTeamId)) throw new Error('NBA球队无效，请重新选择');
+  const ids = new Set(), numbers = new Set();
+  const players = value.players.map(player => {
+    if (!player || typeof player !== 'object' || Array.isArray(player)) throw new Error('队员格式无效');
+    const id = text(player.id, '队员ID', 100);
+    if (ids.has(id)) throw new Error('队员ID不能重复');
+    ids.add(id);
+    if (!Number.isInteger(player.number) || player.number < 0 || player.number > 99 || numbers.has(player.number)) throw new Error('球衣号码须为0–99且不能重复');
+    numbers.add(player.number);
+    return { id, name: text(player.name, '昵称', 24, true), number: player.number };
+  });
+  return { id: text(value.id, '阵容ID', 100), name: text(value.name, '阵容名称', 40), mode,
+    crest: oneOf(value.crest, ['ball', 'shield', 'bolt'], '队徽'), color: oneOf(value.color, ['orange', 'blue', 'green'], '主题色'),
+    revision: value.revision, players, nbaTeamId,
+    recentTemplateId: value.recentTemplateId == null ? null : text(value.recentTemplateId, '最近战术ID', 100) };
+}
+
 export function createLineup(mode = '3v3', options = {}) {
   oneOf(mode, ['3v3', '4v4'], '人数');
   return validateLineup({ id: options.id ?? newId('lineup'), name: options.name ?? (mode === '3v3' ? '三人阵容' : '四人阵容'), mode,
     crest: options.crest ?? 'ball', color: options.color ?? 'orange', nbaTeamId: options.nbaTeamId ?? null, revision: 1, recentTemplateId: null,
     players: Array.from({ length: mode === '3v3' ? 3 : 4 }, (_, index) => ({
-      id: newId('member'), name: '', number: index + 1, height: '', build: '', mobility: '', strengths: [], weaknesses: []
+      id: newId('member'), name: '', number: index + 1
     })) });
 }
 
 export function isLineupReady(value) {
-  try { return validateLineup(value).players.every(player => player.height && player.build && player.mobility); }
+  try { validateLineup(value); return true; }
   catch { return false; }
 }
 

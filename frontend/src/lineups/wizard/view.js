@@ -4,8 +4,6 @@ import { NBA_TEAMS } from '../../../../data/nba-teams.js';
 import { getTeamLogoUrl } from '../components/team-assets.js';
 import { playerName } from '../views/text.js';
 import { createJerseySvg } from '../components/jersey.js';
-import { TRAITS } from '../../../../shared/lineups.js';
-import { SKILLS } from '../../../../shared/lineups.js';
 import { attachWizardSwipe } from '../components/wizard-motion.js';
 
 /** A feature-owned view, using the coordinator's explicit state and callbacks. */
@@ -77,15 +75,14 @@ function wizardTeams(draft) {
 
 function wizardPlayers(draft) {
     draftStore.playerIndex = Math.max(0, Math.min(draft.players.length - 1, draftStore.playerIndex));
-    const player = draft.players[draftStore.playerIndex], content = node('section', 'lineup-wizard-players');
+    const player = draft.players[draftStore.playerIndex], content = node('section', 'lineup-wizard-players lineup-basic-players');
     const tabs = node('div', 'lineup-player-tabs');
     draft.players.forEach((member, index) => {
       const tab = button(playerName(member, index), 'lineup-player', () => selectWizardPlayer(index), { pressed: index === draftStore.playerIndex, data: { index, playerId: member.id, memberNumber: index + 1 }, title: playerName(member, index) });
       const ready = wizardMemberReady(member, draft); tab.dataset.ready = String(ready); tab.classList.toggle('lineup-wizard-member-ready', ready); tab.classList.toggle('lineup-wizard-member-pending', !ready); tabs.append(tab);
     });
-    const sections = node('div', 'lineup-section-tabs');
-    for (const [id, label] of [['identity', '资料'], ['traits', '体型'], ['strengths', '擅长'], ['weaknesses', '弱项']]) sections.append(button(label, 'lineup-edit-section', () => { draftStore.editSection = id; model.feedback = ''; draw(); }, { pressed: draftStore.editSection === id, data: { section: id } }));
-    const body = node('section', `lineup-player-editor lineup-editor-${draftStore.editSection}`); body.dataset.section = draftStore.editSection;
+    draftStore.editSection = 'identity';
+    const body = node('section', 'lineup-player-editor lineup-editor-identity'); body.dataset.section = 'identity';
     const hero = node('div', 'lineup-player-hero lineup-wizard-player-hero'); hero.dataset.playerId = player.id;
     const uniform = node('div', 'lineup-wizard-uniform'); uniform.dataset.playerId = player.id; uniform.dataset.teamId = draft.nbaTeamId || '';
     uniform.append(createJerseySvg({ document, team: getNbaTeam(draft.nbaTeamId), number: player.number === '' ? '—' : player.number, name: playerName(player, draftStore.playerIndex), idPrefix: `wizard-shirt-${++identity.jerseySequence}` }));
@@ -95,24 +92,10 @@ function wizardPlayers(draft) {
       button('‹', 'lineup-wizard-player-prev', () => selectWizardPlayer(draftStore.playerIndex - 1), { className: 'lineup-wizard-player-arrow is-prev', disabled: draftStore.playerIndex === 0, title: '上一名队员' }),
       button('›', 'lineup-wizard-player-next', () => selectWizardPlayer(draftStore.playerIndex + 1), { className: 'lineup-wizard-player-arrow is-next', disabled: draftStore.playerIndex === draft.players.length - 1, title: '下一名队员' }));
     const pane = node('div', 'lineup-editor-fields');
-    if (draftStore.editSection === 'identity') {
-      pane.append(field('昵称（可留空）', player.name, 'lineup-player-name', value => { player.name = value; syncWizardPlayerPreview(); }, { maxLength: 24 }));
-      pane.append(field('球衣号码（队内不重复）', player.number, 'lineup-player-number', value => { player.number = value === '' ? '' : Number(value); syncWizardPlayerPreview(); }, { type: 'number', min: 0, max: 99, inputMode: 'numeric' }));
-    } else if (draftStore.editSection === 'traits') {
-      for (const [key, label] of [['height', '身高特点'], ['build', '体格特点'], ['mobility', '移动能力']]) pane.append(choices(label, TRAITS[key], player[key], 'lineup-trait-' + key, value => { player[key] = value; model.feedback = ''; draw(); }));
-    } else {
-      const key = draftStore.editSection === 'strengths' ? 'strengths' : 'weaknesses', other = key === 'strengths' ? 'weaknesses' : 'strengths', limit = key === 'strengths' ? 3 : 2;
-      pane.append(choices((key === 'strengths' ? '擅长项' : '可选弱项') + ' ' + player[key].length + ' / ' + limit, SKILLS, player[key], 'lineup-' + key, value => {
-        model.feedback = '';
-        if (player[key].includes(value)) player[key] = player[key].filter(id => id !== value);
-        else if (player[other].includes(value)) model.feedback = '同一能力不能同时是擅长与弱项，请先取消另一处选择。';
-        else if (player[key].length >= limit) model.feedback = '最多选择 ' + limit + ' 项，可先取消一项。';
-        else player[key].push(value);
-        draw();
-      }, true));
-    }
-    pane.append(node('p', 'lineup-form-hint', draftStore.editSection === 'traits' ? '按实际特点选择，不代表能力评级。' : '未标注的能力按一般处理；弱项可以留空。'));
-    body.append(pane); content.append(hero, tabs, sections, body);
+    pane.append(field('昵称（可留空）', player.name, 'lineup-player-name', value => { player.name = value; syncWizardPlayerPreview(); }, { maxLength: 24 }));
+    pane.append(field('球衣号码（队内不重复）', player.number, 'lineup-player-number', value => { player.number = value === '' ? '' : Number(value); syncWizardPlayerPreview(); }, { type: 'number', min: 0, max: 99, inputMode: 'numeric' }));
+    pane.append(node('p', 'lineup-form-hint', '先认识队友，具体分工在每套战术中确认。'));
+    body.append(pane); content.append(hero, tabs, body);
     wizardSwipe = attachWizardSwipe({ element: hero, isDisabled: () => model.pending || model.externalBusy || sheet.closing || !sheet.isOpen || !draftStore.wizard || draftStore.wizard.step !== 3 || Boolean(model.confirmation) || Boolean(model.inspection) || document.hidden, onStep: delta => selectWizardPlayer(draftStore.playerIndex + delta) });
     return content;
   }
@@ -143,7 +126,7 @@ function renderWizard(transition = null) {
     const h2 = node('h2', '', draftStore.wizard.kind === 'create' ? model.confirmation?.kind === 'wizard-draft' ? '保留这次配置？' : createTitles[draftStore.wizard.step - 1] : '配置阵容'); h2.id = 'lineup-wizard-title'; title.append(h2);
     heading.append(title, button('×', 'lineup-wizard-close', requestWizardClose, { className: 'lineup-sheet-close', title: '关闭配置面板' }));
     const progress = node('nav', 'lineup-wizard-progress'); progress.setAttribute('aria-label', '配置任务');
-    ['名称与人数', '球队与球衣', '队员特点'].forEach((label, i) => { const step = i + 1, item = button('', 'lineup-wizard-step', () => wizardStep(step), { pressed: draftStore.wizard.step === step, disabled: step > draftStore.wizard.maxStep || Boolean(model.confirmation), data: { step } }); item.append(node('span', '', String(step)), node('strong', '', label)); progress.append(item); });
+    ['名称与人数', '球队与球衣', '队员名号'].forEach((label, i) => { const step = i + 1, item = button('', 'lineup-wizard-step', () => wizardStep(step), { pressed: draftStore.wizard.step === step, disabled: step > draftStore.wizard.maxStep || Boolean(model.confirmation), data: { step } }); item.append(node('span', '', String(step)), node('strong', '', label)); progress.append(item); });
     const body = retainedBody || node('div', 'lineup-sheet-content'), page = node('div', 'lineup-wizard-page');
     page.dataset.current = 'true'; page.dataset.step = String(draftStore.wizard.step); page.dataset.playerId = draft.players[draftStore.playerIndex]?.id || ''; body.replaceChildren(page);
     if (model.inspection) {

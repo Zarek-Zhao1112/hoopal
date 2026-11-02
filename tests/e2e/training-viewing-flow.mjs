@@ -3,8 +3,7 @@ import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { templates } from '../../shared/templates.js';
 import { createLineup, validateLineup } from '../../shared/lineups.js';
-import { recommendLineup } from '../../shared/recommendations.js';
-import { offenseRules } from '../../data/recommendations/offense.js';
+import {confirmedRoleArchive,explicitRoleAssignments} from './role-fixtures.mjs';
 
 /** Exercise the real training board in the runner's disposable browser profile. */
 export async function runTrainingViewingFlow({ send, evaluate, wait, waitFor, folder }) {
@@ -36,12 +35,11 @@ export async function runTrainingViewingFlow({ send, evaluate, wait, waitFor, fo
     finally { await send('Page.removeScriptToEvaluateOnNewDocument', { identifier: script.identifier }); await send('Emulation.setEmulatedMedia', { features: [] }); }
   }
   function profileFor(templateId) {
-    const template = templates.find(t => t.id === templateId), rule = offenseRules.find(r => r.templateId === templateId);
+    const template = templates.find(t => t.id === templateId);
     const profile = createLineup(template.mode, { id: `hc048-${templateId}`, name: `完整动画${template.mode}球队`, nbaTeamId: 'BOS' });
     profile.recentTemplateId = templateId;
-    profile.players.forEach((member, index) => Object.assign(member, { id: `hc048-member-${index}`, name: ['小王', '大李', '阿杰', '小陈'][index], number: [7, 12, 23, 30][index], height: 'medium', build: 'medium', mobility: 'agile', strengths: Object.entries(rule.roles[index].weights).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([skill]) => skill), weaknesses: [] }));
+    profile.players.forEach((member, index) => Object.assign(member, { id: `hc048-member-${index}`, name: ['小王', '大李', '阿杰', '小陈'][index], number: [7, 12, 23, 30][index] }));
     validateLineup(profile);
-    assert.ok(recommendLineup(profile).recommendations.some(r => r.templateId === templateId), 'source fixture is a genuine production recommendation');
     return profile;
   }
   const cases = [
@@ -53,8 +51,8 @@ export async function runTrainingViewingFlow({ send, evaluate, wait, waitFor, fo
   try {
     for (const entry of cases) {
       const template = templates.find(t => t.id === entry.id), play = template.build(), profile = entry.profile;
-      const playbackContext = profile ? { profileId: profile.id, profileRevision: profile.revision, templateId: template.id } : null;
-      await documentWith(JSON.stringify({ schemaVersion: 1, profiles: profile ? [profile] : [], activeProfileId: profile?.id || null, playbackContext }), JSON.stringify({ templateId: template.id, frameIndex: 1 }));
+
+      await documentWith(JSON.stringify(confirmedRoleArchive(profile?[profile]:[],profile?.id||null,template.id)), JSON.stringify({ templateId: template.id, frameIndex: 1 }));
       await nav('play'); const original = await facts();
       assert.equal(original.counter, `2 / ${play.frames.length}`, 'saved nonzero progress restores into the new controls');
       assert.equal(original.source, profile?.id || '');
@@ -105,7 +103,7 @@ export async function runTrainingViewingFlow({ send, evaluate, wait, waitFor, fo
   }
 
   async function checkLegend(profile, templateId) {
-    const recommendation = recommendLineup(profile).recommendations.find(r => r.templateId === templateId), seen = [];
+    const recommendation = {assignments:explicitRoleAssignments(profile,templateId)}, seen = [];
     while (await evaluate("!document.querySelector('#legend-prev').disabled")) await click('#legend-prev');
     for (let page = 0; page < Math.ceil(profile.players.length / 2); page++) {
       seen.push(...await evaluate("[...document.querySelectorAll('.legend-row')].map(n=>({role:Number(n.dataset.role),name:n.querySelector('.legend-name').textContent,task:n.querySelector('.legend-task').textContent}))"));
@@ -153,7 +151,7 @@ export async function runTrainingViewingFlow({ send, evaluate, wait, waitFor, fo
   }
 
   async function checkNaturalPlayback() {
-    await documentWith(JSON.stringify({ schemaVersion: 1, profiles: [], activeProfileId: null, playbackContext: null }), JSON.stringify({ templateId: 'pick-roll', frameIndex: 0 }));
+    await documentWith(JSON.stringify({ schemaVersion: 2, rolePlans: {}, profiles: [], activeProfileId: null, playbackContext: null }), JSON.stringify({ templateId: 'pick-roll', frameIndex: 0 }));
     await nav('play');
     // Select uses actual pointer focus and keyboard navigation, matching a
     // standard native Android/browser selector rather than a fake speed toggle.

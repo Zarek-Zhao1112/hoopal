@@ -1,3 +1,4 @@
+import {defineRoles} from '../../role-helpers.js';
 import {defineTemplate, line} from '../../legacy-helpers.js';
 
 export default defineTemplate('back-screen', '无球背掩护', '3 号为 2 号背掩护，2 号空切，3 号外弹。', [
@@ -5,4 +6,8 @@ export default defineTemplate('back-screen', '无球背掩护', '3 号为 2 号�
   { note: '3 号站稳为 2 号做背掩护，2 号先向外试探，再切向篮下。', positions: { 'attack-3': [320, 290] }, paths: [line('screen', 'attack-3', [[320, 290], [280, 310]]), line('run', 'attack-2', [[220, 370], [240, 240], [480, 180]])] },
   { note: '1 号传给空切的 2 号；3 号掩护后向右侧外弹，给防守第二个选择。', positions: { 'attack-2': [480, 180], 'attack-3': [740, 460], 'defense-2': [320, 270], 'defense-3': [550, 320] }, paths: [line('pass', 'attack-1', [[500, 590], [480, 180]])] },
   { note: '2 号接球近筐终结。防守换人时可将球转移到外弹的 3 号。', positions: {}, holder: 'attack-2' }
-]);
+], '3v3', defineRoles('offense', [
+  ["弧顶传球者","持球等待3号背掩护站稳，观察2号切入窗口后输送传球。",["read-cut-pass"]],
+  ["借挡切入者","等3号背掩护站稳后切向篮下，接球近筐终结。",["use-offball-screen","cut-finish"]],
+  ["背掩护外弹者","为2号站稳背掩护，完成后外弹到右翼，准备接球投射或转移。",["stationary-screen","catch-shoot"]],
+]));

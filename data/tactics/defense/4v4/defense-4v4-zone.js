@@ -1,8 +1,15 @@
+import {defineRoles} from '../../role-helpers.js';
 import {defineDefenseTactic} from '../../defense-helpers.js';
 
 export default defineDefenseTactic({
   id: 'defense-4v4-zone', mode: '4v4', title: '四人二二区域联防', category: '区域联防',
   description: '两高两低分区守半场，按侧翼、底角与回传依次交接。',
+  ...defineRoles('defense', [
+  ["左高位区域者","球到左翼时出防并控制底线入口，转右低位后留弱侧帮助，再恢复左高位。",["zone-handoff","contain-ball","help-recover"]],
+  ["右高位区域者","球在左侧时收中路并照看高位回传，转右翼后出防接球者。",["zone-handoff","closeout","outlet-coverage"]],
+  ["左低位区域者","守左低位，左侧深入时协防接应；球转右侧后护筐并保持弱侧低位。",["zone-handoff","stop-drive","protect-rim"]],
+  ["右低位区域者","弱侧先补篮下，球转右低位时接管该区域，传回右翼后回右低位。",["zone-handoff","contain-ball","protect-rim"]],
+]),
   steps: [
     { note: '蓝方 1、2 号在高位两侧，3、4 号守低位两侧。以球所在区域交接责任，保持中路帮助，这是四人半场区域训练示例。', holder: 1,
       attack: [[500, 620], [180, 400], [820, 400], [700, 190]], defense: [[390, 475], [610, 475], [365, 245], [635, 245]] },

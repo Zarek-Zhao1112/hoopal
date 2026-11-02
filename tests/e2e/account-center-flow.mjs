@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createLineup } from '../../shared/lineups.js';
-import { recommendLineup } from '../../shared/recommendations.js';
+import {confirmedRoleArchive} from './role-fixtures.mjs';
 import { findArchiveCard } from './archive-helpers.mjs';
 
 /** Real local records and the honest unavailable-account UI, never preview data. */
@@ -80,13 +80,13 @@ export async function runAccountCenterFlow({ send, evaluate, wait, waitFor, fold
     dialogs.push(result); motions.push({ label, kind, reduced, close, samples: points });
   }
 
-  const make = (mode, index) => { const profile = createLineup(mode, { id: `hc046-${index}`, name: `真实页面验收球队 ${index + 1}`, nbaTeamId: index % 2 ? 'LAL' : 'BOS' }); profile.players.forEach((member, j) => Object.assign(member, { id: `hc046-${index}-member-${j}`, name: `球队${index + 1}成员${j + 1}`, number: j + 11, height: 'medium', build: 'medium', mobility: 'agile', strengths: ['passing', 'shooting'], weaknesses: [] })); return profile; };
+  const make = (mode, index) => { const profile = createLineup(mode, { id: `hc046-${index}`, name: `真实页面验收球队 ${index + 1}`, nbaTeamId: index % 2 ? 'LAL' : 'BOS' }); profile.players.forEach((member, j) => Object.assign(member, { id: `hc046-${index}-member-${j}`, name: `球队${index + 1}成员${j + 1}`, number: j + 11 })); return profile; };
   const cases = [{ name: 'empty', profiles: [] }, { name: '3v3', profiles: [make('3v3', 0)] }, { name: '4v4', profiles: [make('4v4', 1)] }, { name: 'multi', profiles: Array.from({ length: 7 }, (_, index) => make(index % 2 ? '4v4' : '3v3', index)) }];
   try {
     for (const entry of cases) {
-      const current = entry.profiles[0], templateId = current ? recommendLineup(current).recommendations[0].templateId : 'pick-roll';
-      const playbackContext = current ? { profileId: current.id, profileRevision: current.revision, templateId } : null;
-      const archive = JSON.stringify({ schemaVersion: 1, profiles: entry.profiles, activeProfileId: current?.id || null, playbackContext }), selection = JSON.stringify({ templateId, frameIndex: 1 });
+      const current = entry.profiles[0], templateId = current?.mode==='4v4'?'four-out-cut':'pick-roll';
+
+      const archive = JSON.stringify(confirmedRoleArchive(entry.profiles,current?.id||null,templateId)), selection = JSON.stringify({ templateId, frameIndex: 1 });
       await replaceDocument(archive, selection); await nav('archives'); const original = await snapshot();
       for (const [width, height] of [[360,400],[390,844],[360,640],[844,390],[1024,768],[835,340]]) {
         await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width < 1000 }); await wait(100);
@@ -101,7 +101,7 @@ export async function runAccountCenterFlow({ send, evaluate, wait, waitFor, fold
           assert.equal(geometry.ids.length, Math.min(3, Math.max(0, entry.profiles.length - page * 3))); seen.push(...geometry.ids); layouts.push(geometry);
           if (page < pages - 1) await click('[data-action=lineup-archives-next]');
         }
-        assert.deepEqual(seen, entry.profiles.map(p => p.id)); assert.deepEqual(await snapshot(), original, 'browsing personal-page cards preserves raw data and the actual recommendation source');
+        assert.deepEqual(seen, entry.profiles.map(p => p.id)); assert.deepEqual(await snapshot(), original, 'browsing personal-page cards preserves raw data and the actual confirmed role source');
         while (await evaluate("Boolean(document.querySelector('[data-action=lineup-archives-prev]:not(:disabled)'))")) await click('[data-action=lineup-archives-prev]');
         if (entry.name === 'multi' || width === 390) {
           const label = `${entry.name}-${width}-${height}`;

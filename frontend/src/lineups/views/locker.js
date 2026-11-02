@@ -2,8 +2,6 @@ import { createEmptyLocker } from '../components/locker-room.js';
 import { isLineupReady } from '../../../../shared/lineups.js';
 import { getNbaTeam } from '../../../../data/nba-teams.js';
 import { playerName } from './text.js';
-import { TRAITS } from '../../../../shared/lineups.js';
-import { skillLabel } from './text.js';
 import { createLockerRoom } from '../components/locker-room.js';
 
 /** A feature-owned view, using the coordinator's explicit state and callbacks. */
@@ -38,20 +36,7 @@ export function createLockerView(context){
       detail.dataset.playerId = player.id; detail.dataset.playerIndex = String(index);
       const top = node('div', 'locker-detail-top');
       top.append(button(playerName(player, index), 'lineup-inspect-player', () => inspect('队员资料', `${playerName(player, index)}\n球衣 ${player.number} 号`), { className: 'locker-player-name' }), node('span', 'locker-player-number', `球衣 ${player.number} 号`));
-      const traits = node('div', 'locker-detail-row locker-traits'); traits.append(node('span', 'locker-detail-label', '特点'));
-      for (const [key, label] of [['height', '身高'], ['build', '体格'], ['mobility', '移动']]) {
-        const value = TRAITS[key].find(item => item.id === player[key])?.label || '待选';
-        const text = `${label}${value}`;
-        traits.append(button(text, 'lineup-inspect-trait', () => inspect('体型与移动特点', `${playerName(player, index)}\n${label}：${value}`), { className: 'locker-chip', data: { trait: key, value: player[key] } }));
-      }
-      const fullText = `${playerName(player, index)}\n擅长：${player.strengths.length ? player.strengths.map(skillLabel).join('、') : '未标注，按一般处理'}\n弱项：${player.weaknesses.length ? player.weaknesses.map(skillLabel).join('、') : '未标注'}\n未标注的能力按一般处理。`;
-      const skillsRow = (key, label) => {
-        const row = node('div', `locker-detail-row locker-${key}`); row.append(node('span', 'locker-detail-label', label));
-        if (!player[key].length) row.append(button(key === 'strengths' ? '未标擅长，按一般处理' : '未标弱项', 'lineup-inspect-skills', () => inspect('完整能力标签', fullText), { className: 'locker-empty-skill' }));
-        else player[key].forEach(id => row.append(button(skillLabel(id), 'lineup-inspect-skills', () => inspect('完整能力标签', fullText), { className: 'locker-chip', data: { skill: id, type: key } })));
-        return row;
-      };
-      detail.replaceChildren(top, traits, skillsRow('strengths', '擅长'), skillsRow('weaknesses', '弱项'));
+      detail.replaceChildren(top, node('p', 'locker-duty-hint', '每套战术有不同分工，选择战术后再确认谁来承担。'));
     }
     updateDetail(focusedIndex);
     lockerRoom = createLockerRoom({ document, profile, selectedIndex: focusedIndex, disabled: model.pending || model.externalBusy,
@@ -61,9 +46,7 @@ export function createLockerView(context){
       onInspect(player, index) { inspect('柜位球员', `${playerName(player, index)}\n球衣 ${player.number} 号`); }
     });
     const actions = node('div', 'lineup-profile-actions');
-    actions.append(button('查看进攻推荐', 'lineup-recommend', () => {
-      model.route = 'recommendations'; model.recommendationIndex = 0; model.recommendationSection = 'reasons'; model.textPage = 0; draw();
-    }, { className: 'button button-primary', data: { profileId: profile.id } }));
+    actions.append(button('找一套战术', 'lineup-conditions', () => navigate('roles'), { className: 'button button-primary', data: { profileId: profile.id } }));
     actions.append(button(dirty(profile.id) ? '继续未保存配置' : '配置球员', 'lineup-configure', () => beginEdit(profile), { data: { profileId: profile.id } }));
     card.append(cardHeading, top, lockerRoom.element, detail, actions); root.append(card);
   }

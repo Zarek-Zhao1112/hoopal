@@ -1,8 +1,14 @@
+import {defineRoles} from '../../role-helpers.js';
 import {defineTactic, run, dribble, screen, pass} from '../../helpers.js';
 
 export default defineTactic({
   id: 'pick-pop', title: '挡拆外弹', category: '挡拆配合',
   description: '2 号高位掩护后向外弹开，1 号突破牵制后回传。',
+  ...defineRoles('offense', [
+  ["借挡分球者","持球借2号掩护突破，观察防守后回传给外弹的2号。",["use-ball-screen","drive-pass"]],
+  ["掩护外弹者","先站稳掩护，释放后外弹到外线，接回传判断投射。",["stationary-screen","catch-shoot"]],
+  ["底角接应者","底角保持空间牵制弱侧，准备接球或回传接应。",["space-outlet"]],
+]),
   steps: [
     {
       note: '1 号弧顶持球，2 号从左翼上提准备掩护，3 号留在右底角拉开空间。',

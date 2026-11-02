@@ -1,8 +1,15 @@
+import {defineRoles} from '../../role-helpers.js';
 import {defineTactic, run, dribble, pass} from '../../helpers.js';
 
 export default defineTactic({
   id: 'high-low', mode: '4v4', title: '高低位配合', category: '内线配合',
   description: '先经左翼把球送入高位，3 号低位反跑，高位再向篮下传球。',
+  ...defineRoles('offense', [
+  ["初始转移者","先把球转移给翼侧2号，随后平衡外线站位并保留接应。",["perimeter-transfer","space-outlet"]],
+  ["翼侧入口传球者","翼侧接球，观察高位4号，向高位送出入口传球。",["post-entry-pass"]],
+  ["低位要位终结者","低位保护接球位置，先要位再反跑，接高位内传近筐终结。",["post-seal","cut-finish"]],
+  ["高位策应者","高位接球保护球权，观察低位3号要位与反跑，送出内传。",["post-protect","high-low-pass"]],
+]),
   steps: [
     {
       note: '1 号先把球转到左翼 2 号。4 号上提高位接应，3 号从右侧低位向内调整，为高低位连线做准备。',

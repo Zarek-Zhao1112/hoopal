@@ -1,9 +1,16 @@
+import {defineRoles} from '../../role-helpers.js';
 import {frame, defineExpansion} from '../../expansion-helpers.js';
 import {run, dribble, screen, pass} from '../../helpers.js';
 
 export default defineExpansion({
   id: 'zoom-handoff', title: '下掩护接手递手', mode: '4v4', category: '连续衔接', difficulty: '进阶',
   description: '2 号先借 3 号下掩护上提，再近身接 1 号手递手，随后借挡突破。',
+  ...defineRoles('offense', [
+  ["递手掩护者","高位持球等2号借挡上提，近身递手交球后继续停稳掩护，再外撤接应。",["handoff-give","stationary-screen","space-outlet"]],
+  ["借挡接递手者","先借3号下掩护上提，再接1号递手，借挡突破后分给底角4号。",["use-offball-screen","handoff-receive","use-ball-screen","drive-pass"]],
+  ["下掩护者","为2号站稳下掩护，完成后退出到外线拉开接应。",["stationary-screen","space-outlet"]],
+  ["底角接投者","右底角保持空间，接2号突破分球后判断接投。",["space-outlet","catch-shoot"]],
+]),
   steps: [
     frame('1 号高位持球，2 号在左侧低位，3 号移动到下掩护点，4 号在右底角。先建立无球掩护，不直接远距离传给 2 号。',
       [[500,490],[200,200],[290,360],[820,200]], [[500,410],[280,200],[370,340],[740,220]], [run(3,[290,360],[270,400])]),

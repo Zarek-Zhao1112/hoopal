@@ -18,6 +18,7 @@ import { runStartupFlow } from './startup-flow.mjs';
 import { runAccountCenterFlow } from './account-center-flow.mjs';
 import { runTrainingViewingFlow } from './training-viewing-flow.mjs';
 import { runTacticPickerFlow } from './tactic-picker-flow.mjs';
+import { runRoleRequirementsFlow } from './role-requirements-flow.mjs';
 
 const version=JSON.parse(await readFile('package.json','utf8')).version;
 const folder=path.resolve('artifacts/qa/runs',version+'-'+Date.now());
@@ -34,12 +35,12 @@ try{
  assert.equal(await evaluate("document.querySelectorAll('#frame-list button').length"),4);
  assert.equal(await evaluate("document.querySelectorAll('#template-picker option').length"),10);
  const context={send,evaluate,wait,waitFor,folder,downloadFolder:session.downloads};
- for(const[name,flow]of [['tactic-picker',runTacticPickerFlow],['startup',runStartupFlow],['readonly-26-tactics',runReadOnlyFlow],['library',runLibraryDeckFlow],['page-layout',runPageLayoutFlow],['inline-loop',runInlinePreviewFlow],['expansion-recommendations',runOffenseExpansionFlow],['archives',runArchivesFlow],['creation-motion',runCreationMotionFlow],['locker-frame',runLockerFrameFlow],['team-carousel',runTeamCarouselFlow],['glass-sheet',runGlassSheetFlow],['lineups',runLineupFlow],['page-motion',runPageMotionFlow],['account-center',runAccountCenterFlow],['training-viewing',runTrainingViewingFlow]]){
+ for(const[name,flow]of [['role-requirements',runRoleRequirementsFlow],['tactic-picker',runTacticPickerFlow],['startup',runStartupFlow],['readonly-26-tactics',runReadOnlyFlow],['library',runLibraryDeckFlow],['page-layout',runPageLayoutFlow],['inline-loop',runInlinePreviewFlow],['expansion-roles',runOffenseExpansionFlow],['archives',runArchivesFlow],['creation-motion',runCreationMotionFlow],['locker-frame',runLockerFrameFlow],['team-carousel',runTeamCarouselFlow],['glass-sheet',runGlassSheetFlow],['lineups',runLineupFlow],['page-motion',runPageMotionFlow],['account-center',runAccountCenterFlow],['training-viewing',runTrainingViewingFlow]]){
   const group={name,started:new Date().toISOString(),passed:false};report.groups.push(group);console.log('Checking '+name);
   await flow(context);group.passed=true;group.finished=new Date().toISOString();
  }
  assert.deepEqual(report.errors,[],'No browser runtime errors');assert.deepEqual(report.remoteRequests,[],'No remote app resources');report.passed=true;
- console.log('Full browser QA passed: 26 tactics, lineups, recommendation, startup, offline, export, layout and motion.');
+ console.log('Full browser QA passed: 26 tactics, role confirmations, lineups, startup, offline, export, layout and motion.');
 }catch(error){report.failure=error.stack||String(error);console.error(report.failure);process.exitCode=1}
 finally{
  try{await session?.close();report.tempCleaned=true}catch(error){report.cleanupError=String(error);process.exitCode=1;report.passed=false}
