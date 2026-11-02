@@ -14,3 +14,4 @@
 @import './responsive.css';
 @import './training-legend.css';
 @import './lineup-frame.css';
+@import '../src/training/view.css';

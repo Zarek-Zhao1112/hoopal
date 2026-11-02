@@ -3,7 +3,7 @@ import { templates } from '../../shared/templates.js';
 import { createBuiltinRepository } from './storage/builtins.js';
 import { createStorageAdapter, cleanupLegacyExtras, exportFile, setupLifecycle, isNative } from './platform/index.js';
 import { isBallVisible, isTransitionBallVisible } from './board/hit-test.js';
-import { paginate, pageForIndex } from './workspace/state.js';
+import { paginate } from './workspace/state.js';
 import { createWorkspaceController } from './workspace/controller.js';
 import { createLineupRepository } from './storage/lineups.js';
 import { createLineupSession } from './storage/lineup-session.js';
@@ -12,6 +12,7 @@ import { createLineupUI } from './lineups/controller.js';
 import { COURT_COLORS } from './board/appearance.js';
 import { createTrainingCourt } from './board/court-renderer.js';
 import { createTrainingPlayer } from './training/player.js';
+import { createTrainingView } from './training/view.js';
 import { createLibraryDeck } from './workspace/library-deck.js';
 import { createLibraryPreview } from './workspace/library-preview.js';
 import { startup } from './startup/runtime.js';
@@ -43,8 +44,6 @@ const store = new PlayStore(initial);
 let toastTimer;
 let showDefense = true, renderedStep = -1;
 let workspace, libraryDeck, courtRenderer;
-const pages = { steps: 0 };
-let listedFrame = -1;
 const svg = $('court');
 const training = createTrainingPlayer({
   frameCount: store.play.frames.length, position: store.play.frameIndex,
@@ -52,6 +51,9 @@ const training = createTrainingPlayer({
   getSpeed: () => Number($('speed').value), getLoop: () => $('loop-play').checked,
   onFrame: showPosition, onComplete: () => stop(),
 });
+const trainingView = createTrainingView({ document, onSelectStep(i) {
+  stop(); store.changeFrame(i); training.seek(i); renderAll(); persist();
+} });
 const NS = 'http://www.w3.org/2000/svg';
 const focusTeam = () => activeKind === 'defense' ? 'defense' : 'attack';
 const catalogFor = (kind, mode = store.play.mode) => templates.filter(t => t.mode === mode && (t.kind || 'offense') === kind);
@@ -202,7 +204,6 @@ async function loadTemplate(templateId, { fromRecommendation = false } = {}) {
     catalogKind = activeKind;
     catalogMode = template.mode;
     training.load({ frameCount: store.play.frames.length, position: store.play.frameIndex });
-    pages.steps = pageForIndex(store.play.frameIndex, 6);
     renderAll();
     await persist();
     loaded = true;
@@ -230,32 +231,8 @@ function draw(board = store.board, ballVisible) {
   } });
 }
 
-function renderPager(prefix, page) {
-  const previous = $(`${prefix}-page-prev`), next = $(`${prefix}-page-next`), count = $(`${prefix}-page-count`);
-  if (previous) previous.disabled = page.page === 0;
-  if (next) next.disabled = page.page >= page.pages - 1;
-  if (count) count.textContent = `${page.page + 1} / ${page.pages}`;
-}
 function renderSteps() {
-  const list = $('frame-list');
-  list.replaceChildren();
-  // Locate only when the actual current frame changes; paging alone stays put.
-  if (listedFrame !== store.play.frameIndex) pages.steps = pageForIndex(store.play.frameIndex, 6);
-  listedFrame = store.play.frameIndex;
-  const page = paginate(store.play.frames, pages.steps, 6);
-  pages.steps = page.page;
-  page.items.forEach((board, offset) => {
-    const i = page.start + offset;
-    const button = html('button', `frame-item${i === store.play.frameIndex ? ' active' : ''}`);
-    button.type = 'button';
-    button.dataset.frameIndex = String(i);
-    button.setAttribute('aria-current', i === store.play.frameIndex ? 'step' : 'false');
-    button.append(html('span', 'frame-number', String(i + 1).padStart(2, '0')), html('span', 'frame-label', board.note.split(/[：。\n]/)[0].slice(0, 18) || `步骤 ${i + 1}`));
-    button.addEventListener('click', () => { stop(); store.changeFrame(i); training.seek(i); renderAll(); persist(); });
-    list.append(button);
-  });
-  renderPager('step', page);
-
+  trainingView.renderSteps(store.play.frames, store.play.frameIndex);
 }
 function syncTemplatePicker() {
   const picker = $('template-picker');
@@ -281,9 +258,7 @@ function renderTemplates() {
 function controls() {
   const busy = switching || lineupBusy || Boolean(lineupUI?.isModalOpen);
   libraryDeck?.setBusy(busy);
-  $('play-toggle').textContent = training.playing ? 'Ⅱ 暂停' : '▶ 播放战术';
-  $('play-toggle').setAttribute('aria-label', training.playing ? '暂停战术' : '播放战术');
-  $('play-toggle').setAttribute('aria-pressed', String(training.playing));
+  trainingView.render({ title: store.play.title, note: store.board.note, playing: training.playing });
   $('frame-counter').textContent = `${Math.min(Math.floor(training.position) + 1, store.play.frames.length)} / ${store.play.frames.length}`;
   $('timeline-scrub').value = store.play.frames.length > 1 ? training.position / (store.play.frames.length - 1) * 1000 : 0;
   $('timeline-scrub').disabled = busy || store.play.frames.length < 2;
@@ -292,8 +267,6 @@ function controls() {
   $('next-frame').disabled = busy || training.position >= store.play.frames.length - 1;
   $('play-title').disabled = training.playing || busy;
   $('status').textContent = training.playing ? '正在演练 · 可调整播放速度或拖动进度' : '按步骤观察跑位，点击讲解查看动作分工。';
-  const note = Array.from(store.board.note || '这一步暂无讲解。');
-  $('live-step-note').textContent = `${String(store.play.frameIndex + 1).padStart(2, '0')} / ${note.slice(0, 72).join('')}${note.length > 72 ? '…' : ''}`;
   svg.classList.toggle('is-playing', training.playing);
   for (const node of document.querySelectorAll('[data-view-target],#open-menu,#open-note,#play-toggle,#restart-play,#frame-list button')) node.disabled = busy || Boolean(lineupUI?.isModalOpen);
   $('mode').disabled = training.playing || busy;
@@ -325,7 +298,6 @@ function start() {
   if (store.play.frames.length < 2) return;
   training.play();
   store.changeFrame(Math.floor(training.position));
-  pages.steps = pageForIndex(store.play.frameIndex, 6);
   renderSteps(); controls();
 }
 
@@ -340,14 +312,6 @@ $('timeline-scrub').addEventListener('input', () => {
   showPosition();
 });
 $('timeline-scrub').addEventListener('change', () => { training.seek(Math.round(training.position)); store.changeFrame(training.position); renderAll(); persist(); });
-for (const [prefix, key, render] of [['step', 'steps', renderSteps]]) {
-  for (const [direction, delta] of [['prev', -1], ['next', 1]]) $(`${prefix}-page-${direction}`)?.addEventListener('click', () => {
-    if (switching) return;
-      pages[key] += delta;
-    render();
-    controls();
-  });
-}
 $('toggle-defense').addEventListener('change', event => { showDefense = event.target.checked; draw(); });
 for (const button of document.querySelectorAll('[data-kind-target]')) button.addEventListener('click', () => {
   const kind = button.dataset.kindTarget;

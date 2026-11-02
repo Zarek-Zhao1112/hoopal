@@ -1,0 +1,208 @@
+/* HC-048: the viewing layout is scoped to training; all other card frames stay put. */
+body.page-layout[data-view=play] .training-panel {
+  display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;gap:10px;padding:12px;
+}
+body.page-layout[data-view=play] .training-panel .training-header {
+  display:grid;grid-column:1;grid-row:1;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;min-width:0;min-height:0;
+}
+body.page-layout[data-view=play] .training-title-picker {
+  position:relative;display:flex;align-items:center;gap:5px;min-width:0;min-height:42px;border-radius:8px;
+}
+body.page-layout[data-view=play] #training-title {
+  min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:22px;line-height:1.35;font-weight:750;color:#315b76;pointer-events:none;
+}
+body.page-layout[data-view=play] .training-title-chevron {width:14px;height:14px;transform:rotate(90deg);color:#5c88a3;pointer-events:none}
+body.page-layout[data-view=play] .training-panel #template-picker {
+  position:absolute;inset:0;width:100%;height:100%;min-width:0;min-height:0;margin:0;padding:0;opacity:0;cursor:pointer;
+}
+body.page-layout[data-view=play] .training-title-picker:focus-within {outline:2px solid #5c9abd;outline-offset:2px}
+body.page-layout[data-view=play] #play-header-controls {justify-content:end;gap:5px}
+body.page-layout[data-view=play] #play-header-controls #mode {min-height:36px;height:36px;padding:3px 5px;border-radius:9px;font-size:11px}
+body.page-layout[data-view=play] #play-header-controls #open-menu {width:36px;min-width:36px;height:36px;min-height:36px;border-radius:9px}
+body.page-layout[data-view=play] .training-context {grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;min-height:26px}
+body.page-layout[data-view=play] .training-panel #tactic-kind-label {padding:3px 7px;min-height:23px;border:1px solid #d2e0e9;border-radius:7px;background:#eaf3f9;color:#60869e;font-size:10px}
+body.page-layout[data-view=play] .training-panel .toggle-label {position:relative;min-height:28px;font-size:10px;color:#6a8fa6;gap:5px}
+body.page-layout[data-view=play] .training-panel .court-stage {grid-column:1;grid-row:2;border-radius:11px;background:#e7cba7;min-width:0;min-height:0}
+body.page-layout[data-view=play] .training-panel #court {width:100%;height:100%;object-fit:contain}
+body.page-layout[data-view=play] .training-panel .playback-bar {
+  display:flex;grid-column:1;grid-row:3;flex-direction:column;gap:7px;padding:10px;min-width:0;min-height:0;margin:0;border:1px solid #c7dce9;border-radius:13px;background:linear-gradient(135deg,#f8fcffb8,#eaf4faba);box-shadow:inset 0 1px #fff9;
+}
+body.page-layout[data-view=play] .training-detail {min-width:0;min-height:0}
+body.page-layout[data-view=play] .training-panel .play-note-summary {display:flex;align-items:center;gap:7px;min-width:0;min-height:42px;margin:0;padding:0;border:0}
+body.page-layout[data-view=play] .training-step-copy {flex:1;min-width:0}
+body.page-layout[data-view=play] .training-step-heading {display:flex;align-items:center;gap:8px;min-width:0;color:#355e78}
+body.page-layout[data-view=play] #frame-counter {flex-shrink:0;font-size:12px;font-weight:750;font-variant-numeric:tabular-nums;color:#547f99;white-space:nowrap}
+body.page-layout[data-view=play] #training-step-title {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;line-height:1.7;font-weight:700}
+body.page-layout[data-view=play] .training-panel .live-step-note {min-height:15px;max-height:32px;margin:1px 0 0;font-size:11px;line-height:1.45;-webkit-line-clamp:2;color:#7592a6}
+body.page-layout[data-view=play] .training-panel .note-open-button {flex-shrink:0;min-height:36px;min-width:43px;margin:0;padding:3px 4px;border:1px solid #ccdeea;border-radius:8px;font-size:10px;color:#5b88a4}
+body.page-layout[data-view=play] .training-timeline {min-width:0;min-height:0}
+body.page-layout[data-view=play] .training-scrub {display:flex;align-items:center;gap:5px;min-width:0;height:24px}
+body.page-layout[data-view=play] .training-panel #timeline-scrub {height:24px;min-height:0;flex:1;min-width:0;margin:0;padding:0;border:0;background:transparent;-webkit-appearance:none;appearance:none;accent-color:#4d93b8;color-scheme:light;cursor:pointer}
+body.page-layout[data-view=play] .training-panel #timeline-scrub::-webkit-slider-runnable-track {height:4px;border:0;border-radius:999px;background:#c7dce8;box-shadow:inset 0 1px 1px #7598ad24}
+body.page-layout[data-view=play] .training-panel #timeline-scrub::-webkit-slider-thumb {-webkit-appearance:none;appearance:none;width:14px;height:14px;margin-top:-5px;border:2px solid #f1faff;border-radius:50%;background:linear-gradient(145deg,#78badc,#3e89b1);box-shadow:0 1px 3px #4f87a340}
+body.page-layout[data-view=play] .training-panel #timeline-scrub::-moz-range-track {height:4px;border:0;border-radius:999px;background:#c7dce8;box-shadow:inset 0 1px 1px #7598ad24}
+body.page-layout[data-view=play] .training-panel #timeline-scrub::-moz-range-thumb {width:10px;height:10px;border:2px solid #f1faff;border-radius:50%;background:linear-gradient(145deg,#78badc,#3e89b1);box-shadow:0 1px 3px #4f87a340}
+body.page-layout[data-view=play] .training-panel #play-progress {min-width:27px;font-size:9px;color:#7c9aaf}
+body.page-layout[data-view=play] .training-panel #frame-list {display:grid;grid-template-columns:repeat(var(--training-steps,4),minmax(0,1fr));grid-template-rows:28px;gap:0;min-width:0;min-height:0;margin:0}
+body.page-layout[data-view=play] .training-panel .frame-item {display:flex;align-items:center;justify-content:center;width:100%;min-width:0;min-height:28px;height:28px;padding:0;border:0;border-radius:6px;background:transparent;color:#7f9eb1;box-shadow:none}
+body.page-layout[data-view=play] .training-panel .frame-number {display:grid;place-items:center;width:19px;height:19px;border:1px solid #c9dae5;border-radius:50%;background:#edf5fa;color:inherit;font-size:9px;font-weight:650}
+body.page-layout[data-view=play] .training-panel .frame-item.is-complete .frame-number {border-color:#9fc4d8;background:#d1e7f3;color:#3d799a}
+body.page-layout[data-view=play] .training-panel .frame-item.active .frame-number {border-color:#559bc0;background:linear-gradient(145deg,#77badb,#3a83ac);color:white;box-shadow:0 0 0 3px #e4f2fa,0 0 0 4px #b9d4e4}
+body.page-layout[data-view=play] .training-actions {display:grid;grid-template-columns:84px minmax(0,1fr) 43px;align-items:center;gap:3px;min-width:0;min-height:56px}
+body.page-layout[data-view=play] .training-secondary {display:flex;align-items:center;gap:2px;min-width:0}
+body.page-layout[data-view=play] .training-panel #speed {width:47px;max-width:47px;min-height:36px;padding:3px;border:1px solid #c7dce9;border-radius:8px;background:#f4faff8c;color:#608ba5;font-size:11px}
+body.page-layout[data-view=play] .training-panel #restart-play {width:34px;min-width:34px;height:36px;min-height:36px;padding:7px;border:1px solid #c7dce9;border-radius:8px;background:#f4faff8c;color:#608ba5}
+body.page-layout[data-view=play] .training-panel #restart-play .icon {width:17px;height:17px}
+body.page-layout[data-view=play] .training-panel .playback-controls {display:flex;align-items:center;justify-content:center;gap:3px;min-width:0;flex:none}
+body.page-layout[data-view=play] .training-panel .playback-controls .icon-button {width:35px;min-width:35px;height:38px;min-height:38px;padding:6px;border:1px solid #c7dce9;border-radius:9px;background:#f5faff8c;color:#5987a2}
+body.page-layout[data-view=play] .training-panel .play-button {display:grid;place-items:center;width:56px;min-width:56px;height:56px;min-height:56px;padding:0;border-radius:50%;border:1px solid #4282a8;background:linear-gradient(145deg,#76b5d7,#2e7aa5);box-shadow:inset 0 1px #d9f1ffb3,0 3px 7px #4a86a22b}
+body.page-layout[data-view=play] .training-panel .play-button .icon {width:26px;height:26px;stroke:none;fill:currentColor}
+body.page-layout[data-view=play] .training-panel .loop-label {display:flex;align-items:center;justify-content:center;gap:3px;min-width:0;min-height:36px;font-size:10px;color:#6b90a8;white-space:nowrap}
+body.page-layout[data-view=play] .training-panel .loop-label input {width:13px;height:13px;margin:0;accent-color:#4c92b7}
+body.page-layout[data-view=play] .training-panel .lineup-legend {max-height:none;margin:0 0 6px;padding:4px 6px;border-radius:8px;background:#e7f1f7a8}
+body.page-layout[data-view=play] .training-panel .legend-heading {min-height:20px;gap:4px}
+body.page-layout[data-view=play] .training-panel .legend-heading button {min-height:22px}
+body.page-layout[data-view=play] .training-panel .legend-rows {gap:1px;margin-top:1px}
+body.page-layout[data-view=play] .training-panel .legend-row {min-height:17px;font-size:10px;line-height:1.4}
+@media(max-width:699px) and (max-height:700px) {
+  body.page-layout[data-view=play] .training-panel {padding:9px;gap:7px;grid-template-rows:auto minmax(0,1fr) auto}
+  body.page-layout[data-view=play] .training-title-picker {min-height:34px}
+  body.page-layout[data-view=play] #training-title {font-size:19px}
+  body.page-layout[data-view=play] .training-context {min-height:22px}
+  body.page-layout[data-view=play] #play-header-controls #mode,body.page-layout[data-view=play] #play-header-controls #open-menu {height:32px;min-height:32px}
+  body.page-layout[data-view=play] .training-panel .toggle-label {min-height:24px}
+  body.page-layout[data-view=play] .training-panel .playback-bar {padding:7px;gap:4px}
+  body.page-layout[data-view=play] .training-panel .play-note-summary {min-height:37px}
+  body.page-layout[data-view=play] .training-panel .live-step-note {font-size:10px;max-height:28px;min-height:14px}
+  body.page-layout[data-view=play] #training-step-title {font-size:11px}
+  body.page-layout[data-view=play] .training-actions {min-height:48px;grid-template-columns:78px minmax(0,1fr) 42px;gap:2px}
+  body.page-layout[data-view=play] .training-panel .play-button {width:48px;min-width:48px;height:48px;min-height:48px}
+  body.page-layout[data-view=play] .training-panel .playback-controls .icon-button {width:32px;min-width:32px;height:35px;min-height:35px}
+  body.page-layout[data-view=play] .training-panel #speed {width:44px;max-width:44px;font-size:10px;min-height:34px}
+  body.page-layout[data-view=play] .training-panel #restart-play {width:32px;min-width:32px;height:34px;min-height:34px}
+  body.page-layout[data-view=play] .training-panel .lineup-legend {padding:3px 5px;margin-bottom:3px}
+}
+/* Rotate to give the same un-stretched SVG the left side of the card. */
+@media(min-width:600px) and (max-height:600px), (min-width:900px) and (min-height:601px) {
+  body.page-layout[data-view=play] .training-panel {grid-template-columns:minmax(0,1fr) 290px;grid-template-rows:auto minmax(0,1fr);gap:7px 12px;padding:10px}
+  body.page-layout[data-view=play] .training-panel .training-header {grid-column:2;grid-row:1;gap:1px 5px}
+  body.page-layout[data-view=play] .training-title-picker {min-height:34px}
+  body.page-layout[data-view=play] #training-title {font-size:18px}
+  body.page-layout[data-view=play] #play-header-controls {gap:3px}
+  body.page-layout[data-view=play] #play-header-controls #mode {min-height:30px;height:30px;font-size:10px}
+  body.page-layout[data-view=play] #play-header-controls #open-menu {width:30px;min-width:30px;height:30px;min-height:30px}
+  body.page-layout[data-view=play] .training-context {min-height:22px}
+  body.page-layout[data-view=play] .training-panel .toggle-label {min-height:24px;font-size:9px}
+  body.page-layout[data-view=play] .training-panel .court-stage {grid-column:1;grid-row:1/-1}
+  body.page-layout[data-view=play] .training-panel .playback-bar {grid-column:2;grid-row:2;justify-content:center;gap:4px;padding:7px}
+  body.page-layout[data-view=play] .training-panel .play-note-summary {min-height:34px}
+  body.page-layout[data-view=play] .training-panel .live-step-note {min-height:14px;max-height:28px;font-size:10px;line-height:1.4;-webkit-line-clamp:2}
+  body.page-layout[data-view=play] #training-step-title {font-size:11px}
+  body.page-layout[data-view=play] #frame-counter {font-size:11px}
+  body.page-layout[data-view=play] .training-actions {grid-template-columns:75px minmax(0,1fr) 38px;gap:2px;min-height:46px}
+  body.page-layout[data-view=play] .training-panel .play-button {width:46px;min-width:46px;height:46px;min-height:46px}
+  body.page-layout[data-view=play] .training-panel .playback-controls .icon-button {width:31px;min-width:31px;min-height:34px;height:34px}
+  body.page-layout[data-view=play] .training-panel #speed {width:42px;max-width:42px;min-height:32px;font-size:10px}
+  body.page-layout[data-view=play] .training-panel #restart-play {width:30px;min-width:30px;height:32px;min-height:32px;padding:5px}
+  body.page-layout[data-view=play] .training-panel .loop-label {min-height:32px;font-size:9px}
+  body.page-layout[data-view=play] .training-panel .lineup-legend {padding:2px 4px;margin-bottom:3px}
+  body.page-layout[data-view=play] .training-panel .legend-heading {min-height:18px}
+  body.page-layout[data-view=play] .training-panel .legend-heading button {min-height:18px}
+  body.page-layout[data-view=play] .training-panel .legend-row {min-height:15px;font-size:10px;line-height:1.3}
+}
+@media(min-width:900px) and (min-height:601px) {
+  body.page-layout[data-view=play] .training-panel {grid-template-columns:minmax(0,1fr) 310px;padding:16px;gap:12px 16px}
+  body.page-layout[data-view=play] .training-title-picker {min-height:40px}
+  body.page-layout[data-view=play] #training-title {font-size:20px}
+  body.page-layout[data-view=play] .training-panel .playback-bar {gap:16px;padding:12px}
+  body.page-layout[data-view=play] .training-panel .live-step-note {min-height:30px;max-height:70px;font-size:12px;line-height:1.7;-webkit-line-clamp:4}
+  body.page-layout[data-view=play] #training-step-title {font-size:13px}
+  body.page-layout[data-view=play] .training-actions {min-height:56px}
+  body.page-layout[data-view=play] .training-panel .play-button {width:56px;min-width:56px;height:56px;min-height:56px}
+  body.page-layout[data-view=play] .training-panel .legend-row {min-height:21px;font-size:11px}
+}
+/* Give each landscape control row its measured space; text cannot shrink over the slider. */
+@media(min-width:600px) and (max-height:600px) {
+  body.page-layout[data-view=play] .training-panel {padding:8px;gap:6px 12px}
+  body.page-layout[data-view=play] .training-panel .training-header {grid-template-rows:28px 18px;gap:0 5px}
+  body.page-layout[data-view=play] .training-title-picker {min-height:28px}
+  body.page-layout[data-view=play] #play-header-controls #mode,body.page-layout[data-view=play] #play-header-controls #open-menu {height:28px;min-height:28px}
+  body.page-layout[data-view=play] .training-context {min-height:18px}
+  body.page-layout[data-view=play] .training-panel #tactic-kind-label {min-height:18px;padding:2px 5px;font-size:9px;line-height:12px}
+  body.page-layout[data-view=play] .training-panel .toggle-label {min-height:18px}
+  body.page-layout[data-view=play] .training-panel .playback-bar {display:grid;grid-template-rows:max-content 44px 40px;align-content:center;justify-content:normal;gap:3px;padding:4px}
+  body.page-layout[data-view=play] .training-panel .play-note-summary {min-height:28px}
+  body.page-layout[data-view=play] .training-panel .live-step-note {display:none}
+  body.page-layout[data-view=play] .training-panel .note-open-button {min-height:28px}
+  body.page-layout[data-view=play] .training-scrub,body.page-layout[data-view=play] .training-panel #timeline-scrub {height:20px}
+  body.page-layout[data-view=play] .training-panel #frame-list {grid-template-rows:24px}
+  body.page-layout[data-view=play] .training-panel .frame-item {height:24px;min-height:24px}
+  body.page-layout[data-view=play] .training-actions {min-height:40px}
+  body.page-layout[data-view=play] .training-panel .play-button {width:40px;min-width:40px;height:40px;min-height:40px}
+  body.page-layout[data-view=play] .training-panel .lineup-legend {margin-bottom:2px;padding:2px 4px}
+  body.page-layout[data-view=play] .training-panel .legend-heading,body.page-layout[data-view=play] .training-panel .legend-heading button {min-height:16px}
+  body.page-layout[data-view=play] .training-panel .legend-row {min-height:14px;font-size:10px;line-height:14px}
+  body.page-layout[data-view=play] .training-panel .legend-rows {margin-top:0;gap:0}
+}
+/* Very short portrait uses an inner split rather than squeezing away the court. */
+@media(max-width:599px) and (max-height:500px) {
+  body.page-layout[data-view=play] .training-panel {grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:36px minmax(0,1fr) 38px 36px;gap:3px 7px;padding:6px}
+  body.page-layout[data-view=play] .training-panel .training-header {grid-column:1/-1;grid-row:1;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:22px 14px;gap:0 4px}
+  body.page-layout[data-view=play] .training-title-picker {min-height:22px}
+  body.page-layout[data-view=play] #training-title {font-size:15px}
+  body.page-layout[data-view=play] #play-header-controls #mode {min-height:22px;height:22px;font-size:9px;padding:1px 4px}
+  body.page-layout[data-view=play] #play-header-controls #open-menu {width:26px;min-width:26px;min-height:22px;height:22px}
+  body.page-layout[data-view=play] .training-context {min-height:14px}
+  body.page-layout[data-view=play] .training-panel #tactic-kind-label {min-height:14px;padding:1px 4px;font-size:8px;line-height:10px}
+  body.page-layout[data-view=play] .training-panel .toggle-label {min-height:14px;font-size:8px;gap:3px}
+  body.page-layout[data-view=play] .training-panel .court-stage {grid-column:1;grid-row:2;border-radius:7px}
+  body.page-layout[data-view=play] .training-panel .playback-bar {display:contents}
+  body.page-layout[data-view=play] .training-detail {display:flex;flex-direction:column;justify-content:center;grid-column:2;grid-row:2;min-height:0;gap:2px}
+  body.page-layout[data-view=play] .training-panel .play-note-summary {min-height:28px;gap:2px}
+  body.page-layout[data-view=play] .training-step-heading {gap:4px;display:block}
+  body.page-layout[data-view=play] #frame-counter {font-size:9px;line-height:14px}
+  body.page-layout[data-view=play] #training-step-title {display:block;font-size:10px;line-height:14px}
+  body.page-layout[data-view=play] .training-panel .live-step-note {display:none}
+  body.page-layout[data-view=play] .training-panel .note-open-button {min-width:28px;min-height:28px;font-size:8px;padding:1px;gap:0}
+  body.page-layout[data-view=play] .training-panel .note-open-button .icon {width:9px;height:9px}
+  body.page-layout[data-view=play] .training-timeline {grid-column:1/-1;grid-row:3;display:grid;grid-template-rows:16px 22px}
+  body.page-layout[data-view=play] .training-scrub {grid-column:1;grid-row:1}
+  body.page-layout[data-view=play] .training-scrub,body.page-layout[data-view=play] .training-panel #timeline-scrub {height:16px}
+  body.page-layout[data-view=play] .training-panel #frame-list {grid-column:1;grid-row:2;grid-template-rows:22px}
+  body.page-layout[data-view=play] .training-panel .frame-item {height:22px;min-height:22px}
+  body.page-layout[data-view=play] .training-panel .frame-number {height:15px;width:15px;font-size:8px}
+  body.page-layout[data-view=play] .training-actions {grid-column:1/-1;grid-row:4;min-height:36px;grid-template-columns:80px minmax(0,1fr) 42px}
+  body.page-layout[data-view=play] .training-panel .play-button {width:36px;min-width:36px;height:36px;min-height:36px}
+  body.page-layout[data-view=play] .training-panel .play-button .icon {width:21px;height:21px}
+  body.page-layout[data-view=play] .training-panel .playback-controls .icon-button {min-height:30px;height:30px;width:32px;min-width:32px}
+  body.page-layout[data-view=play] .training-panel #speed,body.page-layout[data-view=play] .training-panel #restart-play {min-height:30px;height:30px}
+  body.page-layout[data-view=play] .training-panel .lineup-legend {padding:2px;margin:0;border:0;background:transparent}
+  body.page-layout[data-view=play] .training-panel .legend-heading {gap:2px;min-height:15px;font-size:9px}
+  body.page-layout[data-view=play] .training-panel .legend-heading button {min-height:16px;padding:0 2px;font-size:9px}
+  body.page-layout[data-view=play] .training-panel .legend-row {font-size:9px;min-height:13px;line-height:13px;gap:2px}
+  body.page-layout[data-view=play] .training-panel .legend-task {display:none}
+}
+@media(min-width:600px) and (max-height:360px) {
+  body.page-layout[data-view=play] .training-panel {padding:6px;gap:3px 9px;grid-template-columns:minmax(0,1fr) 280px}
+  body.page-layout[data-view=play] .training-panel .training-header {grid-template-rows:25px 17px}
+  body.page-layout[data-view=play] .training-title-picker {min-height:25px}
+  body.page-layout[data-view=play] #training-title {font-size:16px}
+  body.page-layout[data-view=play] #play-header-controls #mode,body.page-layout[data-view=play] #play-header-controls #open-menu {height:25px;min-height:25px}
+  body.page-layout[data-view=play] .training-context {min-height:17px}
+  body.page-layout[data-view=play] .training-panel #tactic-kind-label {min-height:17px;font-size:8px;padding:1px 4px}
+  body.page-layout[data-view=play] .training-panel .toggle-label {min-height:17px;font-size:8px}
+  body.page-layout[data-view=play] .training-panel .playback-bar {grid-template-rows:max-content 34px 36px;padding:4px;gap:2px}
+  body.page-layout[data-view=play] .training-panel .play-note-summary {min-height:22px}
+  body.page-layout[data-view=play] .training-panel .live-step-note {display:none}
+  body.page-layout[data-view=play] .training-panel .note-open-button {min-height:22px}
+  body.page-layout[data-view=play] .training-scrub,body.page-layout[data-view=play] .training-panel #timeline-scrub {height:16px}
+  body.page-layout[data-view=play] .training-panel #frame-list {grid-template-rows:18px}
+  body.page-layout[data-view=play] .training-panel .frame-item {height:18px;min-height:18px}
+  body.page-layout[data-view=play] .training-panel .frame-number {width:16px;height:16px;font-size:8px}
+  body.page-layout[data-view=play] .training-actions {min-height:36px}
+  body.page-layout[data-view=play] .training-panel .play-button {width:36px;min-width:36px;height:36px;min-height:36px}
+  body.page-layout[data-view=play] .training-panel .play-button .icon {width:21px;height:21px}
+  body.page-layout[data-view=play] .training-panel .legend-row {min-height:12px;font-size:9px;line-height:12px}
+  body.page-layout[data-view=play] .training-panel .legend-heading,body.page-layout[data-view=play] .training-panel .legend-heading button {min-height:14px}
+  body.page-layout[data-view=play] .training-panel .lineup-legend {margin-bottom:1px;padding:0 3px}
+}

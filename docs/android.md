@@ -2,6 +2,8 @@
 
 ## 运行方式
 
+2026-11-02，1.25.0/code30已将训练场完整动画布局覆盖安装指定新机。225检查、完整Chrome15组、36专项布局及独立审查通过；27秒构建，30网页同dist/15图标同1.24.0/原v2签名通过。COLD985ms/Wait991ms，实际0球队及战术进度双hash保持；WebView96竖屏393×819的真实训练页面/620循环样本/暂停与几何检查通过，物理手势和旋转另待验，见[HC-048](tasks/HC-048-training-viewing-release.md)。
+
 2026-10-23 用户已更换手机，要求后续都安装到新手机。当前识别为 M2101K9C，ADB 序列号 `ef473680`；旧设备 `3b502e83` 的安装记录仅作历史。每次安装先重新核对 `adb devices -l`，不沿用旧设备目标。
 
 新机 API31 / WebView96，1.7.0 首次 USB 安装受系统限制，已把 APK 传至下载目录并由用户正常确认安装；版本/冷启动/空柜截图已核对。初装时无阵容，不自动复制旧机或写入示例队员；该版真机交互待办见 HC-010。
@@ -67,7 +69,7 @@ npm run android:build
 
 脚本会构建网页、同步 Android 资源、运行 `assembleDebug`，再生成 `artifacts/apk/halfcourt-debug.apk`、`hoopal-版本号.apk`及各自的SHA256文件。原始产物在 `android/app/build/outputs/apk/debug/app-debug.apk`。顶层保当前版与一个回退版，更旧包放在`artifacts/apk/archive/`，同步历史文档链接。
 
-当前构建版本为 `1.24.0`（versionCode 29），「我的」页面使用真实本地球队，账号/云备份服务尚未开放。安装证据见[HC-046](tasks/HC-046-account-center-release.md)，[1.24.0安装包](../artifacts/apk/hoopal-1.24.0.apk)可直接发Android平板，升级保留档案与进度，不需卸载或电脑服务。[1.23.0](../artifacts/apk/hoopal-1.23.0.apk)保作源码/资源核对与回退参考，Android降级安装受版本限制。
+当前构建版本为 `1.25.0`（versionCode 30），训练场采用真实大球场、集中播放与全部步骤点，账号/云备份服务仍尚未开放。安装证据见[HC-048](tasks/HC-048-training-viewing-release.md)，[1.25.0安装包](../artifacts/apk/hoopal-1.25.0.apk)可直接发Android平板，升级保留档案与进度，不需卸载或电脑服务。[1.24.0](../artifacts/apk/hoopal-1.24.0.apk)保作源码/资源核对与回退参考，更旧[1.23.0](../artifacts/apk/archive/hoopal-1.23.0.apk)已归档保留，Android降级安装受版本限制。
 
 当前开发机的便携工具放在被忽略的 `.tools/` 中，构建脚本可以自动使用其中的 JDK、SDK 和 Gradle。这些大体积工具不属于项目源码；其他电脑按上面的标准环境变量配置即可。首次构建需要联网下载依赖，安装后的战术应用可离线使用。
 

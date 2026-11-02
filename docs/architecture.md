@@ -27,6 +27,8 @@ main.js先挂载startup单例，再动态加载app.js。app读取内置选择与
 
 app.js负责初始化、当前战术/档案来源、保存和后台串行协调，组合页面、播放器与绘图接口。训练播放状态由training/player.js独占，参数注入帧调度、时间、速度/循环和onFrame/onComplete；提供play、pause、seek、load、destroy与只读状态。训练段在1倍速为2.4秒、前18%停留，循环末停为1.2/倍率秒，暂停取整与手动进度策略保持；旧回调token不能启动第二个RAF。
 
+HC-048的training/view.js只负责真实战术标题、简短讲解、圆形播放图标和全部步骤点；view.css限定训练场内部竖横布局，由全局汇总最后导入。全步骤点击通过onSelectStep交回app原有停止/seek/记录流程，不直接接触存储或时钟。旧步骤分页撤下，人员映射分页和全文面板保持。
+
 库预览仍由workspace/library-preview-clock.js管理独立毫秒时钟：2.4秒段、1秒末停，暂停保留当前位置和剩余末停。library-preview.js负责按钮中的真实动画、单RAF、可见性和销毁；它不修改主Play、来源引用或保存进度。library-deck负责单卡展开、九标题布局、忙态锁和离页暂停。进入训练场才沿原清来源→载入→自动播放流程执行。
 
 ## SVG绘制与页面

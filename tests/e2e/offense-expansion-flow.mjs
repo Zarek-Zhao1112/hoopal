@@ -73,7 +73,7 @@ export async function runOffenseExpansionFlow({ send, evaluate, wait, waitFor, f
         await evaluate(`(()=>{const n=document.querySelector('#timeline-scrub');n.value=${index / (play.frames.length - 1) * 1000};n.dispatchEvent(new Event('input'));n.dispatchEvent(new Event('change'))})()`);
         const actual = await boardState();
         assert.equal(actual.counter, `${index + 1} / ${play.frames.length}`);
-        assert.equal(actual.current, String(index), 'step pagination follows the real current frame, including steps seven/eight');
+        assert.equal(actual.current, String(index), 'timeline marker follows the real current frame, including steps seven/eight');
         assert.ok(actual.note.includes(play.frames[index].note.slice(0, 30)), `${id}/${index}: current explanation matches actual frame`);
         for (const player of play.frames[index].players) {
           const point = actual.players[player.id];

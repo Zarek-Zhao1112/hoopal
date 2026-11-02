@@ -30,6 +30,7 @@
     <symbol id="i-dribble" viewBox="0 0 24 24"><path d="m3 21 2-7 5 1 1-6 5 1 4-7M11 3h9v9"/></symbol>
     <symbol id="i-erase" viewBox="0 0 24 24"><path d="m4 13 10-10 7 7L11 20H6l-4-4 2-3ZM9 8l7 7M11 20h11"/></symbol>
     <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 4 12 8-12 8V4Z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M7 5h3v14H7zM14 5h3v14h-3z"/></symbol>
     <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></symbol>
     <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
@@ -64,34 +65,37 @@
     </aside>
 
     <section class="training-panel panel" aria-label="训练场">
-    <section class="board-section" aria-label="球场与回放">
-      <div class="board-card panel">
-        <div class="board-topbar"><h1>训练场</h1><div id="play-header-controls" class="page-header-controls">
+      <header class="training-header">
+        <div class="training-title-picker">
+          <h1 id="training-title">载入战术…</h1><svg class="icon training-title-chevron" aria-hidden="true"><use href="#i-right"/></svg>
+          <select id="template-picker" aria-label="选择内置战术"><option value="">选择示例</option></select>
+        </div>
+        <div id="play-header-controls" class="page-header-controls">
           <label class="sr-only" for="mode">比赛人数</label><select id="mode" aria-label="比赛人数"><option value="3v3">3 对 3</option><option value="4v4">4 对 4</option></select>
           <button id="open-menu" class="icon-button menu-trigger" title="导出图片或战术文件" aria-label="导出与更多操作" aria-haspopup="dialog"><svg class="icon" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></button>
-        </div></div>
-        <div class="template-chooser"><label for="template-picker"><span id="tactic-kind-label">进攻战术</span></label><select id="template-picker" aria-label="选择示例战术"><option value="">选择示例</option></select><label class="toggle-label"><input id="toggle-defense" type="checkbox" checked><span class="switch" aria-hidden="true"></span><span id="opponent-toggle-label">显示防守</span></label></div>
-        <div class="court-stage"><svg id="court" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 820" preserveAspectRatio="xMidYMid meet" role="img" aria-label="半场篮球战术动画，球员按战术职责编号"></svg></div>
-        <div class="board-status"><span id="status">按职责号观看配合，可选择步骤阅读讲解。</span></div>
-      </div>
-      <section class="playback-bar panel" aria-label="战术动画回放">
-        <div id="lineup-legend" class="lineup-legend" aria-label="本队职责与队员对应"></div>
-        <div class="play-note-summary"><p id="live-step-note" class="live-step-note">载入战术讲解…</p><button id="open-note" type="button" class="note-open-button" title="分页阅读完整讲解" aria-haspopup="dialog">讲解 <svg class="icon"><use href="#i-right"/></svg></button></div>
-        <div class="playback-main">
-          <div class="playback-controls"><button id="prev-frame" class="icon-button" title="上一步" aria-label="上一步"><svg class="icon"><use href="#i-left"/></svg></button><button id="play-toggle" class="play-button" title="播放或暂停（空格）" aria-label="播放战术"><svg class="icon"><use href="#i-play"/></svg><span>播放战术</span></button><button id="next-frame" class="icon-button" title="下一步" aria-label="下一步"><svg class="icon"><use href="#i-right"/></svg></button></div>
-          <div class="playback-description"><span id="frame-counter">步骤 1 / 4</span></div>
-          <div class="playback-speed"><label class="sr-only" for="speed">播放速度</label><select id="speed" aria-label="播放速度"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></div>
         </div>
-        <div class="playback-timeline"><button id="restart-play" class="icon-button" title="重新播放" aria-label="重新播放"><svg class="icon"><use href="#i-reset"/></svg></button><label class="sr-only" for="timeline-scrub">战术播放进度</label><input id="timeline-scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="战术播放进度"><span id="play-progress">0%</span><label class="loop-label"><input id="loop-play" type="checkbox" checked><span>循环</span></label></div>
+        <div class="training-context"><span id="tactic-kind-label">进攻战术</span><label class="toggle-label"><input id="toggle-defense" type="checkbox" checked><span class="switch" aria-hidden="true"></span><span id="opponent-toggle-label">显示防守</span></label></div>
+      </header>
+      <div class="court-stage"><svg id="court" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 820" preserveAspectRatio="xMidYMid meet" role="img" aria-label="半场篮球战术动画，球员按战术职责编号"></svg></div>
+      <span id="status" class="sr-only">按职责号观看配合，可选择步骤阅读讲解。</span>
+      <section class="playback-bar panel" aria-label="战术动画回放">
+        <div class="training-detail">
+          <div id="lineup-legend" class="lineup-legend" aria-label="本队职责与队员对应"></div>
+          <div class="play-note-summary">
+            <div class="training-step-copy"><div class="training-step-heading"><span id="frame-counter">1 / 4</span><strong id="training-step-title">准备站位</strong></div><p id="live-step-note" class="live-step-note">载入战术讲解…</p></div>
+            <button id="open-note" type="button" class="note-open-button" title="分页阅读完整讲解" aria-haspopup="dialog">讲解 <svg class="icon"><use href="#i-right"/></svg></button>
+          </div>
+        </div>
+        <div class="training-timeline">
+          <div class="training-scrub"><label class="sr-only" for="timeline-scrub">战术播放进度</label><input id="timeline-scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="战术播放进度"><span id="play-progress">0%</span></div>
+          <div id="frame-list" class="frame-list" aria-label="选择战术步骤"></div>
+        </div>
+        <div class="training-actions">
+          <div class="training-secondary"><label class="sr-only" for="speed">播放速度</label><select id="speed" aria-label="播放速度"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select><button id="restart-play" class="icon-button" title="重新播放" aria-label="重新播放"><svg class="icon"><use href="#i-reset"/></svg></button></div>
+          <div class="playback-controls"><button id="prev-frame" class="icon-button" title="上一步" aria-label="上一步"><svg class="icon"><use href="#i-left"/></svg></button><button id="play-toggle" class="play-button" title="播放或暂停（空格）" aria-label="播放战术" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-play"/></svg></button><button id="next-frame" class="icon-button" title="下一步" aria-label="下一步"><svg class="icon"><use href="#i-right"/></svg></button></div>
+          <label class="loop-label"><input id="loop-play" type="checkbox" checked><span>循环</span></label>
+        </div>
       </section>
-    </section>
-
-    <aside class="steps-panel panel" aria-label="战术步骤">
-      <div class="panel-heading steps-heading"><h2>步骤与讲解</h2><span class="panel-description">按职责号逐步阅读配合</span></div>
-      <div id="frame-list" class="frame-list" aria-label="步骤列表"></div>
-      <div class="pagination step-pagination" aria-label="步骤分页"><button id="step-page-prev" type="button" class="icon-button" aria-label="上一页步骤"><svg class="icon"><use href="#i-left"/></svg></button><span id="step-page-count">1 / 1</span><button id="step-page-next" type="button" class="icon-button" aria-label="下一页步骤"><svg class="icon"><use href="#i-right"/></svg></button></div>
-      <p class="steps-tip">球场保留战术职责号；从阵容推荐进入后，可查看职责与本队队员的对应。</p>
-    </aside>
     </section>
   </main>
 

@@ -1,6 +1,6 @@
 # 协作任务看板
 
-更新日期：2026-10-28。
+更新日期：2026-11-02。
 
 这里记录需要多 agent 协作的开发任务：目标、模块边界、接口、依赖、审查与验收证据。主 agent 维护任务状态并负责最终整合，各 agent 在约定范围内开发或审查。
 
@@ -8,6 +8,7 @@
 
 | 编号 | 任务 | 状态 | 负责人 | 下一步 |
 | --- | --- | --- | --- | --- |
+| [HC-048](HC-048-training-viewing-release.md) | 训练场完整动画布局正式接入 | `awaiting_device` | ui布局，engine回归，主控集成/安装，training_review审查 | 两P2修复，225/完整15组/36布局与终审通过；1.25.0已保数据安装，WV96真实循环620样本/暂停及双hash保持，人工体验待确认 |
 | [HC-047](HC-047-training-design-concept.md) | 训练场整套动画视觉讨论 | `completed` | 主控概念图与设计记录 | 竖屏/横屏静态效果已交付，完整动画优先；布局待讨论，正式App和APK保持 |
 | [HC-046](HC-046-account-center-release.md) |「我的」页正式接入与手机更新 | `awaiting_device` | ui真实页面，engine回归，主控构建安装，interaction_design审查 | 225/完整14组/专项36布局20面板及终审通过；1.24.0已安装，双hash同，WV96真实我的/四面板通过；账号云备份尚未开放，人工体验待确认 |
 | [HC-045](HC-045-account-center-preview.md) |「我的」与个人账号交互预览 | `completed` | ui独立页面，主控验证/集成，interaction_design审查 | 可点原型、77组五尺寸/9组file与独立审查通过，213正式SHA保持；源码同步GitHub，真实登录/云备份未接入，APK未改 |

@@ -68,8 +68,9 @@ export async function runPageLayoutFlow({ send, evaluate, wait, waitFor, folder 
       await nav('play');
       await checkMode('play-header-controls', actualMode);
       await checkLayout(width, height, expectedTop, 'play', 'paused');
-      const pager=await evaluate("(()=>{const card=document.querySelector('.training-panel').getBoundingClientRect();return[...document.querySelectorAll('.step-pagination button,.step-pagination>span')].filter(n=>n.getClientRects().length).map(n=>{const r=n.getBoundingClientRect();return{text:n.textContent,inside:r.x>=card.x&&r.right<=card.right&&r.y>=card.y&&r.bottom<=card.bottom}})})()");
-      assert.ok(pager.every(n=>n.inside),`${width}x${height}: page count and both arrows stay within training card`);
+      const markers=await evaluate("(()=>{const card=document.querySelector('.training-panel').getBoundingClientRect();return[...document.querySelectorAll('#frame-list button')].map(n=>{const r=n.getBoundingClientRect();return{index:Number(n.dataset.frameIndex),inside:r.width>0&&r.height>0&&r.x>=card.x&&r.right<=card.right&&r.y>=card.y&&r.bottom<=card.bottom}})})()");
+      assert.ok(markers.length>0&&markers.every(n=>n.inside),`${width}x${height}: every step marker stays within training card`);
+      assert.deepEqual(markers.map(n=>n.index),templates.find(t=>t.id===baseline.template).build().frames.map((_,i)=>i),'all steps are visible together');
       await screenshot(`hc031-${width}x${height}-training.png`);
       // The relocated menu must still open by a real pointer hit inside the card.
       await click('#open-menu');
@@ -158,6 +159,8 @@ export async function runPageLayoutFlow({ send, evaluate, wait, waitFor, folder 
       return{
         sw:document.documentElement.scrollWidth,sh:document.documentElement.scrollHeight,
         card:rect(card),title:card&&[...card.querySelectorAll('h1,h2')].find(visible)?.textContent,
+        tacticTitle:document.querySelector('#template-picker')?.selectedOptions[0]?.textContent,
+        actualTacticTitle:document.querySelector('#play-title')?.value,
         nav:[...document.querySelectorAll('.view-nav button')].map(n=>({view:n.dataset.viewTarget,label:n.textContent.trim(),pressed:n.getAttribute('aria-pressed')})),
         brandVisible:visible(brand),brand:rect(brand),blankVisible:visible(document.querySelector('.page-top-space')),
         legacyBrandVisible:[...document.querySelectorAll('.app-header .brand')].some(visible),
@@ -176,7 +179,8 @@ export async function runPageLayoutFlow({ send, evaluate, wait, waitFor, folder 
     assert.ok(Math.abs(value.card.y - expectedTop) <= 3, `${label}: card top ${value.card.y}, expected ${expectedTop}`);
     assert.ok(value.card.x >= -1 && value.card.right <= width + 1 && value.card.bottom <= height + 1, `${label}: card stays inside screen`);
     if (width >= 1280) assert.ok(value.card.width <= 1280, `${label}: desktop card has a bounded reading width`);
-    assert.ok(value.title?.includes(view === 'lineups' ? '更衣室' : view === 'play' ? '训练场' : '战术库'), `${label}: visible page title ${value.title}`);
+    if(view==='play')assert.ok(value.title===value.actualTacticTitle&&value.tacticTitle?.includes(value.actualTacticTitle)&&value.actualTacticTitle,`${label}: the actual current tactic is the primary selector title`);
+    else assert.ok(value.title?.includes(view==='lineups'?'更衣室':'战术库'),`${label}: visible page title ${value.title}`);
     assert.deepEqual(value.nav.map(n => n.label), ['更衣室', '训练场', '战术库', '我的']);
     assert.equal(value.nav.find(n => n.view === view)?.pressed, 'true');
     assert.equal(value.brandVisible, view === 'lineups', `${label}: brand belongs only to locker room`);

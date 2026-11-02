@@ -32,15 +32,11 @@ export async function runReadOnlyFlow({send,evaluate,wait,waitFor,folder,downloa
       await evaluate(`(()=>{let n=document.querySelector('#template-picker');n.value=${JSON.stringify(template.id)};n.dispatchEvent(new Event('change'))})()`);
       await waitFor(`!document.body.classList.contains('is-loading')&&document.querySelector('#template-picker').value===${JSON.stringify(template.id)}`);
       const frameCount=template.build().frames.length;
-      assert.equal(await evaluate("document.querySelectorAll('#frame-list button').length"),Math.min(6,frameCount));
+      assert.equal(await evaluate("document.querySelectorAll('#frame-list button').length"),frameCount);
       assert.equal(await evaluate("document.querySelector('#frame-counter').textContent"),`1 / ${frameCount}`);
-      const steps=[];
-      for(let page=0;page<Math.ceil(frameCount/6);page++){
-        steps.push(...await evaluate("[...document.querySelectorAll('#frame-list button')].map(n=>Number(n.dataset.frameIndex))"));
-        if(page+1<Math.ceil(frameCount/6))await evaluate("document.querySelector('#step-page-next').click()");
-      }
-      assert.deepEqual(steps,Array.from({length:frameCount},(_,index)=>index),'all real steps remain reachable across six-step pages');
-      while(await evaluate("!document.querySelector('#step-page-prev').disabled"))await evaluate("document.querySelector('#step-page-prev').click()");
+      const steps=await evaluate("[...document.querySelectorAll('#frame-list button')].map(n=>Number(n.dataset.frameIndex))");
+      assert.deepEqual(steps,Array.from({length:frameCount},(_,index)=>index),'all real steps are present together on the playback timeline');
+      assert.equal(await evaluate("Boolean(document.querySelector('#step-page-prev,#step-page-next'))"),false,'obsolete step pagination is removed');
       const before=await evaluate("document.querySelector('#players-layer').innerHTML");
       await evaluate("document.querySelector('#restart-play').click()");
       await waitFor(`document.querySelector('#players-layer').innerHTML!==${JSON.stringify(before)}`);
