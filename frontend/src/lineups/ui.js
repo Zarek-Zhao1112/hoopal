@@ -179,7 +179,8 @@ export function createLineupUI({root,onAction,onInspect,onModalChange,onNavigate
       const back = button('‹', 'teams-back', () => handleBack(), { className: 'icon-button', title: '返回我的' }); back.setAttribute('aria-label', '返回我的');
       const copy = node('div'); copy.append(node('h1', '', '球队管理'), node('p', '', '本机档案')); head.append(back, copy); root.append(head);
     }
-    const heading = node(managing ? 'h2' : 'h1', '', managing ? '读取本机球队' : model.section === 'archives' ? '我的' : '更衣室');
+    const account = model.section === 'archives';
+    const heading = node(account ? 'h2' : 'h1', '', account ? '读取本机球队' : '更衣室');
     const message = node('div', 'lineup-read-error-message');
     message.setAttribute('role', 'status');
     message.append(node('h2', '', '档案暂时无法读取'), node('p', '', '读取恢复前不会覆盖本机档案。\n请重试读取，再继续选择或创建球队。'));
@@ -232,6 +233,7 @@ export function createLineupUI({root,onAction,onInspect,onModalChange,onNavigate
     root.classList.remove('has-input-focus');
     destroyLocker();
     root.replaceChildren(); root.dataset.section = model.section; root.dataset.readLocked = String(model.readLocked); root.dataset.subview = model.confirmation && !draftStore.wizard ? 'confirmation' : model.route;
+    document.body.dataset.lineupRoute = model.route;
     root.setAttribute('aria-busy', String(model.pending || model.externalBusy));
     if (model.readLocked) readLockedPageView();
     else if (model.inspection) {

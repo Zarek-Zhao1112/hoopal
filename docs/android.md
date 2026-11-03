@@ -2,6 +2,8 @@
 
 ## 运行方式
 
+2026-11-03，1.29.1/code35已保数据覆盖安装同一新手机：训练场/我的一级标题卡外同起线，利用原留白不挤球场，账号内容上移补空。248检查、三组受影响浏览器与独立12项通过；21秒构建、30网页同dist/15原图标/原v2/无server.url。install-r Success，COLD602/Wait608；WV96真实标题几何/玻璃blur/管理返回程序验证通过，两原文hash严格保持，人工观感待确认。见[HC-061](tasks/HC-061-primary-page-headings-release.md)与[当前APK](../artifacts/apk/hoopal-1.29.1.apk)。
+
 2026-11-03，1.29.0/code34已保数据覆盖安装同一ef473680/M2101K9C：三底栏、训练场内450ms玻璃战术库、真实叠卡循环、体型/管理卡外标题。248检查、13组浏览器分段覆盖和独立审查通过；管理标题串页P2修后五/六尺寸复验。32秒构建，30网页同dist、15原图标、原v2证书/无server.url。install-r Success，COLD645/Wait652；真实WebView96完整卡片cycle1、关闭保原战术、管理页返回与前台检查通过，球队/进度两原文hash与安装前即时备份完全一致，未写入示例或新偏好。实际手势/Back/IME/旋转待用户确认，证据分界见[HC-059](tasks/HC-059-training-library-release.md)。[当前APK](../artifacts/apk/hoopal-1.29.0.apk)可发Android平板覆盖安装。
 
 2026-11-02，1.28.0/code33已覆盖安装指定ef473680/M2101K9C，支持按整体体型「挑选战术」、同人数过滤及局部玻璃选单，取消逐人确认门槛。246检查/完整17组/独立审查通过；原生构建24秒，30网页同dist、15原图标/原v2签名/无server.url通过。install-r Success，COLD846/Wait853。安装前为真实1队3v3及pick-roll第1步，WV96程序验证三人草稿取消和四人异人数8组浏览，不写真实偏好；探针起止双原文同备份。随后复查档案仅体型偏好与revision更新，核心球队/成员/旧plans及进度保持；最终整档hash不同已如实记录，不恢复旧备份，也不推定该变化是人工验收。详见[HC-056](tasks/HC-056-body-type-tactic-release.md)，[1.28 APK](../artifacts/apk/hoopal-1.28.0.apk)可直接发Android平板覆盖安装。

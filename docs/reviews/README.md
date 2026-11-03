@@ -4,6 +4,7 @@
 
 | 任务 | 范围 | 结论 | 限制 |
 | --- | --- | --- | --- |
+| [HC-061 一级页面标题](HC-061-primary-page-headings-release.md) | 根标题卡外/既有留白、我的去重与grid、二级隐藏/错误态/玻璃背景 | 独立10项＋真实blur2项/五尺寸通过；248项/主控三组、APK实际SHA、1.29.1安装双hash/WV96程序证据终审核对，无未修P1/P2 | 首次补验选择器错误保留；主控设备证据与独立浏览器分列，人工手势/Back/IME/旋转与观感awaiting_device |
 | [HC-059 训练场库与二级标题正式接入](HC-059-training-library-release.md) | 三tab/玻璃库/体型与球队卡外标题、真实保存与旧来源保护 | 跨页标题P2修后5尺寸独立复验，原15项保持；248项/13组分段/APK/安装双hash/WV96程序证据已核对，无未修P1/P2 | 不是单次整套浏览器通过；主控APK/设备程序与独立Chrome分记，前提失败保留，人工手势/Back/IME/旋转awaiting_device |
 | [HC-058 训练场库与二级标题交互预览](HC-058-training-library-interactive-preview.md) | 独立内存原型、玻璃库/真实播放、卡外标题与数据隔离 | 独立16组/5布局、完整循环、26模板/14目录、206SHA及真实隐藏2项通过；创建人数静态问题修后验证，无未修P1/P2 | 首次hidden前提失败保留，修正focus emulation后独立补验；不是正式1.28/真实存储或APK验收，不碰设备 |
 | [HC-056 整体体型挑选战术](HC-056-body-type-tactic-release.md) | 分类/同人数/玻璃选单、schema2偏好与旧计划、预览/来源保护 | 短屏footer P2已独立复验；26/91/155、独立14组/6布局/存储、246项/完整17组/四入口负例、APK及1.28受限原生程序证据终审通过，无未修P1/P2 | 原生探针起止双hash同，后续观察bodyType/revision变化且严格after拒绝，最终档案hash不同；成员/旧plans/进度同，来源未观察，人工体验awaiting_device |

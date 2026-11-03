@@ -40,6 +40,8 @@ HC-050的training/tactic-picker.js提供标题下展玻璃选单，只持有展�
 
 ## SVG绘制与页面
 
+HC-061的primary-page-headings.css复用.page-top-space承载卡外一级标题，不增加body grid行。lineups draw发布展示用途的body.dataset.lineupRoute，CSS同时按当前tab、teams route和tacticSelection完整体型页约束显示；不依赖WebView96尚不支持的:has。我的卡移除内部页名后将身份/球队/工具grid行在各断点上移，保原真实回调与存储。新标题区域随共用sheet开合一起blur，仍没有交互入口。
+
 board/court-renderer.js提供三种现有画面的共用绘制：
 - createTrainingCourt：主球场、路线、球员、球和角色title，保原DOM ID与导出结构。
 - createLibraryCourt：卡内独立SVG/棋子与逐帧更新，保原data属性与独立surface前缀。

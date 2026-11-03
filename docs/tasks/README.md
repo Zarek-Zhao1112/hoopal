@@ -8,6 +8,7 @@
 
 | 编号 | 任务 | 状态 | 负责人 | 下一步 |
 | --- | --- | --- | --- | --- |
+| [HC-061](HC-061-primary-page-headings-release.md) | 训练场与我的一级标题正式接入 | `awaiting_device` | 主控实现/集成，heading_review独立审查 | 248检查、三组受影响回归与独立12项/五尺寸通过；1.29.1保数据安装，WV96标题/blur/返回与双hash保持，人工观感待验 |
 | [HC-060](HC-060-primary-page-headings-concept.md) | 训练场与我的一级标题效果图 | `completed` | 主控生成/图检/记录 | 双屏静态图已交付，标题置主卡外同起线，保三导航和既有内容；正式1.29不变，待看图讨论 |
 | [HC-059](HC-059-training-library-release.md) | 训练场内战术库与二级标题正式接入 | `awaiting_device` | library_ui面板、headers_ui球队页、tests回归、主控集成、review独立审查 | 248检查/13浏览器组分段覆盖及独立审查通过，串页P2修后5/6尺寸复验；1.29已保数据安装，WV96真实循环/取消/管理检查通过，人工手感待验 |
 | [HC-058](HC-058-training-library-interactive-preview.md) | 训练场内战术库与二级标题交互网页 | `completed` | ui独立预览、主控QA/启动、review独立审查 | 本地网页已打开；三底栏/真实循环/玻璃面板/卡外标题，独立21项及五尺寸通过，206正式文件SHA保持；不改App/手机 |

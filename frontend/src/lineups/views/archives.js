@@ -10,9 +10,7 @@ export function createArchivesView(context){
  function archivesPageView() {
     if (model.route === 'teams') { teamsPageView(); return; }
     const card = node('section', 'lineup-archives-card lineup-account-page');
-    const heading = node('header', 'lineup-archives-heading');
-    heading.append(node('h1', '', '我的'), node('span', '', '球队与账号'));
-    card.append(heading, account.identity());
+    card.append(account.identity());
     const teams = node('section', 'lineup-account-teams lineup-account-glass lineup-team-overview');
     const top = node('header', 'lineup-account-teams-heading'), title = node('div');
     title.append(node('h2', '', '我的球队'), node('span', 'lineup-teams-count', `${model.state.profiles.length} / 20`)); top.append(title); teams.append(top);
