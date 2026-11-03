@@ -3,6 +3,7 @@ import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { templates } from '../../shared/templates.js';
 import { createLineup, validateLineup } from '../../shared/lineups.js';
+import {libraryControls} from './library-flow-helpers.mjs';
 import {confirmedRoleArchive} from './role-fixtures.mjs';
 
 /** Exercise the real training board in the runner's disposable browser profile. */
@@ -134,7 +135,7 @@ export async function runTrainingViewingFlow({ send, evaluate, wait, waitFor, fo
     await click('#restart-play'); await waitFor("document.querySelector('#play-toggle').getAttribute('aria-pressed')==='true'&&Number(document.querySelector('#timeline-scrub').value)>1");
     assert.equal(await evaluate("document.querySelector('#play-toggle').getAttribute('aria-label')"), '暂停战术');
     assert.equal(await evaluate("document.querySelector('#template-picker').disabled&&document.querySelector('#mode').disabled"), true, 'changing tactics or size is blocked while playing');
-    assert.equal(await evaluate("document.querySelector('#training-picker-trigger').disabled"), true, 'the visible tactic trigger is also blocked while playing');
+    assert.equal(await evaluate("!document.querySelector('#open-tactic-library').disabled"), true, 'library entry can pause current playback without snapping');
     await click('#play-toggle'); assert.equal(await evaluate("document.querySelector('#play-toggle').getAttribute('aria-pressed')"), 'false');
     const paused = await facts(); await wait(120); assert.deepEqual(await facts(), paused, 'pause has no continuing animation or delayed source writes');
     await click('#frame-list [data-frame-index="1"]');
@@ -165,18 +166,15 @@ export async function runTrainingViewingFlow({ send, evaluate, wait, waitFor, fo
     assert.equal(await evaluate("document.querySelector('#timeline-scrub').value"), '1000', 'non-loop playback stops at the actual final frame');
     await click('.loop-label'); await click('#restart-play');
     await waitFor("Number(document.querySelector('#timeline-scrub').value)>10");
-    await nav('library'); const left = await facts(); await wait(180); assert.deepEqual(await facts(), left, 'leaving training stops the main animation');
+    await nav('archives'); const left = await facts(); await wait(180); assert.deepEqual(await facts(), left, 'leaving training stops the main animation');
     assert.equal(await evaluate("document.querySelector('#play-toggle').getAttribute('aria-pressed')"), 'false');
     await nav('play'); assert.equal(await evaluate("document.querySelector('#play-toggle').getAttribute('aria-pressed')"), 'false', 'returning does not silently restart');
     const resized = await facts();
     for (const [width, height] of [[844, 390], [390, 844]]) { await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: true }); await wait(100); assert.deepEqual(await facts(), resized, 'rotation preserves exact current board and progress'); }
-    await click('#training-picker-trigger');
-    await waitFor("document.querySelector('#training-tactic-picker').dataset.phase==='open'");
-    await key('End'); await key('Enter');
+    const lc=libraryControls({send,evaluate,wait,waitFor});await lc.open();
     const target = templates.filter(t => t.mode === '3v3' && t.kind === 'offense').at(-1);
-    await waitFor(`!document.body.classList.contains('is-loading')&&document.querySelector('#template-picker').value===${JSON.stringify(target.id)}`);
-    await waitFor("document.querySelector('#training-tactic-picker').dataset.phase==='closed'");
-    assert.equal(await evaluate("document.querySelector('#training-title').textContent"), target.title, 'the visible title picker selects a real built-in tactic');
-    natural.push({ kind: 'loop-off-final-stop-leave-resize-title-selection', stoppedProgress: 1000, selectedTemplate: target.id });
+    await lc.choose(target.id);
+    assert.equal(await evaluate("document.querySelector('#training-title').textContent"),target.title,'library selects a real builtin under the static training title');
+    natural.push({kind:'loop-off-final-stop-leave-resize-library-selection',stoppedProgress:1000,selectedTemplate:target.id});
   }
 }

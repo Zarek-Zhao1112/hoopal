@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 export async function navigateLineupView({ evaluate, waitFor }, view) {
   await evaluate(`document.querySelector('[data-view-target="${view}"]').click()`);
   await waitFor(`document.body.dataset.view===${JSON.stringify(view)}&&!document.body.dataset.pageTransition`);
+  if(view==='archives'&&await evaluate("Boolean(document.querySelector('[data-action=teams-open]'))")) await evaluate("document.querySelector('[data-action=teams-open]').click()");
 }
 
 export async function findArchiveCard(context, id) {

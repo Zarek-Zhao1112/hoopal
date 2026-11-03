@@ -1,0 +1,21 @@
+/* Secondary pages share the workspace frame, independent of the tab beneath. */
+body.page-layout[data-tactic-selection=true] #lineup-brand-header{display:none}
+body.page-layout[data-tactic-selection=true]{grid-template-rows:108px minmax(0,1fr) 73px}
+body.page-layout[data-tactic-selection=true] .page-top-space{display:block}
+body.page-layout[data-tactic-selection=true] .workspace{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);padding:8px 18px 10px;gap:0}
+body.page-layout[data-tactic-selection=true] .workspace>.lineups-panel,body.page-layout[data-tactic-selection=true] .workspace>.training-panel{display:none!important}
+body.page-layout[data-tactic-selection=true] .view-nav{position:relative;right:auto;bottom:auto;width:min(440px,calc(100% - 36px));height:61px;margin:0 auto 12px;padding:4px;align-self:end}
+body.page-layout[data-view=play] .training-title-static{display:flex;align-items:center;min-width:0;overflow:hidden}
+body.page-layout[data-view=play] #template-picker[hidden]{display:none!important}
+body.page-layout[data-view=play] #open-tactic-library{min-width:64px;min-height:36px;padding:5px 9px;font-size:12px;white-space:nowrap}
+body.page-layout[data-view=play] #play-header-controls #mode{display:none}
+@media(max-height:700px) and (max-width:699px){
+ body.page-layout[data-tactic-selection=true]{grid-template-rows:70px minmax(0,1fr) 60px}
+ body.page-layout[data-tactic-selection=true] .workspace{padding:4px 16px 8px}
+ body.page-layout[data-tactic-selection=true] .view-nav{height:50px;margin-bottom:8px}
+}
+@media(min-width:600px) and (max-height:600px){
+ body.page-layout[data-tactic-selection=true]{grid-template-rows:38px minmax(0,1fr) 51px}
+ body.page-layout[data-tactic-selection=true] .workspace{padding:0 14px 6px}
+ body.page-layout[data-tactic-selection=true] .view-nav{height:45px;margin-bottom:5px;width:340px}
+}

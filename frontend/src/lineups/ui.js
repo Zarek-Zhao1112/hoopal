@@ -173,7 +173,13 @@ export function createLineupUI({root,onAction,onInspect,onModalChange,onNavigate
 
   function readLockedPageView() {
     const card = node('section', 'lineup-read-error');
-    const heading = node('h1', '', model.section === 'archives' ? '我的' : '更衣室');
+    const managing = model.section === 'archives' && model.route === 'teams';
+    if (managing) {
+      const head = node('header', 'lineup-secondary-heading'); head.id = 'team-management-header';
+      const back = button('‹', 'teams-back', () => handleBack(), { className: 'icon-button', title: '返回我的' }); back.setAttribute('aria-label', '返回我的');
+      const copy = node('div'); copy.append(node('h1', '', '球队管理'), node('p', '', '本机档案')); head.append(back, copy); root.append(head);
+    }
+    const heading = node(managing ? 'h2' : 'h1', '', managing ? '读取本机球队' : model.section === 'archives' ? '我的' : '更衣室');
     const message = node('div', 'lineup-read-error-message');
     message.setAttribute('role', 'status');
     message.append(node('h2', '', '档案暂时无法读取'), node('p', '', '读取恢复前不会覆盖本机档案。\n请重试读取，再继续选择或创建球队。'));
@@ -204,7 +210,7 @@ export function createLineupUI({root,onAction,onInspect,onModalChange,onNavigate
       wrap.append(button('保留阵容', 'lineup-delete-cancel', () => { model.confirmation = null; draw(); }));
       wrap.append(button('删除阵容与成员', 'lineup-delete-confirm', () => {
         const id = model.confirmation.id;
-        perform('delete', { id }, () => { draftStore.drafts.delete(id); draftStore.baselines.delete(id); model.confirmation = null; model.route = 'profiles'; });
+        perform('delete', { id }, () => { draftStore.drafts.delete(id); draftStore.baselines.delete(id); model.confirmation = null; model.route = model.section === 'archives' ? 'teams' : 'profiles'; });
       }, { className: 'button lineup-danger', disabled: !profile }));
     } else {
       wrap.append(node('h2', '', '配置尚未保存'), node('p', '', '可以继续填写，或保留草稿返回。离开本次应用前请明确保存。'));
@@ -251,7 +257,11 @@ export function createLineupUI({root,onAction,onInspect,onModalChange,onNavigate
     if (archiveMenu.open) { closeArchiveMenu(); return true; }
     if (sheet.isOpen) { requestWizardClose(); return true; }
     if (model.confirmation) { model.confirmation = null; draw(); return true; }
-    if (model.route !== 'profiles') { model.route = 'profiles'; draw(); return true; }
+    if (model.route !== 'profiles') {
+      const fromTeams = model.route === 'teams'; model.route = 'profiles'; draw();
+      if (fromTeams) document.defaultView?.requestAnimationFrame(() => root.querySelector('[data-action="teams-open"]')?.focus({ preventScroll: true }));
+      return true;
+    }
     return false;
   }
  // Feature modules receive explicit state and live callbacks, never storage.

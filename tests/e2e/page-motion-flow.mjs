@@ -12,7 +12,7 @@ export async function runPageMotionFlow({send,evaluate,wait,waitFor,folder}){
     await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<1000});
     await wait(100); // Allow the metric change's async resize events before starting a transition.
     await nav('lineups');await settled();
-    for(const to of ['play','library','archives','lineups']){
+    for(const to of ['play','archives','lineups']){
       const from=await evaluate('document.body.dataset.view');
       const counts=await evaluate("({ids:[...document.querySelectorAll('[id]')].filter(n=>!n.closest('#lineups-panel')).map(n=>n.id),nav:document.querySelectorAll('[data-view-target]').length})");
       // Read in the same JS task as click, before the first animation frame.
@@ -23,7 +23,7 @@ export async function runPageMotionFlow({send,evaluate,wait,waitFor,folder}){
       assert.ok(Math.abs(state.x-state.expectedX)<1&&Math.abs(state.y-state.expectedY)<1,'circle uses target navigation center');
       assert.ok(state.radius>=Math.hypot(Math.max(state.x,width-state.x),Math.max(state.y,height-state.y)));
       const retained=await evaluate("[...document.querySelectorAll('[id]')].filter(n=>!n.closest('#lineups-panel')).map(n=>n.id)");
-      assert.deepEqual(retained.slice().sort(),counts.ids.slice().sort(),'snapshot preserves fixed application IDs while the shared lineup root legitimately changes view');assert.equal(new Set(state.ids).size,state.ids.length,'snapshot cannot duplicate IDs in application selectors');assert.equal(state.nav,counts.nav);assert.equal(state.nav,4);
+      assert.deepEqual(retained.slice().sort(),counts.ids.slice().sort(),'snapshot preserves fixed application IDs while the shared lineup root legitimately changes view');assert.equal(new Set(state.ids).size,state.ids.length,'snapshot cannot duplicate IDs in application selectors');assert.equal(state.nav,counts.nav);assert.equal(state.nav,3);
       assert.equal(state.mask,'none','initial old page is fully visible');assert.ok(state.capture<250,`snapshot preparation fits interaction budget: ${state.capture}ms`);
       const halo=await evaluate(`(()=>{const h=document.querySelector('[data-page-transition=snapshot]'),g=document.querySelector('[data-page-transition=glow]'),n=document.querySelector('.view-nav');return{count:document.querySelectorAll('[data-page-transition=glow]').length,effect:h?.dataset.effect,feather:Number(h?.dataset.feather),hidden:g?.getAttribute('aria-hidden'),pointer:g&&getComputedStyle(g).pointerEvents,above:Number(getComputedStyle(n).zIndex)>Number(getComputedStyle(g).zIndex),ordered:h?.nextElementSibling===g}})()`);
       assert.equal(halo.count,1);assert.equal(halo.effect,'soft-glow');assert.equal(halo.hidden,'true');assert.equal(halo.pointer,'none');assert.ok(halo.above&&halo.ordered);assert.ok(halo.feather>=36&&halo.feather<=72);
@@ -43,12 +43,12 @@ export async function runPageMotionFlow({send,evaluate,wait,waitFor,folder}){
       if(to==='play')assert.ok(await evaluate("document.querySelector('#storage-status').hidden&&!document.querySelector('#storage-status').textContent"),'normal offline status text removed');
     }
   }
-  await evaluate("document.querySelector('[data-view-target=play]').click();document.querySelector('[data-view-target=library]').click();document.querySelector('[data-view-target=lineups]').click()");
+  await evaluate("document.querySelector('[data-view-target=play]').click();document.querySelector('[data-view-target=archives]').click();document.querySelector('[data-view-target=lineups]').click()");
   assert.equal(await evaluate('document.body.dataset.view'),'lineups');assert.equal(await evaluate(layers),2);
   await settled();await nav('lineups');assert.equal(await evaluate(layers),0,'same page does not animate');
   await nav('play');await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await settled();
   assert.equal(await evaluate('document.body.dataset.pageTransitionLastReason'),'resize');
-  await nav('library');await evaluate('window.dispatchEvent(new Event("pagehide"))');await settled();
+  await nav('archives');await evaluate('window.dispatchEvent(new Event("pagehide"))');await settled();
   assert.equal(await evaluate('document.body.dataset.pageTransitionLastReason'),'pagehide');
   await nav('play');await evaluate("document.querySelector('#open-menu').click()");
   assert.equal(await evaluate(layers),0);assert.equal(await evaluate("document.querySelector('#workspace-menu').open"),true);

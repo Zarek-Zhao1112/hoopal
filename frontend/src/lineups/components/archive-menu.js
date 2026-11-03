@@ -73,7 +73,7 @@ function renderArchiveMenu() {
       archiveMenu.append(button('保留球队', 'lineup-delete-cancel', () => { menuState.deleting = false; renderArchiveMenu(); }));
       archiveMenu.append(button('删除球队与成员', 'lineup-delete-confirm', () => {
         const id = menuState.id;
-        perform('delete', { id }, () => { draftStore.drafts.delete(id); draftStore.baselines.delete(id); closeArchiveMenu({ force: true }); model.route = 'profiles'; });
+        perform('delete', { id }, () => { draftStore.drafts.delete(id); draftStore.baselines.delete(id); closeArchiveMenu({ force: true }); model.route = model.section === 'archives' ? 'teams' : 'profiles'; });
       }, { className: 'button lineup-danger', data: { profileId: profile.id } }));
     } else {
       archiveMenu.append(button(dirty(profile.id) ? '继续未保存配置' : '配置球员', 'lineup-configure', () => editFromMenu(3), { data: { profileId: profile.id } }));

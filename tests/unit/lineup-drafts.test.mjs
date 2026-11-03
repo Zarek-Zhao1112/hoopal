@@ -56,6 +56,26 @@ test('opening a non-current member binds the edit to that profile and member', (
   assert.equal(h.draftStore.wizard.step, 3); assert.equal(h.commits.length, 0);
 });
 
+test('creation dismissed from team management retains its draft and returns to that route', () => {
+  const h = harness(); h.model.route = 'teams'; h.controller.beginCreate();
+  h.draftStore.createDraft.name = '留在管理页的草稿';
+  h.controller.closeWizard(false);
+  assert.equal(h.model.route, 'teams');
+  assert.equal(h.draftStore.createDraft.name, '留在管理页的草稿');
+  assert.equal(h.closes, 1); assert.equal(h.commits.length, 0);
+});
+
+test('successful member edit returns to team management without dropping another create draft', () => {
+  const h = harness(); h.model.route = 'teams';
+  h.draftStore.beginCreate().name = '未提交的另一支队';
+  h.controller.beginEdit(h.saved); h.draftStore.drafts.get(h.saved.id).players[0].name = '已编辑队员';
+  h.controller.saveWizard();
+  assert.equal(h.commits[0].kind, 'update'); h.commits[0].success();
+  assert.equal(h.model.route, 'teams');
+  assert.equal(h.draftStore.createDraft.name, '未提交的另一支队');
+  assert.equal(h.draftStore.drafts.has(h.saved.id), false);
+});
+
 test('discard close binds to the active wizard, not another retained draft', () => {
   const h = harness(); h.controller.beginEdit(h.saved); h.draftStore.drafts.get(h.saved.id).name = '留下编辑';
   h.controller.beginCreate(); h.controller.closeWizard(true);

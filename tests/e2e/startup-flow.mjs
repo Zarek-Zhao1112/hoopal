@@ -118,7 +118,7 @@ export async function runStartupFlow({ send, evaluate, wait, folder }) {
     const view=await evaluate('document.body.dataset.view');
     await evaluate("document.querySelector('[data-view-target=play]').click()");
     assert.equal(await evaluate('document.body.dataset.view'),view,'startup guard blocks background button activation');
-    const point=await evaluate("(()=>{const r=document.querySelector('[data-view-target=library]').getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2}})()");
+    const point=await evaluate("(()=>{const r=document.querySelector('[data-view-target=archives]').getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2}})()");
     await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[point]});await send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
     assert.equal(await evaluate('document.body.dataset.view'),view,'startup overlay blocks actual background touch');
     await send('Input.dispatchKeyEvent',{type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});await send('Input.dispatchKeyEvent',{type:'keyUp',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});assert.equal(await evaluate('document.activeElement.id'),'startup-skip');

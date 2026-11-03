@@ -1,7 +1,7 @@
 import { splitNote } from './state.js';
 import { createPageTransition } from './page-transition.js';
 
-const VIEWS = new Set(['lineups', 'play', 'library', 'archives']);
+const VIEWS = new Set(['lineups', 'play', 'archives']);
 
 /** View state is intentionally separate from Play and persistent storage. */
 export function createWorkspaceController({

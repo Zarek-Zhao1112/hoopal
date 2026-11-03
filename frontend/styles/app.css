@@ -15,6 +15,6 @@
 @import './training-legend.css';
 @import './lineup-frame.css';
 @import '../src/training/view.css';
-@import '../src/training/tactic-picker.css';
 @import '../src/lineups/wizard/basic-layout.css';
 @import '../src/selection/styles.css';
+@import './library-integration.css';

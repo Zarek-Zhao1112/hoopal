@@ -1,5 +1,11 @@
 # Android 接入验证记录
 
+## 1.29.0训练场内战术库（2026-11-03）
+
+三导航/450ms玻璃库/真实循环和卡外二级标题已接入，248单元HTTP检查通过。13个浏览器大组按同一JS构建分段覆盖，真实管理CSS串页P2修复后六尺寸跨页及五尺寸独立复验通过；两处旧“列表同时可见”前提改为内部滚动后逐卡真实中心检查，原失败保留。[汇总](../artifacts/qa/hc059-browser-coverage.json)列每组来源，不能称为单次全套通过。独立15项加五尺寸复验、内置选择写失败保持实际SVG/进度与重试补验均通过，无未修P1/P2。
+
+1.29.0/code34 APK 4,837,885B，SHA256 `2a9cb83508496dd07d23dee82feaebd52ae37b8975f848066d623d4d33b2ee36`，32秒原生构建；30网页逐hash同dist、15图标同原、原v2与离线配置通过。指定新机保数据install-r Success，COLD645/Wait652；真实WebView96三tab、库完整cycle1/单RAF、取消保持和管理标题/返回程序检查通过。安装前后球队和选择原文双hash一致，未造队/提交体型或新战术。人工物理交互待验，见[HC-059](tasks/HC-059-training-library-release.md)与[独立审查](reviews/HC-059-training-library-release.md)。
+
 ## 1.28.0整体体型挑选战术（2026-11-02）
 
 用户批准HC055纯体型方案，入口改名/按队偏好/严格同人数/进攻防守玻璃选单/真实循环与编号演练已接入。新分类共14组可达，原26顺序/155帧/91职责与roleVersion保持；旧rolePlans兼容读写，bodyType坏字段只隔离自身并备份，调用时快照/并发版本/换队/失败重试保护通过。246单元/HTTP、4个实际npm/Android分类gate负例与[完整17组](../artifacts/qa/runs/1.28.0-1793607069188/run.json)通过，零runtime/remote且自有临时进程清理。

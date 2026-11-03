@@ -20,9 +20,9 @@ function openTeamPicker() { if (draftStore.wizard) { draftStore.wizard.step = 2;
 function beginCreate() {
     if (sheet.closing || model.state.profiles.length >= 20) return;
     draftStore.beginCreate();
-    const originSection = model.section;
+    const originSection = model.section, originRoute = model.route;
     model.route = 'create'; model.confirmation = null; model.feedback = '';
-    draftStore.wizard = { kind: 'create', id: draftStore.createDraft.id, step: 1, maxStep: 1, originSection, originRoute: 'profiles', teamPage: Math.max(0, Math.floor(NBA_TEAMS.findIndex(team => team.id === draftStore.createDraft.nbaTeamId) / 12)) }; draw();
+    draftStore.wizard = { kind: 'create', id: draftStore.createDraft.id, step: 1, maxStep: 1, originSection, originRoute, teamPage: Math.max(0, Math.floor(NBA_TEAMS.findIndex(team => team.id === draftStore.createDraft.nbaTeamId) / 12)) }; draw();
   }
 
 function wizardDraft() { return draftStore.wizard?.kind === 'create' ? draftStore.createDraft : draftStore.drafts.get(draftStore.wizard?.id); }
@@ -33,7 +33,7 @@ function closeWizard(discard = false) {
     if (discard) {
       draftStore.discard(source);
     }
-    draftStore.wizard = null; model.confirmation = null; model.feedback = ''; model.section = source.originSection || model.section; model.route = 'profiles'; destroyTeamCarousel(); sheet.close(); draw();
+    draftStore.wizard = null; model.confirmation = null; model.feedback = ''; model.section = source.originSection || model.section; model.route = source.originRoute === 'teams' ? 'teams' : 'profiles'; destroyTeamCarousel(); sheet.close(); draw();
   }
 
 function requestWizardClose() {
@@ -78,7 +78,7 @@ function saveWizard() {
       const savedId = source.kind === 'create' ? model.state.activeProfileId : source.id;
       const index = model.state.profiles.findIndex(item => item.id === savedId); if (index >= 0) model.profilePage = Math.floor(index / 3);
       model.section = source.originSection || model.section;
-      draftStore.wizard = null; model.confirmation = null; model.route = 'profiles'; model.feedback = '配置已保存。'; destroyTeamCarousel();
+      draftStore.wizard = null; model.confirmation = null; model.route = source.originRoute === 'teams' ? 'teams' : 'profiles'; model.feedback = '配置已保存。'; destroyTeamCarousel();
       if (source.kind === 'create') model.afterSheetNavigation = 'lineups';
       sheet.close();
     });

@@ -24,6 +24,10 @@ shared不引用DOM、存储、Capacitor或HTTP。页面通过操作回调进入�
 
 ## 应用入口与播放
 
+HC-059将独立library页与标题下拉整合为selection/ui.js管理的玻璃战术库：workspace仅lineups/play/archives三路由，训练场静态标题旁按钮和更衣室挑选快捷入口打开同一组件。库复用lineups/components/sheet.js的450ms原生dialog隔离壳，data-lineup-owned避免公共弹窗接管；内部单卡复用library-preview真实时钟。完整体型二级页占workspace但不改变底层路由，返回回原库；source=team锁人数，source=library可异人数只读浏览，匹配当前队才交session保存体型。
+
+选用沿clearContext→保存新内置ID/合法步骤→替换Play执行；记录失败不替换原Play/精确位置/SVG，可靠解除的旧来源不恢复。onClose在关闭动画结束后才导航，opening/closing全程锁背景，主训练无取整暂停。旧tactic-picker/selection/picker/library-deck模块留作历史兼容，不进入当前应用组合；下文HC-050/056描述为对应版本历史。
+
 main.js先挂载startup单例，再动态加载app.js。app读取内置选择与档案、完成页面渲染后调用ready；读取失败继续展示原错误和重试，不能用默认空柜覆盖未知资料。启动时序保持1000ms静止、1100ms展开、300ms交接，跳过/后台/减少动效的门控保持。导航、弹窗、键盘与Android Back共享启动保护。
 
 app.js负责初始化、当前战术/档案来源、保存和后台串行协调，组合页面、播放器与绘图接口。训练播放状态由training/player.js独占，参数注入帧调度、时间、速度/循环和onFrame/onComplete；提供play、pause、seek、load、destroy与只读状态。训练段在1倍速为2.4秒、前18%停留，循环末停为1.2/倍率秒，暂停取整与手动进度策略保持；旧回调token不能启动第二个RAF。
@@ -43,9 +47,11 @@ board/court-renderer.js提供三种现有画面的共用绘制：
 
 appearance.js提供显式SVG木地板、颜色与棋子；hit-test.js处理阵营/球的可见性。共用绘制保留主场、库卡和缩略图已有差异，不合并它们的播放或保存策略。
 
-workspace/controller.js管理更衣室(lineups)、训练场(play)、战术库(library)、档案(archives)及公共弹窗。state.js提供分页与长文字分段；page-transition/soft-glow管理600ms柔光取消、快速切换和减少动效。页面状态不写入Play。
+workspace/controller.js当前管理更衣室(lineups)、训练场(play)、我的(archives)三路由及公共弹窗；HC-056及以前的library路由已退出应用入口。state.js提供分页与长文字分段；page-transition/soft-glow管理600ms柔光取消、快速切换和减少动效。页面状态不写入Play。
 
 ## 阵容界面与样式
+
+HC-059的archives内部新增teams完整管理route；我的页保当前球队概览和管理入口，管理标题/返回为玻璃卡外的兄弟元素。wizard originRoute与originSection一起恢复，取消/编辑保存回管理页，创建成功仍进入更衣室；菜单删除后留管理页，保原草稿/实际session和读锁。组件样式位于views/team-management.css，全局library-integration.css负责任意tab之上的完整体型页框架。
 
 frontend/previews/account-center是独立HTML/CSS/JS原型，不被正式index/app导入，不进入默认Vite/APK打包。仅内存演示个人中心及玻璃登录交互；真实账号、云备份与本地档案的接入不由原型承担。原型源码随Git同步，截图/验收仍进artifacts，范围见[HC-045](tasks/HC-045-account-center-preview.md)。
 

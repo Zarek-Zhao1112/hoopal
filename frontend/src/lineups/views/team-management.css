@@ -1,0 +1,53 @@
+/* HC-059: secondary navigation sits outside the team's glass surface. */
+#lineups-panel .lineup-team-overview{grid-template-rows:auto minmax(0,1fr) auto;align-items:stretch}
+#lineups-panel .lineup-team-overview.has-create-draft{grid-template-rows:auto minmax(0,1fr) auto auto}
+.lineup-team-overview-copy{display:flex;align-items:center;gap:14px;min-width:0;min-height:0;padding:4px 2px}
+.lineup-team-overview-copy>.lineup-crest{width:52px;height:52px;object-fit:contain;flex-shrink:0}
+.lineup-team-overview-copy>div{min-width:0}
+.lineup-team-overview-copy strong{display:block;max-width:100%;color:#3b647e;font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lineup-team-overview-copy p,.lineup-team-draft-hint{margin:7px 0 0;color:#7b98ac;font-size:11px;line-height:1.7}
+.lineup-team-draft-hint{margin:0}
+#lineups-panel .lineup-teams-open{width:100%;min-height:40px;margin:0}
+body[data-view=archives] #lineups-panel[data-section=archives][data-subview=teams]{display:flex;flex-direction:column;gap:16px;overflow:hidden}
+.lineup-secondary-heading{display:flex;flex-shrink:0;align-items:center;gap:12px;min-width:0;min-height:55px;padding:0 3px}
+.lineup-secondary-heading>.icon-button{width:42px;height:42px;min-width:42px;min-height:42px;border:1px solid #c3d7e4;border-radius:50%;background:#edf6fbc7;color:#527e9b;font-size:28px;line-height:1}
+.lineup-secondary-heading>div{min-width:0}
+.lineup-secondary-heading h1{margin:0;color:#355d77;font-size:24px;font-weight:650;line-height:1.3}
+.lineup-secondary-heading p{margin:5px 0 0;color:#819fb3;font-size:11px;line-height:1.5}
+#lineups-panel>.lineup-teams-page{display:flex;flex:1;min-width:0;min-height:0;width:100%;overflow:hidden}
+#lineups-panel>.lineup-teams-page>.lineup-account-teams{flex:1;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:14px;min-width:0;min-height:0;width:100%;padding:18px;border:1px solid #c4d4df;border-radius:20px;background:linear-gradient(140deg,#f7fbfddf,#edf5f9c7);box-shadow:inset 0 1px #fff,0 8px 20px #5b80951a;overflow:hidden}
+.lineup-teams-page .lineup-archive-list{display:flex;flex-direction:column;gap:12px;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:2px}
+.lineup-teams-page .lineup-archive-card{flex:1 0 108px;max-height:180px}
+.lineup-teams-page .lineup-archive-create{flex-shrink:0;margin:0;width:100%;min-height:42px}
+.lineup-teams-page .lineup-account-teams-heading{flex-shrink:0}
+.lineup-teams-page .lineup-account-teams-heading{display:flex;grid-template-rows:none;min-height:26px}
+.lineup-teams-page .lineup-archives-empty{flex:1;min-height:100px}
+#lineups-panel[data-subview=teams]>.lineup-read-error{flex:1}
+#lineups-panel[data-subview=teams]>.lineup-read-error>h2{margin:0;color:#355d77;font-size:18px}
+@media(max-height:700px){
+ body[data-view=archives] #lineups-panel[data-section=archives][data-subview=teams]{gap:10px}
+ .lineup-secondary-heading{min-height:44px;gap:10px}
+ .lineup-secondary-heading h1{font-size:21px}
+ .lineup-secondary-heading p{font-size:10px;margin-top:3px}
+ .lineup-secondary-heading>.icon-button{width:36px;height:36px;min-width:36px;min-height:36px}
+ #lineups-panel>.lineup-teams-page>.lineup-account-teams{padding:12px;gap:9px}
+ .lineup-teams-page .lineup-archive-card{flex-basis:93px}
+ .lineup-team-overview-copy>.lineup-crest{width:42px;height:42px}
+ .lineup-team-overview-copy strong{font-size:15px}
+}
+@media(max-height:450px){
+ body[data-view=archives] #lineups-panel[data-section=archives][data-subview=teams]{gap:6px}
+ .lineup-secondary-heading{min-height:34px;gap:8px}
+ .lineup-secondary-heading h1{font-size:18px}
+ .lineup-secondary-heading p{margin-top:1px;font-size:9px}
+ .lineup-secondary-heading>.icon-button{width:32px;height:32px;min-width:32px;min-height:32px;font-size:24px}
+ #lineups-panel>.lineup-teams-page>.lineup-account-teams{padding:9px;gap:6px}
+ .lineup-teams-page .lineup-archive-card{flex-basis:82px;padding:8px}
+ .lineup-teams-page .lineup-archive-create{min-height:34px;font-size:11px}
+ .lineup-team-overview-copy{gap:9px}
+ .lineup-team-overview-copy strong{font-size:13px}
+ .lineup-team-overview-copy p{font-size:10px;margin-top:3px}
+ .lineup-team-overview-copy>.lineup-crest{width:32px;height:32px}
+ #lineups-panel .lineup-teams-open{min-height:32px;font-size:11px}
+ .lineup-team-draft-hint{display:none}
+}

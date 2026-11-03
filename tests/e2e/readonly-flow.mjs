@@ -2,9 +2,10 @@ import assert from 'node:assert/strict';
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import {templates} from '../../shared/templates.js';
+import {libraryControls} from './library-flow-helpers.mjs';
 
 export async function runReadOnlyFlow({send,evaluate,wait,waitFor,folder,downloadFolder}) {
-  const nav=async view=>evaluate(`document.querySelector('[data-view-target=${view}]').click()`);
+  const c=libraryControls({send,evaluate,wait,waitFor}),nav=c.nav;
   assert.equal(await evaluate('document.body.dataset.view'),'lineups');
   assert.ok(await evaluate("!document.querySelector('[data-view-target=edit],[data-tool],#frame-note,#add-frame,#delete-frame,#undo,#redo,#reset,#edit-note-dialog,#saved-list,#save-play,#new-play,#import-file')"));
   await evaluate("localStorage.setItem('halfcourt-draft-v1','{old-private-play}');localStorage.setItem('halfcourt-library-v1','[\"old-private-library\"]');localStorage.setItem('halfcourt-library-v1.corrupt-old','old-copy');localStorage.setItem('unrelated-setting','keep')");
@@ -14,22 +15,9 @@ export async function runReadOnlyFlow({send,evaluate,wait,waitFor,folder,downloa
   assert.equal(await evaluate("localStorage.getItem('halfcourt-library-v1.corrupt-old')"),null);
   assert.equal(await evaluate("localStorage.getItem('unrelated-setting')"),'keep');
   for(const mode of ['3v3','4v4'])for(const kind of ['offense','defense']) {
-    await nav('library');
-    await evaluate(`document.querySelector('[data-kind-target=${kind}]').click()`);
-    if(await evaluate("document.querySelector('#mode').value")!==mode) {
-      await evaluate(`(()=>{let n=document.querySelector('#mode');n.value=${JSON.stringify(mode)};n.dispatchEvent(new Event('change'))})()`);
-      await waitFor(`!document.body.classList.contains('is-loading')&&document.querySelector('#mode').value===${JSON.stringify(mode)}`);
-    }
-    await nav('library');
-    await evaluate(`document.querySelector('[data-kind-target=${kind}]').click()`);
-    const first=templates.find(t=>t.mode===mode&&t.kind===kind);
-    await evaluate(`document.querySelector('[data-template-id="${first.id}"]').click()`);
-    await evaluate(`document.querySelector('[data-play-template="${first.id}"]').click()`);
-    await waitFor(`!document.body.classList.contains('is-loading')&&document.querySelector('#template-picker').value===${JSON.stringify(first.id)}`);
-    await waitFor("document.querySelector('#play-toggle').getAttribute('aria-pressed')==='true'");
-    await evaluate("document.querySelector('#play-toggle').click()");
     for(const template of templates.filter(t=>t.mode===mode&&t.kind===kind)) {
-      await evaluate(`(()=>{let n=document.querySelector('#template-picker');n.value=${JSON.stringify(template.id)};n.dispatchEvent(new Event('change'))})()`);
+      await c.open();if(await evaluate("document.querySelector('#tactic-library-dialog').dataset.mode")!==mode)await c.mode(mode);await c.kind(kind);await c.choose(template.id);
+
       await waitFor(`!document.body.classList.contains('is-loading')&&document.querySelector('#template-picker').value===${JSON.stringify(template.id)}`);
       const frameCount=template.build().frames.length;
       assert.equal(await evaluate("document.querySelectorAll('#frame-list button').length"),frameCount);
@@ -48,7 +36,7 @@ export async function runReadOnlyFlow({send,evaluate,wait,waitFor,folder,downloa
   await evaluate("document.querySelector('#restart-play').click()");await wait(250);
   assert.equal(await evaluate("document.querySelectorAll('#players-layer [data-player]').length"),4);
   assert.equal(await evaluate("document.querySelectorAll('#ball-layer [data-ball]').length"),0,'training court opponent ball remains hidden while moving');
-  assert.equal(await evaluate("[...document.querySelectorAll('#template-list .library-card-court')].reduce((n,b)=>n+Number(b.dataset.rafCount||0),0)"),0,'hidden library previews have no running frame callbacks');
+  assert.equal(await evaluate("[...document.querySelectorAll('#tactic-library-dialog [data-action=selection-preview]')].reduce((n,b)=>n+Number(b.dataset.rafCount||0),0)"),0,'hidden library previews have no running frame callbacks');
   await evaluate("document.querySelector('#play-toggle').click();(()=>{let n=document.querySelector('#timeline-scrub');n.value=100;n.dispatchEvent(new Event('input'))})()");
   assert.equal(await evaluate("document.querySelectorAll('#ball-layer [data-ball]').length"),0);
   await evaluate("document.querySelector('#toggle-defense').checked=true;document.querySelector('#toggle-defense').dispatchEvent(new Event('change'))");

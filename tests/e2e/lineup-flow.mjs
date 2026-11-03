@@ -4,13 +4,14 @@ import path from 'node:path';
 import {createLineup} from '../../shared/lineups.js';
 import {confirmedRolePlan} from './role-fixtures.mjs';
 import {NBA_TEAMS} from '../../data/nba-teams.js';
-import {findLibraryCard} from './library-deck-helpers.mjs';
+import {libraryControls} from './library-flow-helpers.mjs';
 import {beginArchiveCreate,selectArchive,openArchiveMenu} from './archive-helpers.mjs';
 import {waitForWizardMotion} from './wizard-helpers.mjs';
 
 export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
+  const lc=libraryControls({send,evaluate,wait,waitFor});
   const action=async(id,extra='')=>{await evaluate(`(()=>{const b=document.querySelector('[data-action="${id}"]${extra}');if(!b)throw Error('missing ${id}');b.click()})()`);await waitForWizardMotion({waitFor})};
-  const nav=async view=>{await evaluate(`document.querySelector('[data-view-target=${view}]').click()`);if(!await evaluate("Boolean(document.querySelector('dialog[open]'))"))await waitFor(`document.body.dataset.view===${JSON.stringify(view)}&&!document.body.dataset.pageTransition`)};
+  const nav=async view=>{await evaluate(`document.querySelector('[data-view-target=${view}]').click()`);if(!await evaluate("Boolean(document.querySelector('dialog[open]'))"))await waitFor(`document.body.dataset.view===${JSON.stringify(view)}&&!document.body.dataset.pageTransition`);if(view==='archives'&&await evaluate("Boolean(document.querySelector('[data-action=teams-open]'))"))await evaluate("document.querySelector('[data-action=teams-open]').click()")};
   const input=async(id,value)=>evaluate(`(()=>{let n=document.querySelector('[data-action="${id}"]');n.value=${JSON.stringify(value)};n.dispatchEvent(new Event('input',{bubbles:true}))})()`);
   const disk="JSON.parse(localStorage.getItem('halfcourt-lineups-v1'))";
   const modalStable=async()=>{await waitFor("(()=>{const d=document.querySelector('#lineup-wizard-dialog');return !d?.open||d.dataset.phase==='open'})()");await wait(40)};
@@ -121,23 +122,21 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
   await evaluate(`(()=>{const s=${disk};s.rolePlans[${JSON.stringify(legacyProfile.id)}]={[${JSON.stringify(template)}]:${JSON.stringify(legacyPlan)}};s.playbackContext=${JSON.stringify(context)};localStorage.setItem('halfcourt-lineups-v1',JSON.stringify(s))})()`);
   await send('Page.reload');await waitFor("Boolean(document.querySelector('[data-player]'))");
   assert.equal(await evaluate(`${disk}.profiles.length`),1);assert.equal(await evaluate('document.body.dataset.lineupContext'),'');
-  await nav('play');await nav('library');await waitFor('!document.body.dataset.pageTransition');
-  await findLibraryCard({evaluate,waitFor},template);
-  await evaluate(`document.querySelector('.library-card-heading[data-template-id="${template}"]').click()`);
+  await lc.open();await lc.expand(template);
   assert.equal(await evaluate('document.body.dataset.lineupContext'),'');
   const beforeClear=await evaluate("({archive:localStorage.getItem('halfcourt-lineups-v1'),selection:localStorage.getItem('halfcourt-builtin-selection-v1'),players:document.querySelector('#players-layer').innerHTML,step:document.querySelector('#frame-counter').textContent})");
   await evaluate("window.savedSet=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(k==='halfcourt-lineups-v1'&&JSON.parse(v).playbackContext===null)throw Error('simulated clear failure');return window.savedSet.call(this,k,v)}");
-  await evaluate(`document.querySelector('[data-play-template="${template}"]').click()`);
+  await evaluate(`document.querySelector('#tactic-library-dialog [data-action=selection-play]').click()`);
   await waitFor("!document.body.classList.contains('is-loading')");
   assert.equal(await evaluate('document.body.dataset.lineupContext'),'','old role source cannot become a new person mapping even on failure');
   assert.deepEqual(await evaluate("({archive:localStorage.getItem('halfcourt-lineups-v1'),selection:localStorage.getItem('halfcourt-builtin-selection-v1'),players:document.querySelector('#players-layer').innerHTML,step:document.querySelector('#frame-counter').textContent})"),beforeClear,'failed source clear preserves exact archives, old plan, selected play and step');
-  assert.equal(await evaluate('document.body.dataset.view'),'library','clear failure cannot navigate or start playback');
-  assert.equal(await evaluate("document.querySelector('#template-list').dataset.expandedId"),template,'failed source clear retains expanded card for retry');
+  assert.equal(await evaluate('document.body.dataset.view'),'play','clear failure cannot navigate or start playback');
+  assert.equal(await evaluate("window.hoopalAppSnapshot().selection.expandedId"),template,'failed source clear retains expanded card for retry');
   await evaluate('Storage.prototype.setItem=window.savedSet');
-  await evaluate(`document.querySelector('[data-play-template="${template}"]').click()`);
+  await evaluate(`document.querySelector('#tactic-library-dialog [data-action=selection-play]').click()`);
   await waitFor("!document.body.classList.contains('is-loading')&&!document.body.dataset.lineupContext");
-  await waitFor("document.querySelector('#play-toggle').getAttribute('aria-pressed')==='true'");
-  await evaluate("document.querySelector('#play-toggle').click()");
+  await lc.phase('closed');
+  assert.equal(await evaluate("document.querySelector('#play-toggle').getAttribute('aria-pressed')"),'false');
   await send('Page.reload');await waitFor("Boolean(document.querySelector('[data-player]'))");
   assert.equal(await evaluate('document.body.dataset.lineupContext'),'');
   await nav('lineups');
@@ -150,7 +149,7 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
   assert.equal(await evaluate("[...document.querySelectorAll('#players-layer [data-player^=\"attack-\"] text')].map(p=>p.textContent).join(',')"),'1,2,3,4');
   for(const [width,height] of [[360,640],[390,844],[844,390],[1024,768],[1280,800],[1440,900]]) {
     await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<1000});
-    for(const view of ['play','library','archives','lineups']) {
+    for(const view of ['play','archives','lineups']) {
       await nav(view);await wait(40);await checkLayout(width,height,`${view} base`);
       if(view!=='lineups')await screenshot(`manager-${view}-${width}-${height}.png`);
     }
@@ -220,12 +219,12 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
   assert.ok(await evaluate("document.querySelector('#lineups-panel').textContent.includes('选择 NBA 球队')||document.querySelector('#lineups-panel').textContent.includes('选择NBA球队')"));
 
   async function startTeamPractice(){
-    await action('lineup-conditions');await waitFor("document.body.dataset.tacticSelection==='true'&&!document.body.dataset.pageTransition");
-    if(await evaluate("document.querySelector('#tactic-selection-panel').dataset.stage==='body'")){
-      await action('body-type','[data-body-type=one-big]');await action('selection-view');
-      await waitFor("document.querySelector('#tactic-selection-panel').dataset.stage==='tactics'&&document.querySelector('#tactic-selection-panel').getAttribute('aria-busy')==='false'");
-    }
-    await action('selection-play');await waitFor("document.body.dataset.view==='play'&&!document.body.dataset.lineupContext&&!document.body.classList.contains('is-loading')&&!document.body.dataset.pageTransition");
+    await action('lineup-conditions');await lc.phase('open');
+    await lc.click('#tactic-library-dialog [data-action=selection-change-body]');
+    await waitFor("!document.querySelector('#tactic-selection-panel').hidden");
+    await action('body-type','[data-body-type=one-big]');await action('selection-view');await lc.phase('open');
+    const id=await evaluate("document.querySelector('#tactic-library-dialog [data-action=selection-card]').dataset.templateId");
+    await lc.expand(id);await lc.click('#tactic-library-dialog [data-action=selection-play]');await lc.phase('closed');await waitFor("document.body.dataset.view==='play'&&!document.body.dataset.lineupContext&&!document.body.classList.contains('is-loading')&&!document.body.dataset.pageTransition");
   }
 
   async function checkNbaDrafts(){
@@ -324,8 +323,14 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
       const dialogs=[...document.querySelectorAll('dialog[open]')];
       const top=document.activeElement?.closest('dialog[open]')||dialogs.find(n=>n.id==='note-dialog')||dialogs.at(-1);
       const visible=n=>(!top||top.contains(n))&&n.getClientRects().length&&getComputedStyle(n).visibility!=='hidden'&&!n.closest('[hidden],[inert],[aria-hidden=true]');
-      const controls=[...document.querySelectorAll('button,input,select,#court')].filter(visible);
+      const scrolled=[...document.querySelectorAll('.lineup-archive-list button')].filter(n=>visible(n)&&!n.disabled).map(n=>{
+        const list=n.closest('.lineup-archive-list'),r=n.getBoundingClientRect(),b=list.getBoundingClientRect();list.scrollTop+=r.top-b.top-(b.height-r.height)/2;
+        const a=n.getBoundingClientRect(),h=document.elementFromPoint(a.x+a.width/2,a.y+a.height/2);
+        return{action:n.dataset.action,inside:a.width>0&&a.height>0&&a.x>=-1&&a.y>=-1&&a.right<=innerWidth+1&&a.bottom<=innerHeight+1,hit:h===n||n.contains(h)};
+      });
+      const controls=[...document.querySelectorAll('button,input,select,#court')].filter(n=>visible(n)&&!n.closest('.lineup-archive-list'));
       return{w:document.documentElement.scrollWidth,h:document.documentElement.scrollHeight,
+        scrolled,
         out:controls.map(n=>({id:n.id||n.dataset.action||n.dataset.viewTarget,r:n.getBoundingClientRect().toJSON()})).filter(({r})=>r.width&&r.height&&(r.x< -2||r.y< -2||r.right>innerWidth+2||r.bottom>innerHeight+2)),
         overflow:[...document.querySelectorAll('#lineups-panel,.lineup-recommendation-detail,.lineup-glass-sheet,.lineup-sheet-content')].filter(visible).filter(n=>n.scrollHeight>n.clientHeight+2||n.scrollWidth>n.clientWidth+2).map(n=>({id:n.id||n.className,sh:n.scrollHeight,ch:n.clientHeight,sw:n.scrollWidth,cw:n.clientWidth})),
         blocked:controls.filter(n=>n.matches('button,input,select')&&!n.disabled&&getComputedStyle(n).opacity!=='0').filter(n=>{const r=n.getBoundingClientRect();if(r.width<5||r.height<5)return false;const hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return hit!==n&&!n.contains(hit)}).map(n=>n.id||n.dataset.action||n.dataset.viewTarget)};
@@ -334,5 +339,6 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
     assert.ok(result.w<=width+2&&result.h<=height+2,`${label}: ${JSON.stringify(result)}`);
     assert.deepEqual(result.out,[],`${width}x${height} ${label}: controls fit`);assert.deepEqual(result.overflow,[],`${width}x${height} ${label}: readable contents fit`);
     assert.deepEqual(result.blocked,[],`${width}x${height} ${label}: active modal or page controls are not covered`);
+    assert.ok(result.scrolled.every(n=>n.inside&&n.hit),`${width}x${height} ${label}: archive controls are reachable by internal scrolling: ${JSON.stringify(result.scrolled)}`);
   }
 }

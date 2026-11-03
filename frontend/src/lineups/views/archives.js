@@ -8,10 +8,39 @@ export function createArchivesView(context){
  const account = createAccountCards({document,node,button,openAccount});
 
  function archivesPageView() {
+    if (model.route === 'teams') { teamsPageView(); return; }
     const card = node('section', 'lineup-archives-card lineup-account-page');
     const heading = node('header', 'lineup-archives-heading');
     heading.append(node('h1', '', '我的'), node('span', '', '球队与账号'));
     card.append(heading, account.identity());
+    const teams = node('section', 'lineup-account-teams lineup-account-glass lineup-team-overview');
+    const top = node('header', 'lineup-account-teams-heading'), title = node('div');
+    title.append(node('h2', '', '我的球队'), node('span', 'lineup-teams-count', `${model.state.profiles.length} / 20`)); top.append(title); teams.append(top);
+    const active = model.state.profiles.find(profile => profile.id === model.state.activeProfileId);
+    const summary = node('div', 'lineup-team-overview-copy');
+    if (active) {
+      summary.append(crest(active));
+      const copy = node('div'); copy.append(node('strong', '', active.name), node('p', '', `${active.mode} · ${active.players.length}名队员 · 当前使用`)); summary.append(copy);
+    } else {
+      const copy = node('div'); copy.append(node('strong', '', model.state.profiles.length ? '选一支球队，开始配合' : '先组一支自己的球队'), node('p', '', model.state.profiles.length ? '球队配置与队员资料都保存在本机。' : '从名字和喜欢的球衣开始。')); summary.append(copy);
+    }
+    teams.append(summary);
+    if (draftStore.createDraft) { teams.classList.add('has-create-draft'); teams.append(node('p', 'lineup-team-draft-hint', '有一份未完成的建队草稿，可到球队管理继续。')); }
+    teams.append(button('管理球队 ›', 'teams-open', () => {
+      model.route = 'teams'; model.feedback = ''; draw();
+      document.defaultView?.requestAnimationFrame(() => root.querySelector('[data-action="teams-back"]')?.focus({ preventScroll: true }));
+    }, { className: 'button button-primary lineup-teams-open' }));
+    card.append(teams, account.tools()); root.append(card);
+  }
+
+ function teamsPageView() {
+    const head = node('header', 'lineup-secondary-heading'); head.id = 'team-management-header';
+    const back = button('‹', 'teams-back', () => {
+      model.route = 'profiles'; model.feedback = ''; draw();
+      document.defaultView?.requestAnimationFrame(() => root.querySelector('[data-action="teams-open"]')?.focus({ preventScroll: true }));
+    }, { className: 'icon-button', title: '返回我的' }); back.setAttribute('aria-label', '返回我的');
+    const copy = node('div'); copy.append(node('h1', '', '球队管理'), node('p', '', `本机档案 · ${model.state.profiles.length}支球队`)); head.append(back, copy); root.append(head);
+    const card = node('section', 'lineup-teams-page'); card.id = 'team-management-card'; card.setAttribute('aria-label', '我的球队列表');
     const teams = node('section', 'lineup-account-teams lineup-account-glass');
     const teamHeading = node('header', 'lineup-account-teams-heading'), teamTitle = node('div');
     teamTitle.append(node('h2', '', '我的球队'), node('span', 'lineup-teams-count', `${model.state.profiles.length} / 20`));
@@ -49,7 +78,7 @@ export function createArchivesView(context){
     teams.append(list);
     if (pages > 1) { card.classList.add('has-pages'); teamHeading.append(pager(pages, model.profilePage, page => { model.profilePage = page; model.feedback = ''; draw(); }, 'lineup-archives')); }
     teams.append(button(draftStore.createDraft ? '继续创建球队' : '＋ 创建球队', model.state.profiles.length ? 'lineup-create' : 'lineup-create-empty', beginCreate, { className: 'button button-primary lineup-archive-create', disabled: model.state.profiles.length >= 20 }));
-    card.append(teams, account.tools());
+    card.append(teams);
     root.append(card);
   }
 

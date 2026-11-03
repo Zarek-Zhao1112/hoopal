@@ -14,11 +14,11 @@ export async function runArchivesFlow({ send, evaluate, wait, waitFor, folder })
   const settled = () => waitFor("!document.body.dataset.pageTransition&&document.querySelector('#lineups-panel').getAttribute('aria-busy')==='false'");
   const action = async (name, extra = '') => {await evaluate(`document.querySelector(${JSON.stringify(`[data-action="${name}"]${extra}`)}).click()`);await waitForWizardMotion({waitFor})};
   const click = async selector => {
-    const point = await evaluate(`(()=>{const n=document.querySelector(${JSON.stringify(selector)});if(!n||n.disabled)throw Error('Missing/disabled '+${JSON.stringify(selector)});const r=n.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,h=document.elementFromPoint(x,y);if(!r.width||!r.height||!(h===n||n.contains(h)))throw Error('Unhittable '+${JSON.stringify(selector)});return{x,y}})()`);
+    const point = await evaluate(`(()=>{const n=document.querySelector(${JSON.stringify(selector)});if(!n||n.disabled)throw Error('Missing/disabled '+${JSON.stringify(selector)});const list=n.closest('.lineup-archive-list');if(list){const r=n.getBoundingClientRect(),b=list.getBoundingClientRect();list.scrollTop+=r.top-b.top-(b.height-r.height)/2;}const r=n.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,h=document.elementFromPoint(x,y);if(!r.width||!r.height||!(h===n||n.contains(h)))throw Error('Unhittable '+${JSON.stringify(selector)});return{x,y}})()`);
     await send('Input.dispatchMouseEvent', { type: 'mousePressed', ...point, button: 'left', buttons: 1, clickCount: 1 });
     await send('Input.dispatchMouseEvent', { type: 'mouseReleased', ...point, button: 'left', buttons: 0, clickCount: 1 });
   };
-  const nav = async view => { await click(`[data-view-target="${view}"]`); await waitFor(`document.body.dataset.view===${JSON.stringify(view)}`); await settled(); };
+  const nav = async view => { await click(`[data-view-target="${view}"]`); await waitFor(`document.body.dataset.view===${JSON.stringify(view)}`); await settled(); if(view==='archives'&&await evaluate("Boolean(document.querySelector('[data-action=teams-open]'))")) await click('[data-action=teams-open]'); };
   const reloadDocument = async () => {
     await evaluate('window.__hc033ReloadMarker=true');
     await send('Page.reload');
@@ -35,6 +35,7 @@ export async function runArchivesFlow({ send, evaluate, wait, waitFor, folder })
     await evaluate(`localStorage.removeItem('${key}')`); await reload();
     assert.equal(await evaluate("document.querySelectorAll('#lineups-panel [data-action=lineup-create],#lineups-panel [data-action=lineup-create-empty]').length"), 0, 'locker does not contain an archive creation entry');
     await click('[data-action=lineup-open-archives]'); await waitFor("document.body.dataset.view==='archives'&&!document.body.dataset.pageTransition");
+    await click('[data-action=teams-open]');
     assert.ok(await evaluate("Boolean(document.querySelector('.lineup-archives-empty'))"));
     await click('[data-action=lineup-create-empty]'); await waitFor("document.querySelector('#lineup-wizard-dialog').dataset.phase==='open'");
     await evaluate("(()=>{const n=document.querySelector('[data-action=lineup-name]');n.value='仅在本次会话的档案草稿';n.dispatchEvent(new Event('input',{bubbles:true}))})()");
@@ -78,7 +79,7 @@ export async function runArchivesFlow({ send, evaluate, wait, waitFor, folder })
     }
     await evaluate('window.hc033ReadBlocked=false');
     await send('Page.removeScriptToEvaluateOnNewDocument', { identifier: readFailureScript }); readFailureScript = null;
-    await click('[data-action=lineup-retry]'); await settled();
+    await click('[data-action=lineup-retry]'); await settled(); if(await evaluate("Boolean(document.querySelector('[data-action=teams-open]'))"))await click('[data-action=teams-open]');
     await waitFor("document.querySelectorAll('.lineup-archive-card').length===3&&!document.querySelector('[data-action=lineup-retry]')&&document.querySelector('#lineups-panel').dataset.readLocked==='false'");
     const recoveredIds = [];
     for (let page = 0; page < 3; page++) {
@@ -100,9 +101,14 @@ export async function runArchivesFlow({ send, evaluate, wait, waitFor, folder })
       while (await evaluate("Boolean(document.querySelector('[data-action=lineup-archives-prev]:not(:disabled)'))")) await click('[data-action=lineup-archives-prev]');
       const seen = [];
       for (let page = 0; page < 3; page++) {
-        const layout = await evaluate(`(()=>{const cards=[...document.querySelectorAll('.lineup-archive-card')],visible=n=>n.getClientRects().length;return{ids:cards.map(n=>n.dataset.profileId),current:cards.filter(n=>n.dataset.current==='true').map(n=>n.dataset.profileId),overflow:document.documentElement.scrollHeight>innerHeight+2||document.documentElement.scrollWidth>innerWidth+2,brand:visible(document.querySelector('#lineup-brand-header')),controls:[...document.querySelectorAll('.lineup-archives-card button,.view-nav button')].filter(n=>!n.disabled&&visible(n)).map(n=>{const r=n.getBoundingClientRect(),h=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return{action:n.dataset.action||n.dataset.viewTarget,inside:r.x>=-1&&r.y>=-1&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1,hit:h===n||n.contains(h)}})}})()`);
+        const layout = await evaluate(`(()=>{const cards=[...document.querySelectorAll('.lineup-archive-card')],visible=n=>n.getClientRects().length;return{ids:cards.map(n=>n.dataset.profileId),current:cards.filter(n=>n.dataset.current==='true').map(n=>n.dataset.profileId),overflow:document.documentElement.scrollHeight>innerHeight+2||document.documentElement.scrollWidth>innerWidth+2,brand:visible(document.querySelector('#lineup-brand-header')),controls:[...document.querySelectorAll('#team-management-header button,#team-management-card button,.view-nav button')].filter(n=>!n.disabled&&visible(n)&&!n.closest('.lineup-archive-list')).map(n=>{const r=n.getBoundingClientRect(),h=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return{action:n.dataset.action||n.dataset.viewTarget,inside:r.x>=-1&&r.y>=-1&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1,hit:h===n||n.contains(h)}})}})()`);
+        layout.reachableCards=[];
+        for(const id of layout.ids)for(const action of ['lineup-select','lineup-archive-menu']){
+          const control=await evaluate(`(()=>{const n=document.querySelector('[data-action="${action}"][data-profile-id="${id}"]'),list=n.closest('.lineup-archive-list'),r=n.getBoundingClientRect(),b=list.getBoundingClientRect();list.scrollTop+=r.top-b.top-(b.height-r.height)/2;const a=n.getBoundingClientRect(),p=document.elementFromPoint(a.x+a.width/2,a.y+a.height/2);return{id:${JSON.stringify(id)},action:${JSON.stringify(action)},inside:a.x>=0&&a.y>=0&&a.right<=innerWidth+1&&a.bottom<=innerHeight+1,hit:p===n||n.contains(p)}})()`);
+          assert.ok(control.inside&&control.hit,'internally scrolled archive centre '+JSON.stringify(control));layout.reachableCards.push(control);
+        }
         assert.equal(layout.ids.length, page < 2 ? 3 : 1); assert.equal(layout.overflow, false, `${width}x${height} archive is one screen`); assert.equal(layout.brand, 0, 'brand belongs only to locker');
-        assert.ok(layout.controls.every(n=>n.inside&&n.hit), `${width}x${height} page ${page}: card, management, create, pager and four nav centers are reachable`);
+        assert.ok(layout.controls.every(n=>n.inside&&n.hit), `${width}x${height} page ${page}: ${JSON.stringify(layout.controls.filter(n=>!n.inside||!n.hit))}`);
         seen.push(...layout.ids); if (page < 2) await click('[data-action=lineup-archives-next]');
       }
       assert.deepEqual(seen, profiles.map(p=>p.id)); metrics.push({ width, height, seen });
