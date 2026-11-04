@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="description" content="球搭 3v3 和 4v4 球员角色与站位交互预览">
+  <title>球搭 · 球员角色预览</title>
+  <link rel="icon" href="../../assets/app-icon.png">
+  <link rel="stylesheet" href="../training-library/preview.css">
+  <link rel="stylesheet" href="./preview.css">
+  <script type="module" src="./preview.js"></script>
+</head>
+<body>
+  <aside class="preview-caption">
+    <span>HOOPAL · 球搭</span>
+    <h1>球员角色</h1>
+    <p>点球员的角色标签，直接在该行展开选项。切到 4v4，看看两名队员选择同一角色时如何分配站位。</p>
+    <div class="demo-shortcuts" aria-label="体验步骤">
+      <button type="button" class="button" data-jump="roles"><b>01</b> 设置球员角色 <span>›</span></button>
+      <button type="button" class="button" data-jump="body"><b>02</b> 按体型挑选战术 <span>›</span></button>
+      <button type="button" class="button" data-jump="training"><b>03</b> 查看本队站位 <span>›</span></button>
+    </div>
+    <small>本地设计预览 · 示例数据随刷新重置</small>
+  </aside>
+  <main class="device">
+    <div id="preview-app">
+      <div class="preview-status" aria-hidden="true"><span>9:41</span><span>◒　▰</span></div>
+      <div id="app-content"></div>
+      <nav id="bottom-nav" aria-label="主页面"></nav>
+      <div id="preview-toast" role="status"></div>
+      <dialog class="glass-dialog" aria-labelledby="role-sheet-title">
+        <div class="dialog-shade" aria-hidden="true"></div>
+        <section class="library-sheet"></section>
+      </dialog>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,5 +1,6 @@
 import { getNbaTeam } from '../data/nba-teams.js';
 import { isBodyTypeForMode } from './tactic-body-types.js';
+import { isMainRoleForMode } from './team-roles.js';
 
 export const MAX_LINEUPS = 20;
 export const SKILLS = Object.freeze([
@@ -58,7 +59,7 @@ export function validateLegacyLineup(value) {
     recentTemplateId: value.recentTemplateId === null ? null : text(value.recentTemplateId, '最近战术ID', 100) };
 }
 
-/** Basic team identity and optional whole-team browsing preference. */
+/** Basic team identity, optional browsing preference and optional per-player role. */
 export function validateLineup(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('阵容格式无效');
   const mode = oneOf(value.mode, ['3v3', '4v4'], '人数');
@@ -77,7 +78,9 @@ export function validateLineup(value) {
     ids.add(id);
     if (!Number.isInteger(player.number) || player.number < 0 || player.number > 99 || numbers.has(player.number)) throw new Error('球衣号码须为0–99且不能重复');
     numbers.add(player.number);
-    return { id, name: text(player.name, '昵称', 24, true), number: player.number };
+    const mainRole = player.mainRole;
+    if (mainRole !== undefined && mainRole !== '' && !isMainRoleForMode(mode, mainRole)) throw new Error('球员角色与阵容人数不符');
+    return { id, name: text(player.name, '昵称', 24, true), number: player.number, ...(mainRole ? { mainRole } : {}) };
   });
   return { id: text(value.id, '阵容ID', 100), name: text(value.name, '阵容名称', 40), mode,
     crest: oneOf(value.crest, ['ball', 'shield', 'bolt'], '队徽'), color: oneOf(value.color, ['orange', 'blue', 'green'], '主题色'),

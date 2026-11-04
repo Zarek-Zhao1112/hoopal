@@ -1,14 +1,15 @@
 @import '../wizard/creation-layout.css';
 @import './wizard-motion.css';
 /* HC-021 — a real modal task sheet. All rules are scoped above legacy forms. */
-#lineup-wizard-dialog{position:fixed;inset:0;width:100%;max-width:none;height:100vh;height:100dvh;height:var(--lineup-viewport-height,100vh);max-height:none;margin:0;padding:0;border:0;background:transparent;color:#385b73;overflow:hidden;overscroll-behavior:contain}
-#lineup-wizard-dialog{overflow:clip}
-#lineup-wizard-dialog:not([open]){display:none}
-#lineup-wizard-dialog::backdrop{background:transparent}
-#lineup-wizard-dialog .lineup-sheet-shade{position:absolute;inset:0;background:#405c7147;opacity:0;transition:opacity 450ms ease}
-#lineup-wizard-dialog[data-visible=true] .lineup-sheet-shade{opacity:1}
-#lineup-wizard-dialog .lineup-glass-sheet{position:absolute;top:16%;bottom:0;left:0;right:0;display:grid;grid-template-rows:52px 40px minmax(0,1fr) 87px;gap:13px;max-width:850px;margin:0 auto;padding:22px 19px max(12px,env(safe-area-inset-bottom));box-sizing:border-box;border:1px solid #f5fbffba;border-bottom:0;border-radius:26px 26px 0 0;background:linear-gradient(125deg,#eef8fbe8,#dcecf5eb 66%,#d5e8f2eb);box-shadow:0 -12px 45px #365b702b,inset 0 1px 1px #fff;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);transform:translateY(110%);transition:transform 450ms cubic-bezier(.22,.62,.25,1);overflow:hidden;outline:none}
-#lineup-wizard-dialog[data-visible=true] .lineup-glass-sheet{transform:translateY(0)}
+:is(#lineup-wizard-dialog,#lineup-main-roles-dialog){position:fixed;inset:0;width:100%;max-width:none;height:100vh;height:100dvh;height:var(--lineup-viewport-height,100vh);max-height:none;margin:0;padding:0;border:0;background:transparent;color:#385b73;overflow:hidden;overscroll-behavior:contain}
+:is(#lineup-wizard-dialog,#lineup-main-roles-dialog){overflow:clip}
+:is(#lineup-wizard-dialog,#lineup-main-roles-dialog):not([open]){display:none}
+:is(#lineup-wizard-dialog,#lineup-main-roles-dialog)::backdrop{background:transparent}
+:is(#lineup-wizard-dialog,#lineup-main-roles-dialog) .lineup-sheet-shade{position:absolute;inset:0;background:#405c7147;opacity:0;transition:opacity 450ms ease}
+:is(#lineup-wizard-dialog,#lineup-main-roles-dialog)[data-visible=true] .lineup-sheet-shade{opacity:1}
+:is(#lineup-wizard-dialog,#lineup-main-roles-dialog) .lineup-glass-sheet{position:absolute;bottom:0;left:0;right:0;display:grid;max-width:850px;margin:0 auto;box-sizing:border-box;border:1px solid #f5fbffba;border-bottom:0;border-radius:26px 26px 0 0;background:linear-gradient(125deg,#eef8fbe8,#dcecf5eb 66%,#d5e8f2eb);box-shadow:0 -12px 45px #365b702b,inset 0 1px 1px #fff;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);transform:translateY(110%);transition:transform 450ms cubic-bezier(.22,.62,.25,1);overflow:hidden;outline:none}
+#lineup-wizard-dialog .lineup-glass-sheet{top:16%;grid-template-rows:52px 40px minmax(0,1fr) 87px;gap:13px;padding:22px 19px max(12px,env(safe-area-inset-bottom))}
+:is(#lineup-wizard-dialog,#lineup-main-roles-dialog)[data-visible=true] .lineup-glass-sheet{transform:translateY(0)}
 #lineup-wizard-dialog .lineup-sheet-heading{display:flex;align-items:center;justify-content:space-between;min-width:0;gap:12px}
 #lineup-wizard-dialog .lineup-sheet-heading p{margin:0 0 5px;font-size:10px;letter-spacing:1.2px;color:#7d9aad}
 #lineup-wizard-dialog .lineup-sheet-heading h2{margin:0;color:#436c85;font-size:24px;font-weight:650;letter-spacing:1px}
@@ -16,7 +17,7 @@
 #lineup-wizard-dialog button:disabled{cursor:default;opacity:.5}
 #lineup-wizard-dialog .button{min-width:0;min-height:40px;padding:8px 10px;border:1px solid #bad3e2;border-radius:9px;background:#eff8fcbf;color:#567e97;font-size:12px;font-weight:550;box-shadow:inset 0 1px #ffffffc4}
 #lineup-wizard-dialog .button-primary{background:linear-gradient(#5689a5,#3c7594);border-color:#5e90ac;color:#f7fcff;box-shadow:inset 0 1px #b5d9e9,0 4px 9px #456e8420}
-#lineup-wizard-dialog .lineup-sheet-close{width:35px;min-width:35px;height:35px;border:1px solid #bcd6e6;border-radius:50%;background:#eff8fc96;color:#759ab0;font-size:24px;line-height:1}
+:is(#lineup-wizard-dialog,#lineup-main-roles-dialog) .lineup-sheet-close{width:35px;min-width:35px;height:35px;border:1px solid #bcd6e6;border-radius:50%;background:#eff8fc96;color:#759ab0;font-size:24px;line-height:1}
 #lineup-wizard-dialog .lineup-wizard-progress{display:flex;gap:6px;min-height:0}
 #lineup-wizard-dialog .lineup-wizard-progress button{display:flex;flex:1;align-items:center;justify-content:center;min-width:0;gap:5px;min-height:36px;padding:4px;border:1px solid #c1d8e5;border-radius:9px;background:#f2f9fc7d;color:#829faf;font-size:10px}
 #lineup-wizard-dialog .lineup-wizard-progress button span{display:grid;place-items:center;width:19px;height:19px;flex-shrink:0;border-radius:50%;background:#d9e9f2;font-size:10px}
@@ -167,4 +168,4 @@
  #lineup-wizard-dialog .lineup-sheet-heading p{display:none}
  #lineup-wizard-dialog .lineup-sheet-footer{grid-template-rows:22px 35px 12px}
 }
-@media(prefers-reduced-motion:reduce){#lineup-wizard-dialog .lineup-glass-sheet,#lineup-wizard-dialog .lineup-sheet-shade{transition:none}}
+@media(prefers-reduced-motion:reduce){:is(#lineup-wizard-dialog,#lineup-main-roles-dialog) .lineup-glass-sheet,:is(#lineup-wizard-dialog,#lineup-main-roles-dialog) .lineup-sheet-shade{transition:none}}

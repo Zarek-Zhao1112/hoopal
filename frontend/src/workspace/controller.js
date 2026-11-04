@@ -169,7 +169,7 @@ export function createWorkspaceController({
   return {
     get view() { return view; },
     get hasOpenDialog() { return Boolean(document.querySelector('dialog[open]')); },
-    setView, openNote, openText,
+    setView, openDialog, openNote, openText,
     openMenu: () => openDialog('workspace-menu'),
     closeMenu: () => closeDialog(byId('workspace-menu')),
     closeTopDialog,

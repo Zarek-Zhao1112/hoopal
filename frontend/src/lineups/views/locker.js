@@ -3,10 +3,11 @@ import { isLineupReady } from '../../../../shared/lineups.js';
 import { getNbaTeam } from '../../../../data/nba-teams.js';
 import { playerName } from './text.js';
 import { createLockerRoom } from '../components/locker-room.js';
+import { getTeamRoleOptions } from '../../../../shared/team-roles.js';
 
 /** A feature-owned view, using the coordinator's explicit state and callbacks. */
 export function createLockerView(context){
- const {header,button,navigate,root,active,node,model,document,inspect,crest,selectedByProfile,jersey,draw,dirty,beginEdit}=context;
+ const {header,button,navigate,root,active,node,model,document,inspect,crest,selectedByProfile,jersey,draw,dirty,beginEdit,openRolePicker}=context;
  let lockerRoom=null;
  function profilePageView() {
     header('更衣室', '', false, button('换球队 ›', 'lineup-switch-archive', () => navigate('archives'), { className: 'button button-subtle' }));
@@ -31,12 +32,14 @@ export function createLockerView(context){
     if (focusedIndex < 0) focusedIndex = 0;
     selectedByProfile.set(profile.id, profile.players[focusedIndex].id);
     const detail = node('section', 'locker-player-detail');
+    const roleOptions = getTeamRoleOptions(profile.mode);
     function updateDetail(index) {
       const player = profile.players[index];
       detail.dataset.playerId = player.id; detail.dataset.playerIndex = String(index);
       const top = node('div', 'locker-detail-top');
       top.append(button(playerName(player, index), 'lineup-inspect-player', () => inspect('队员资料', `${playerName(player, index)}\n球衣 ${player.number} 号`), { className: 'locker-player-name' }), node('span', 'locker-player-number', `球衣 ${player.number} 号`));
-      detail.replaceChildren(top, node('p', 'locker-duty-hint', '按球队体型，挑一套配合。'));
+      const role = player.mainRole && roleOptions.find(option => option.id === player.mainRole)?.label;
+      detail.replaceChildren(top, node('p', 'locker-duty-hint', role ? `主角色 · ${role}` : '按球队体型，挑一套配合。'));
     }
     updateDetail(focusedIndex);
     lockerRoom = createLockerRoom({ document, profile, selectedIndex: focusedIndex, disabled: model.pending || model.externalBusy,
@@ -48,6 +51,8 @@ export function createLockerView(context){
     const actions = node('div', 'lineup-profile-actions');
     actions.append(button('挑选战术', 'lineup-conditions', () => navigate('roles'), { className: 'button button-primary', data: { profileId: profile.id } }));
     actions.append(button(dirty(profile.id) ? '继续未保存配置' : '配置球员', 'lineup-configure', () => beginEdit(profile), { data: { profileId: profile.id } }));
+    const roleSettings = button('设置球员角色', 'lineup-role-settings', () => openRolePicker(profile, roleSettings), { data: { profileId: profile.id } });
+    actions.append(roleSettings);
     card.append(cardHeading, top, lockerRoom.element, detail, actions); root.append(card);
   }
  function destroyLocker(){lockerRoom?.destroy();lockerRoom=null;}

@@ -1,5 +1,6 @@
 /* Feature entry. Keep the legacy paint order while modules gain ownership. */
 @import './components/sheet.css';
+@import './components/main-roles.css';
 @import './views/archives.css';
 @import './views/pages.css';
 @import './components/account-center.css';

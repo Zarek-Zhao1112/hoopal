@@ -75,6 +75,27 @@ test('invalid and duplicate individual profiles are isolated without losing the 
   assert.equal(adapter.values.get(LINEUPS_KEY+'.corrupt-test'),original);
 });
 
+test('malformed main roles alone keep all members and valid roles, with exact backup before the first replacement', async () => {
+  const team = createLineup('4v4');
+  team.players[0].mainRole = 'support';
+  team.players[1].mainRole = 'relay';
+  team.players[2].mainRole = null;
+  team.players[3].mainRole = 'relay';
+  const raw = JSON.stringify(stateWith(team), null, 2);
+  const adapter = memory({ [LINEUPS_KEY]: raw }), store = repo(adapter);
+  const { state, warnings, writeLocked } = await store.load();
+  assert.equal(writeLocked, false);
+  assert.equal(warnings.length, 1);
+  assert.deepEqual(state.profiles[0].players.map(player => player.mainRole), [undefined, 'relay', undefined, 'relay']);
+  assert.deepEqual(state.profiles[0].players.map(player => player.id), team.players.map(player => player.id));
+  assert.equal(adapter.writes.length, 0);
+  await assert.rejects(store.save(stateWith(team)), /角色/);
+  assert.equal(adapter.values.get(LINEUPS_KEY), raw);
+  await store.save(state);
+  assert.deepEqual(adapter.writes[0], [LINEUPS_KEY + '.corrupt-test', raw]);
+  assert.deepEqual((await store.load()).state, state);
+});
+
 test('only matching active identity, current role version and a fully confirmed plan retain team playback source', async () => {
   const p=createLineup('3v3'),t=templates.find(t=>t.id==='pick-roll');
   const plan=t.roles.reduce((plan,role,i)=>setRoleResponse(plan,role.id,{status:'available',memberId:p.players[i].id},t,p),createRolePlan(t,p));

@@ -206,3 +206,42 @@ body.page-layout[data-view=play] .training-panel .legend-row {min-height:17px;fo
   body.page-layout[data-view=play] .training-panel .legend-heading,body.page-layout[data-view=play] .training-panel .legend-heading button {min-height:14px}
   body.page-layout[data-view=play] .training-panel .lineup-legend {margin-bottom:1px;padding:0 3px}
 }
+
+/* HC-063: team assignments use the existing space between the court and notes. */
+body.page-layout[data-view=play] .training-panel .legend-rows {
+  grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;
+}
+body.page-layout[data-view=play] .training-panel .lineup-legend[data-player-count="4"] .legend-rows {
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+body.page-layout[data-view=play] .training-panel .legend-row {
+  display:grid;grid-template-columns:minmax(0,1fr);gap:0;align-content:center;min-height:32px;padding:2px 5px;border-radius:5px;background:#ddecf6;
+}
+body.page-layout[data-view=play] .training-panel .lineup-legend[data-player-count="4"] .legend-row {
+  grid-template-columns:minmax(0,.9fr) minmax(0,1fr);align-items:center;gap:3px;min-height:18px;
+}
+body.page-layout[data-view=play] .training-panel .legend-row .legend-name {
+  display:block;max-width:none;color:#2a5671;line-height:inherit;
+}
+body.page-layout[data-view=play] .training-panel .legend-number {margin-inline-end:3px;white-space:nowrap}
+body.page-layout[data-view=play] .training-panel .legend-row .legend-task {
+  display:block;min-width:0;color:#486a82;line-height:inherit;
+}
+body.page-layout[data-view=play] .training-panel .legend-row:focus-visible {outline-offset:1px}
+.team-role-swap-dialog[open] {gap:10px;background:linear-gradient(145deg,#f6fbff,#e1eef6);border-color:#c8dfed}
+.team-role-swap-form {display:grid;gap:12px;min-height:0;overflow:auto;overscroll-behavior:contain;padding:2px}
+.team-role-swap-fields {display:grid;gap:7px}
+.team-role-swap-field {
+  display:grid;grid-template-columns:auto minmax(0,1fr);gap:9px;align-items:center;color:#315b76;font-size:12px;
+}
+.team-role-swap-field select {
+  width:100%;min-height:38px;padding:4px 8px;border:1px solid #bad5e5;border-radius:8px;background:#f9fcff;color:#2a5671;
+}
+.team-role-swap-actions {display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px}
+.team-role-swap-actions .button {min-height:38px}
+@media(max-width:599px) and (max-height:500px), (min-width:600px) and (max-height:360px) {
+  body.page-layout[data-view=play] .training-panel .legend-row {min-height:24px;padding:0 2px}
+  body.page-layout[data-view=play] .training-panel .legend-rows {gap:2px}
+  body.page-layout[data-view=play] .training-panel .lineup-legend[data-player-count="4"] .legend-row {min-height:14px}
+  body.page-layout[data-view=play] .training-panel .legend-number {margin-inline-end:1px}
+}

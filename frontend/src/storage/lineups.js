@@ -1,6 +1,7 @@
 import { validateLineup, validateLegacyLineup, MAX_LINEUPS } from '../../../shared/lineups.js';
 import { validateRolePlan, getRolePlanState } from '../../../shared/tactic-roles.js';
 import { isBodyTypeForMode } from '../../../shared/tactic-body-types.js';
+import { isMainRoleForMode } from '../../../shared/team-roles.js';
 
 export const LINEUPS_KEY = 'halfcourt-lineups-v1';
 export const emptyLineupState = () => ({ schemaVersion: 2, profiles: [], activeProfileId: null, rolePlans: {}, playbackContext: null });
@@ -42,6 +43,19 @@ export function createLineupRepository({ adapter, templates, makeBackupId = uid 
           if (!tolerant) throw new Error('球队体型分类无效');
           candidate = { ...candidate, bodyType: null };
           warnings.push('一份球队的体型分类已失效，已解除该偏好；原文将在替换前备份');
+        }
+        if (tolerant && !legacy && Array.isArray(candidate?.players)) {
+          let invalidRole = false;
+          const players = candidate.players.map(player => {
+            if (!object(player) || !Object.hasOwn(player, 'mainRole') || player.mainRole === '' || isMainRoleForMode(candidate.mode, player.mainRole)) return player;
+            invalidRole = true;
+            const { mainRole: _invalidRole, ...identity } = player;
+            return identity;
+          });
+          if (invalidRole) {
+            candidate = { ...candidate, players };
+            warnings.push('一份球队含无效球员角色，已清除该角色；原文将在替换前备份');
+          }
         }
         const profile = validateLineup(candidate);
         if (state.profiles.length >= MAX_LINEUPS) throw new Error('超过档案容量');

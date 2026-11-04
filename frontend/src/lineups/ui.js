@@ -11,6 +11,7 @@ import {createLockerView} from './views/locker.js';
 import {createArchivesView} from './views/archives.js';
 import {createArchiveMenu} from './components/archive-menu.js';
 import {createAccountSheet} from './components/account-sheet.js';
+import {createMainRolePicker} from './components/main-roles.js';
 export {splitLineupText} from './views/text.js';
 
 /** Coordinates saved state, views and owned dialogs. Drafts never persist here. */
@@ -37,7 +38,11 @@ export function createLineupUI({root,onAction,onInspect,onModalChange,onNavigate
   archiveMenu.setAttribute('aria-labelledby', 'lineup-archive-menu-title'); document.body.append(archiveMenu);
   const accountSheet = createAccountSheet({
     document, onModalChange,
-    isBlocked: () => sheet.isOpen || archiveMenu.open || model.pending || model.externalBusy,
+    isBlocked: () => sheet.isOpen || rolePicker.isOpen || archiveMenu.open || model.pending || model.externalBusy,
+  });
+  const rolePicker = createMainRolePicker({
+    document, model, onModalChange, perform, node,
+    isBlocked: () => sheet.isOpen || archiveMenu.open || accountSheet.isOpen,
   });
 
   function openAccount(kind, trigger) { return accountSheet.open(kind, trigger); }
@@ -76,7 +81,7 @@ export function createLineupUI({root,onAction,onInspect,onModalChange,onNavigate
     if (options.pressed !== undefined) element.setAttribute('aria-pressed', String(options.pressed));
     if (options.title) element.title = options.title;
     element.addEventListener('click', () => {
-      if (model.pending || model.externalBusy || element.disabled || element.isConnected === false || sheet.closing || wizardView.teamAllOpen || accountSheet.isOpen || archiveMenu.open && !archiveMenu.contains(element)) return;
+      if (model.pending || model.externalBusy || element.disabled || element.isConnected === false || sheet.closing || wizardView.teamAllOpen || rolePicker.isOpen || accountSheet.isOpen || archiveMenu.open && !archiveMenu.contains(element)) return;
       if (!sheet.isOpen) sheet.rememberTrigger(element);
       callback();
     });
@@ -171,6 +176,23 @@ export function createLineupUI({root,onAction,onInspect,onModalChange,onNavigate
     onNavigate?.(view); draw();
   }
 
+  function openRolePicker(profile, trigger, beforeOpen) {
+    if (dirty(profile.id)) {
+      model.feedback = '这支球队有未保存的球员配置，请先继续配置并保存或放弃修改，再设置角色。';
+      draw();
+      const scope = archiveMenu.open ? archiveMenu : root;
+      scope.querySelector('[data-action="lineup-role-settings"]')?.focus({ preventScroll: true });
+      return false;
+    }
+    draftStore.drafts.delete(profile.id);
+    draftStore.baselines.delete(profile.id);
+    const clearFeedback = Boolean(model.feedback);
+    model.feedback = '';
+    beforeOpen?.();
+    if (clearFeedback && !beforeOpen) draw();
+    return rolePicker.open(profile, trigger);
+  }
+
   function readLockedPageView() {
     const card = node('section', 'lineup-read-error');
     const managing = model.section === 'archives' && model.route === 'teams';
@@ -249,11 +271,13 @@ export function createLineupUI({root,onAction,onInspect,onModalChange,onNavigate
     }
     if (draftStore.wizard) { renderWizard(snapshot ? { snapshot, intent } : null); sheet.open(); }
     sheet.refreshIsolation();
+    rolePicker.refresh();
     accountSheet.refreshIsolation();
     if (archiveMenu.open) { renderArchiveMenu(); refreshMenuIsolation(); }
   }
   function handleBack() {
     if (model.pending || model.externalBusy) return true;
+    if (rolePicker.isOpen) { rolePicker.close(); return true; }
     if (accountSheet.handleBack()) return true;
     if (model.inspection) { model.inspection = null; draw(); return true; }
     if (archiveMenu.open) { closeArchiveMenu(); return true; }
@@ -295,6 +319,7 @@ export function createLineupUI({root,onAction,onInspect,onModalChange,onNavigate
   crest:(...args)=>crest(...args),
   beginEdit:(...args)=>beginEdit(...args),
   openArchiveMenu:(...args)=>openArchiveMenu(...args),
+  openRolePicker,
   beginCreate:(...args)=>beginCreate(...args),
   profilePageView:(...args)=>profilePageView(...args),
   notice:(...args)=>notice(...args)};
@@ -327,10 +352,10 @@ export function createLineupUI({root,onAction,onInspect,onModalChange,onNavigate
     setView(view) {
       if (!['lineups', 'archives'].includes(view)) return false;
       if (model.section === view) return true;
-      if (sheet.isOpen || archiveMenu.open || accountSheet.isOpen || model.pending || model.externalBusy) return false;
+      if (sheet.isOpen || rolePicker.isOpen || archiveMenu.open || accountSheet.isOpen || model.pending || model.externalBusy) return false;
       model.section = view; model.route = 'profiles'; model.feedback = ''; draw(); return true;
     },
-    get isModalOpen() { return sheet.isOpen || archiveMenu.open || accountSheet.isOpen; },
+    get isModalOpen() { return sheet.isOpen || rolePicker.isOpen || archiveMenu.open || accountSheet.isOpen; },
   };
 
 }

@@ -15,8 +15,9 @@ import { runStartupFlow } from './startup-flow.mjs';
 import { runAccountCenterFlow } from './account-center-flow.mjs';
 import { runTrainingLibraryFlow } from './training-library-flow.mjs';
 import { runTrainingViewingFlow } from './training-viewing-flow.mjs';
+import { runTeamMainRolesFlow } from './team-main-roles-flow.mjs';
 
-const allFlows=[['training-library',runTrainingLibraryFlow],['startup',runStartupFlow],['readonly-26-tactics',runReadOnlyFlow],['page-layout',runPageLayoutFlow],['archives',runArchivesFlow],['creation-motion',runCreationMotionFlow],['locker-frame',runLockerFrameFlow],['team-carousel',runTeamCarouselFlow],['glass-sheet',runGlassSheetFlow],['lineups',runLineupFlow],['page-motion',runPageMotionFlow],['account-center',runAccountCenterFlow],['training-viewing',runTrainingViewingFlow]];
+const allFlows=[['training-library',runTrainingLibraryFlow],['startup',runStartupFlow],['readonly-26-tactics',runReadOnlyFlow],['page-layout',runPageLayoutFlow],['archives',runArchivesFlow],['creation-motion',runCreationMotionFlow],['locker-frame',runLockerFrameFlow],['team-carousel',runTeamCarouselFlow],['glass-sheet',runGlassSheetFlow],['lineups',runLineupFlow],['page-motion',runPageMotionFlow],['account-center',runAccountCenterFlow],['training-viewing',runTrainingViewingFlow],['team-main-roles',runTeamMainRolesFlow]];
 const requested=process.argv.slice(2);
 for(const arg of requested)assert.ok(arg.startsWith('--group=')&&allFlows.some(([name])=>'--group='+name===arg),'Unknown browser QA group/argument: '+arg);
 const flows=requested.length?allFlows.filter(([name])=>requested.includes('--group='+name)):allFlows;

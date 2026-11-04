@@ -1,6 +1,7 @@
 import { createLineup, validateLineup, MAX_LINEUPS } from '../../../shared/lineups.js';
 import { createRolePlan, getRolePlanState, setRoleResponse, swapRoleMembers } from '../../../shared/tactic-roles.js';
 import { isBodyTypeForMode } from '../../../shared/tactic-body-types.js';
+import { isMainRoleForMode } from '../../../shared/team-roles.js';
 
 const copy = value => JSON.parse(JSON.stringify(value));
 const plansFor = (state, id) => Object.hasOwn(state.rolePlans, id) ? state.rolePlans[id] : {};
@@ -59,6 +60,11 @@ export function createLineupSession({ repository, builtinRepository, templates, 
         if (!previous || snapshot.mode !== previous.mode) throw new Error('阵容人数不可改变，请另建档案');
         if (snapshot.revision !== previous.revision) throw new Error('档案已更新，请重新打开后再修改');
         const profile = validateLineup({ ...snapshot, bodyType: previous.bodyType, revision: previous.revision + 1, recentTemplateId: previous.recentTemplateId });
+        for (const player of profile.players) {
+          const role = previous.players.find(member => member.id === player.id)?.mainRole;
+          if (role) player.mainRole = role;
+          else delete player.mainRole;
+        }
         const teamPlans = {};
         for (const [id, plan] of Object.entries(plansFor(state, profile.id))) teamPlans[id] = { ...plan, assignments: plan.assignments.map(row => row.memberId && !profile.players.some(p => p.id === row.memberId) ? { ...row, status: 'unknown', memberId: null } : row) };
         let ctx = state.playbackContext;
@@ -87,6 +93,34 @@ export function createLineupSession({ repository, builtinRepository, templates, 
         if (profile.bodyType === snapshot.bodyType) return copy(profile);
         const nextProfile = { ...profile, bodyType: snapshot.bodyType, revision: profile.revision + 1 };
         await commit({ ...state, profiles: state.profiles.map(p => p.id === profile.id ? nextProfile : p), playbackContext: null });
+        return copy(nextProfile);
+      });
+    },
+    saveMainRoles(payload) {
+      const snapshot = copy(payload ?? null);
+      return run(async () => {
+        if (locked) throw new Error('阵容读取未成功，请先重试读取，原档案未被覆盖');
+        const profile = state.profiles.find(item => item.id === snapshot?.profileId);
+        if (!profile || !Number.isSafeInteger(snapshot.expectedRevision) || profile.revision !== snapshot.expectedRevision) {
+          throw new Error('球队已更新，请重新打开后再设置角色');
+        }
+        if (!Array.isArray(snapshot.roles) || snapshot.roles.length !== profile.players.length) throw new Error('球员角色清单不完整');
+        const members = new Set(profile.players.map(player => player.id));
+        const chosen = new Map();
+        for (const row of snapshot.roles) {
+          if (!members.has(row?.memberId) || chosen.has(row.memberId) || (row.role !== '' && !isMainRoleForMode(profile.mode, row.role))) {
+            throw new Error('球员身份或角色无效');
+          }
+          chosen.set(row.memberId, row.role);
+        }
+        if (profile.players.every(player => (player.mainRole ?? '') === chosen.get(player.id))) return copy(profile);
+        const players = profile.players.map(({ mainRole: _previousRole, ...player }) => {
+          const role = chosen.get(player.id);
+          return role ? { ...player, mainRole: role } : player;
+        });
+        const nextProfile = { ...profile, players, revision: profile.revision + 1 };
+        const playbackContext = state.playbackContext?.profileId === profile.id ? null : state.playbackContext;
+        await commit({ ...state, profiles: state.profiles.map(item => item.id === profile.id ? nextProfile : item), playbackContext });
         return copy(nextProfile);
       });
     },

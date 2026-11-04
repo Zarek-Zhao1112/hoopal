@@ -12,6 +12,7 @@ import { COURT_COLORS } from './board/appearance.js';
 import { createTrainingCourt } from './board/court-renderer.js';
 import { createTrainingPlayer } from './training/player.js';
 import { createTrainingView } from './training/view.js';
+import { assignTeamRoles } from '../../shared/team-roles.js';
 import { startup } from './startup/runtime.js';
 
 const $ = id => document.getElementById(id);
@@ -41,6 +42,7 @@ let toastTimer;
 let showDefense = true, renderedStep = -1;
 let workspace, courtRenderer, selectionUI, selectionPlayPending = false;
 let selectionOrigin = null;
+let teamTrainingId = null, teamRoles = null, temporaryTeamRoles = false;
 const svg = $('court');
 const training = createTrainingPlayer({
   frameCount: store.play.frames.length, position: store.play.frameIndex,
@@ -48,7 +50,12 @@ const training = createTrainingPlayer({
   getSpeed: () => Number($('speed').value), getLoop: () => $('loop-play').checked,
   onFrame: showPosition, onComplete: () => stop(),
 });
-const trainingView = createTrainingView({ document, onSelectStep(i) {
+const trainingView = createTrainingView({ document,
+  openDialog: id => workspace?.openDialog(id),
+  openText: (title, text) => workspace?.openText(title, text),
+  canEditTeamRoles: () => workspace?.view === 'play' && !startup.active && !switching && !lineupBusy &&
+    !lineupUI?.isModalOpen && !selectionUI?.isOpen,
+  onSelectStep(i) {
   stop(); store.changeFrame(i); training.seek(i); renderAll(); persist();
 } });
 const NS = 'http://www.w3.org/2000/svg';
@@ -71,10 +78,39 @@ function renderLineups() {
   selectionUI?.render(options);
 }
 function renderLegend() {
-  // Retired role plans remain readable on disk; this flow teaches numbered duties.
-  const box = $('lineup-legend');
-  if (box) { box.hidden = true; box.replaceChildren(); }
-  document.body.dataset.lineupContext = '';
+  trainingView.setTeamRoles(teamRoles, { temporary: temporaryTeamRoles, onSwap: swapTeamRoles, onReset: resetTeamRoles });
+  document.body.dataset.lineupContext = teamRoles ? 'main-roles' : '';
+}
+function updateTeamRoles() {
+  const profile = activeLineup();
+  if (profile?.id !== teamTrainingId) teamTrainingId = null;
+  teamRoles = teamTrainingId ? assignTeamRoles(templates.find(t => t.id === activeTemplateId), profile) : null;
+  temporaryTeamRoles = false;
+}
+function restartTeamPositions() {
+  training.pause({ snap: false });
+  training.seek(0);
+  store.changeFrame(0);
+  renderAll();
+  persist();
+}
+function swapTeamRoles(first, second) {
+  if (switching || lineupBusy || !teamRoles || first === second) return false;
+  const a = teamRoles.find(role => role.playerId === first), b = teamRoles.find(role => role.playerId === second);
+  if (!a || !b) return false;
+  teamRoles = teamRoles.map(role => {
+    const member = role === a ? b : role === b ? a : null;
+    return member ? { ...role, memberId: member.memberId, number: member.number, name: member.name } : role;
+  });
+  temporaryTeamRoles = true;
+  restartTeamPositions();
+  return true;
+}
+function resetTeamRoles() {
+  if (switching || lineupBusy || !teamRoles) return false;
+  updateTeamRoles();
+  restartTeamPositions();
+  return true;
 }
 async function handleLineupAction(kind, payload = {}) {
   if (kind === 'conditions') return openSelection(payload.templateId);
@@ -84,8 +120,10 @@ async function handleLineupAction(kind, payload = {}) {
   if (training.playing) stop();
   renderLineups(); controls();
   try {
+    const previous = activeLineup();
     if (kind === 'create') { await lineupSession.create(payload); toast('阵容已创建并保存在本机'); }
     else if (kind === 'update') { await lineupSession.update(payload.profile); toast('阵容已保存在本机'); }
+    else if (kind === 'save-main-roles') { await lineupSession.saveMainRoles(payload); toast('球员角色已保存在本机'); }
     else if (kind === 'select') {
       // Reopening the current team preserves its confirmed identity.
       if (payload.id !== lineupSession.state.activeProfileId) await lineupSession.select(payload.id);
@@ -96,6 +134,8 @@ async function handleLineupAction(kind, payload = {}) {
       if (result.writeLocked) throw new Error(result.warnings.join('；'));
       lineupError = result.warnings.join('；');
     } else throw new Error('无法识别的阵容操作');
+    const current = activeLineup();
+    if (previous?.id !== current?.id || previous?.revision !== current?.revision || kind === 'retry') updateTeamRoles();
     return true;
   } catch (error) {
     lineupError = `操作未完成：${error.message}`;
@@ -103,7 +143,7 @@ async function handleLineupAction(kind, payload = {}) {
     return false;
   } finally {
     lineupBusy = false;
-    renderLineups(); renderLegend(); draw(); controls();
+    renderLineups(); renderLegend(); renderSteps(); showPosition();
     finishOperation();
   }
 }
@@ -137,8 +177,8 @@ async function handleSelectionAction(kind, payload = {}) {
       const template = templates.find(t => t.id === payload.templateId);
       if (!template || template.mode !== selectionUI.state.mode) throw new Error('战术人数已变化，请重新挑选');
       const profile = activeLineup();
-      if (selectionOrigin.source === 'team' && (profile?.id !== selectionOrigin.profileId || profile?.mode !== template.mode)) throw new Error('当前球队已变化，请重新挑选');
-      if (!await loadTemplate(payload.templateId, { navigate: false })) return false;
+      if (!selectionOrigin || selectionOrigin.source === 'team' && (profile?.id !== selectionOrigin.profileId || profile?.mode !== template.mode)) throw new Error('当前球队已变化，请重新挑选');
+      if (!await loadTemplate(payload.templateId, { navigate: false, profileId: selectionOrigin.profileId })) return false;
       selectionPlayPending = true;
     } else throw new Error('无法识别的挑选操作');
     return true;
@@ -163,7 +203,7 @@ async function persist() {
     return false;
   }
 }
-async function loadTemplate(templateId, { navigate = true } = {}) {
+async function loadTemplate(templateId, { navigate = true, profileId = null } = {}) {
   if (switching) return false;
   const template = templates.find(t => t.id === templateId);
   if (!template) return false;
@@ -183,6 +223,8 @@ async function loadTemplate(templateId, { navigate = true } = {}) {
     store.load(next);
     activeTemplateId = templateId;
     activeKind = template.kind || 'offense';
+    teamTrainingId = profileId;
+    updateTeamRoles();
     catalogKind = activeKind;
     catalogMode = template.mode;
     training.load({ frameCount: store.play.frames.length, position: store.play.frameIndex });
@@ -206,9 +248,7 @@ async function loadTemplate(templateId, { navigate = true } = {}) {
   }
 }
 function draw(board = store.board, ballVisible) {
-  courtRenderer.draw(board, { kind: activeKind, showOpponent: showDefense, ballVisible, playerTitle(player) {
-    return `${player.team === 'attack' ? '进攻' : '防守'} ${player.number} 号`;
-  } });
+  courtRenderer.draw(trainingView.displayBoard(board), { kind: activeKind, showOpponent: showDefense, ballVisible, playerTitle: trainingView.playerTitle });
 }
 
 function renderSteps() {
@@ -253,7 +293,7 @@ function controls() {
 function renderAll() {
   $('play-title').value = store.play.title;
   $('mode').value = workspace?.view === 'library' ? catalogMode : store.play.mode;
-  renderSteps(); renderTemplates(); renderLegend(); showPosition();
+  renderLegend(); renderSteps(); renderTemplates(); showPosition();
 }
 function showPosition() {
   const { stepIndex: index, fraction, interpolation } = training.state;
@@ -403,7 +443,7 @@ workspace = createWorkspaceController({
     persist();
     return true;
   },
-  getNote: () => store.board.note,
+  getNote: () => trainingView.formatNote(store.board.note),
 });
 lineupUI = createLineupUI({ root: $('lineups-panel'), onAction: handleLineupAction, onNavigate: view => view === 'roles' ? openSelection() : workspace.setView(view), onInspect: ({ title, text }) => workspace.openText(title, text), onModalChange(open) { if (open) { workspace.cancelTransition(); if (training.playing) stop(); } controls(); } });
 selectionUI = createTacticSelectionUI({ document, root: $('tactic-selection-panel'), onAction: handleSelectionAction,

@@ -1,0 +1,60 @@
+.demo-shortcuts{display:grid;gap:8px;margin-top:22px}
+.demo-shortcuts .button{display:grid;grid-template-columns:27px 1fr auto;align-items:center;text-align:left;min-height:42px}
+.demo-shortcuts b{color:#6595b1;font-size:10px}
+.demo-shortcuts span{font-size:19px;line-height:1}
+.mode-toggle{display:flex;gap:3px;padding:3px;border:1px solid #c4dae8;border-radius:14px;background:#e2eef6}
+.mode-tab{min-width:42px;min-height:28px;border:1px solid transparent;border-radius:10px;background:none;color:#527993;font-weight:650;font-size:12px}
+.mode-tab[aria-pressed=true]{border-color:#fff;background:#f7fcff;color:#28678a;box-shadow:0 2px 5px #5a8baa20}
+.demo-heading{flex:none;margin:0 2px;font-size:25px;line-height:1.25;color:#315770}
+.tactic-title{padding:0;border:0;background:none;color:inherit;font:inherit;font-weight:inherit;text-align:left}
+.role-status{margin-top:2px;text-align:center}
+.role-sheet[data-mode=roles],.role-sheet[data-mode=swap],.role-sheet[data-mode=explain]{height:auto;max-height:calc(100% - 26px)}
+.role-list{display:grid;gap:8px;min-height:0;overflow:auto}
+.role-row{display:grid;grid-template-columns:36px minmax(0,1fr) auto;align-items:center;gap:8px;border:1px solid #c7deec;border-radius:13px;padding:6px 9px;background:#f5fbffb8;min-height:53px}
+.role-row svg{display:block;width:36px;height:38px}
+.role-name{display:grid;gap:1px;font-size:13px}
+.role-trigger,.role-sheet .swap-select{min-height:36px;padding:5px 8px;border:1px solid #b7d4e5;border-radius:9px;background:#f8fcff;color:#315770;font-size:12px}
+.role-trigger{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:96px;font-weight:650}
+.role-chevron{display:inline-block;font-size:14px;line-height:1;transition:transform 180ms}
+.role-trigger[aria-expanded=true] .role-chevron{transform:rotate(180deg)}
+.role-row[data-expanded=true]{border-color:#78b1cf;background:#edf8ff;box-shadow:inset 0 1px #fff}
+.role-options{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:2px 0 3px;animation:role-options-in 170ms ease-out}
+.role-options[hidden]{display:none}
+.role-option{display:grid;gap:2px;align-content:center;min-height:44px;padding:5px 8px;text-align:left;border:1px solid #c6dce9;border-radius:9px;background:#f8fcff;color:#315770}
+.role-option strong{font-size:12px}
+.role-option small{color:#526f85;font-size:10px}
+.role-option[aria-pressed=true]{border-color:#63a4c7;background:#d5edf9;box-shadow:inset 0 1px #fff}
+.role-option[aria-pressed=true] strong::after{content:' ✓';color:#2678a0}
+#preview-app[data-mode="4v4"] .role-option[data-role=""]{grid-column:1/-1;display:flex;align-items:center;gap:8px;min-height:32px}
+@keyframes role-options-in{from{opacity:.2;transform:translateY(-3px)}to{opacity:1;transform:none}}
+.role-footer{display:grid;gap:3px;margin-top:3px}
+.role-footer .text-button{justify-self:center}
+.role-context{display:flex;justify-content:space-between;align-items:center;gap:4px}
+.position-panel{display:grid;gap:5px;padding:7px 8px;border:1px solid #c4dce9;border-radius:11px;background:#f4fbff9c}
+.position-head{display:flex;justify-content:space-between;align-items:center;gap:4px}
+.position-head strong{font-size:12px}
+.position-head .text-button{padding:0 4px;min-height:26px}
+.position-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+#preview-app[data-mode="4v4"] .position-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+#preview-app[data-mode="4v4"] .position-item{grid-template-columns:auto minmax(0,1fr);align-items:center}
+.position-item{display:grid;gap:2px;justify-items:start;min-width:0;padding:4px 5px;border-radius:7px;background:#e2f1fa}
+.position-item strong,.position-item small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.position-item strong{font-size:11px}
+.position-item small{color:#557b95;font-size:10px}
+.role-body-card .body-choice{grid-template-columns:1fr;min-height:62px}
+.role-body-card .body-choice .body-copy{padding-right:24px}
+.role-training .training-details{gap:5px}
+.role-training .training-note{min-height:34px}
+.training-explanation{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:3px}
+.training-explanation .text-button{padding:1px 4px;min-height:26px}
+.role-instruction{color:#385d75;font-size:14px;line-height:1.8;overflow:auto}
+.role-training .play-button{width:48px;height:48px;font-size:20px}
+.swap-fields{display:grid;gap:8px}
+.swap-fields label{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:13px}
+.role-library-list{min-height:0;overflow:auto}
+.role-library-list .library-card-body{display:block}
+.role-library-list .library-card-body p{padding-top:3px}
+.role-sheet .sheet-footer .primary{width:100%}
+.demo-about{display:grid;align-content:start;gap:14px}
+@media(max-height:700px){.demo-heading{font-size:22px}.role-training{gap:6px}.position-panel{gap:2px;padding:4px 6px}.position-item{padding:2px 4px}.role-training .training-note{min-height:29px}.role-training .play-button{width:40px;height:40px;font-size:18px}.role-training .training-court{min-height:68px}}
+@media(max-height:460px){.demo-heading{font-size:18px}.role-training{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr);gap:4px 8px}.role-training .training-context{grid-column:1/-1;grid-row:2}.role-training .training-court{grid-column:1;grid-row:3;min-height:0}.role-training .training-details{grid-column:2;grid-row:3;align-self:center;gap:3px}.role-training .training-note{min-height:0;-webkit-line-clamp:2}.role-training .play-button{width:30px;height:30px;font-size:14px}.position-item{gap:0}.position-item small{font-size:9px}.role-row{min-height:38px;padding:2px 6px}.role-row svg{height:28px}.role-row select{min-height:28px}.role-body-card .body-choice{min-height:47px}}

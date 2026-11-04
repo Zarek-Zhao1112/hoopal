@@ -300,3 +300,38 @@ test('flush reports a last failed persistence and returns to usable state after 
   await assert.rejects(f.session.confirmRole(payload),/clear failed/);await assert.rejects(f.session.flush(),/clear failed/);
   f.switches.failClear=false;await f.session.confirmRole(payload);await f.session.flush();assert.equal(f.disk.profiles[0].revision,2);
 });
+
+test('main-role saves keep duplicate roles, persist a call-time snapshot and reject stale or incomplete submissions', async () => {
+  const f = await fixture('4v4'), p = f.profile;
+  const roles = p.players.map((player, index) => ({ memberId: player.id, role: ['relay', 'relay', 'screen', ''][index] }));
+  const payload = { profileId: p.id, expectedRevision: p.revision, roles };
+  await assert.rejects(f.session.saveMainRoles({ ...payload, roles: roles.slice(1) }), /不完整/);
+  await assert.rejects(f.session.saveMainRoles({ ...payload, roles: roles.map(row => ({ ...row, memberId: p.players[0].id })) }), /无效/);
+  await assert.rejects(f.session.saveMainRoles({ ...payload, roles: roles.map(row => ({ ...row, role: 'support' })) }), /无效/);
+  const first = f.session.saveMainRoles(payload), stale = f.session.saveMainRoles(payload);
+  roles[0].role = 'start';
+  assert.equal((await first).revision, 2);
+  await assert.rejects(stale, /已更新/);
+  assert.deepEqual(f.disk.profiles[0].players.map(player => player.mainRole), ['relay', 'relay', 'screen', undefined]);
+  const renamed = f.session.state.profiles[0];
+  renamed.players[0].name = '改名';
+  delete renamed.players[0].mainRole;
+  await f.session.update(renamed);
+  assert.equal(f.disk.profiles[0].players[0].mainRole, 'relay');
+});
+
+test('failed main-role writes preserve prior state and can retry without affecting an independent team', async () => {
+  const f = await fixture('4v4'), p = f.profile;
+  const other = await f.session.create({ mode: '3v3', name: '另一队' });
+  const before = f.session.state;
+  const payload = { profileId: p.id, expectedRevision: p.revision, roles: p.players.map(player => ({ memberId: player.id, role: 'screen' })) };
+  f.switches.failClear = true;
+  await assert.rejects(f.session.saveMainRoles(payload), /clear failed/);
+  assert.deepEqual(f.session.state, before);
+  assert.deepEqual(f.disk, before);
+  f.switches.failClear = false;
+  await f.session.saveMainRoles(payload);
+  assert.equal(f.disk.activeProfileId, other.id);
+  assert.deepEqual(f.disk.profiles[1], other);
+  assert.ok(f.disk.profiles[0].players.every(player => player.mainRole === 'screen'));
+});
