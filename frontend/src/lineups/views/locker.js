@@ -7,7 +7,7 @@ import { getTeamRoleOptions } from '../../../../shared/team-roles.js';
 
 /** A feature-owned view, using the coordinator's explicit state and callbacks. */
 export function createLockerView(context){
- const {header,button,navigate,root,active,node,model,document,inspect,crest,selectedByProfile,jersey,draw,dirty,beginEdit,openRolePicker}=context;
+ const {header,button,navigate,root,active,node,model,document,inspect,crest,selectedByProfile,jersey,draw,dirty,beginEdit}=context;
  let lockerRoom=null;
  function profilePageView() {
     header('更衣室', '', false, button('换球队 ›', 'lineup-switch-archive', () => navigate('archives'), { className: 'button button-subtle' }));
@@ -50,9 +50,7 @@ export function createLockerView(context){
     });
     const actions = node('div', 'lineup-profile-actions');
     actions.append(button('挑选战术', 'lineup-conditions', () => navigate('roles'), { className: 'button button-primary', data: { profileId: profile.id } }));
-    actions.append(button(dirty(profile.id) ? '继续未保存配置' : '配置球员', 'lineup-configure', () => beginEdit(profile), { data: { profileId: profile.id } }));
-    const roleSettings = button('设置球员角色', 'lineup-role-settings', () => openRolePicker(profile, roleSettings), { data: { profileId: profile.id } });
-    actions.append(roleSettings);
+    actions.append(button(dirty(profile.id) ? '继续未保存配置' : '配置球员', 'lineup-configure', () => beginEdit(profile, undefined, { playerConfigOnly: true }), { data: { profileId: profile.id } }));
     card.append(cardHeading, top, lockerRoom.element, detail, actions); root.append(card);
   }
  function destroyLocker(){lockerRoom?.destroy();lockerRoom=null;}

@@ -3,7 +3,7 @@ import { playerName } from '../views/text.js';
 
 /** A feature-owned view, using the coordinator's explicit state and callbacks. */
 export function createArchiveMenu(context){
- const {archiveMenu,root,document,model,onModalChange,draw,sheet,beginEdit,node,pager,button,inspect,perform,draftStore,dirty,openRolePicker}=context;
+ const {archiveMenu,root,document,model,onModalChange,draw,sheet,beginEdit,node,pager,button,inspect,perform,draftStore,dirty}=context;
  let menuState=null,menuTrigger=null,menuTriggerId='';const menuGuards=new Map();
  function refreshMenuIsolation() {
     if (!archiveMenu.open) return;
@@ -48,7 +48,7 @@ function editFromMenu(step) {
     const profile = model.state.profiles.find(item => item.id === menuState?.id), trigger = menuTrigger;
     if (!profile) return;
     closeArchiveMenu({ restoreFocus: false }); sheet.rememberTrigger(trigger);
-    beginEdit(profile, undefined, { step });
+    beginEdit(profile, undefined, { step, playerConfigOnly: step === 3 });
   }
 
 function renderArchiveMenu() {
@@ -77,9 +77,6 @@ function renderArchiveMenu() {
       }, { className: 'button lineup-danger', data: { profileId: profile.id } }));
     } else {
       archiveMenu.append(button(dirty(profile.id) ? '继续未保存配置' : '配置球员', 'lineup-configure', () => editFromMenu(3), { data: { profileId: profile.id } }));
-      archiveMenu.append(button('设置球员角色', 'lineup-role-settings', () => {
-        openRolePicker(profile, menuTrigger, () => closeArchiveMenu({ restoreFocus: false }));
-      }, { data: { profileId: profile.id } }));
       archiveMenu.append(button('修改球队名称', 'lineup-archive-rename', () => editFromMenu(1), { data: { profileId: profile.id } }));
       archiveMenu.append(button('更换 NBA 球队', 'lineup-team-open', () => editFromMenu(2), { data: { profileId: profile.id } }));
       archiveMenu.append(button('删除球队', 'lineup-delete', () => { menuState.deleting = true; renderArchiveMenu(); }, { className: 'button lineup-danger', data: { profileId: profile.id } }));

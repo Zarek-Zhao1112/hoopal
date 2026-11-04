@@ -335,3 +335,49 @@ test('failed main-role writes preserve prior state and can retry without affecti
   assert.deepEqual(f.disk.profiles[1], other);
   assert.ok(f.disk.profiles[0].players.every(player => player.mainRole === 'screen'));
 });
+
+test('combined player configuration saves identity and roles together and preserves the draft after a failed write', async () => {
+  const f = await fixture('4v4', (_state, profile) => { profile.players[2].mainRole = 'space'; });
+  await confirmAll(f, 'four-out-cut');
+  const before = f.session.state;
+  const draft = f.session.state.profiles[0];
+  Object.assign(draft.players[0], { name: '阿杰', number: 88, mainRole: 'relay' });
+  draft.players[1].mainRole = 'relay';
+  draft.players[2].mainRole = '';
+  draft.players[3].mainRole = 'support';
+  const save = () => f.session.update(draft, { includeMainRoles: true });
+  await assert.rejects(save(), /角色与阵容人数不符/);
+  draft.players[3].mainRole = 'screen';
+
+  f.switches.failClear = true;
+  await assert.rejects(save(), /clear failed/);
+  assert.deepEqual(f.session.state, before);
+  assert.deepEqual(f.disk, before);
+  f.switches.failClear = false;
+  const pending = save();
+  draft.players[0].name = '等待时修改';
+  draft.players[0].mainRole = 'space';
+  const saved = await pending;
+  assert.deepEqual(f.disk.profiles[0], saved);
+  assert.equal(saved.revision, before.profiles[0].revision + 1);
+  assert.equal(saved.players[0].name, '阿杰');
+  assert.equal(saved.players[0].number, 88);
+  assert.deepEqual(saved.players.map(player => player.mainRole), ['relay', 'relay', undefined, 'screen']);
+  assert.equal(Object.hasOwn(saved.players[2], 'mainRole'), false);
+  assert.deepEqual(f.disk.rolePlans, before.rolePlans);
+  await assert.rejects(save(), /档案已更新/);
+});
+
+test('a new three-person lineup can save duplicate roles with its player identities', async () => {
+  const f = await fixture();
+  const draft = createLineup('3v3', { name: '周末三人队' });
+  draft.players[0].mainRole = 'support';
+  draft.players[1].mainRole = 'support';
+  draft.players[2].mainRole = 'relay';
+  await assert.rejects(f.session.create(draft), /角色与阵容人数不符/);
+  draft.players[2].mainRole = '';
+  const saved = await f.session.create(draft);
+  assert.deepEqual(f.disk.profiles[1], saved);
+  assert.deepEqual(saved.players.map(player => player.mainRole), ['support', 'support', undefined]);
+  assert.equal(f.disk.activeProfileId, saved.id);
+});

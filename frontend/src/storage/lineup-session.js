@@ -53,17 +53,19 @@ export function createLineupSession({ repository, builtinRepository, templates, 
       });
     },
     select(id) { return run(async () => { if (!state.profiles.some(p => p.id === id)) throw new Error('阵容不存在'); return commit({ ...state, activeProfileId: id, playbackContext: null }); }); },
-    update(value) {
+    update(value, { includeMainRoles = false } = {}) {
       const snapshot = copy(value);
       return run(async () => {
         const previous = state.profiles.find(p => p.id === snapshot.id);
         if (!previous || snapshot.mode !== previous.mode) throw new Error('阵容人数不可改变，请另建档案');
         if (snapshot.revision !== previous.revision) throw new Error('档案已更新，请重新打开后再修改');
         const profile = validateLineup({ ...snapshot, bodyType: previous.bodyType, revision: previous.revision + 1, recentTemplateId: previous.recentTemplateId });
-        for (const player of profile.players) {
-          const role = previous.players.find(member => member.id === player.id)?.mainRole;
-          if (role) player.mainRole = role;
-          else delete player.mainRole;
+        if (!includeMainRoles) {
+          for (const player of profile.players) {
+            const role = previous.players.find(member => member.id === player.id)?.mainRole;
+            if (role) player.mainRole = role;
+            else delete player.mainRole;
+          }
         }
         const teamPlans = {};
         for (const [id, plan] of Object.entries(plansFor(state, profile.id))) teamPlans[id] = { ...plan, assignments: plan.assignments.map(row => row.memberId && !profile.players.some(p => p.id === row.memberId) ? { ...row, status: 'unknown', memberId: null } : row) };

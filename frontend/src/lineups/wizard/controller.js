@@ -12,7 +12,7 @@ export function createLineupWizardController(context){
     draftStore.beginEdit(profile);
     const originSection = model.section, originRoute = model.route;
     draftStore.editorId = profile.id; draftStore.playerIndex = Math.max(0, draftStore.drafts.get(profile.id).players.findIndex(player => player.id === memberId)); draftStore.editSection = 'identity'; model.route = 'edit'; model.confirmation = null; model.feedback = '';
-    draftStore.wizard = { kind: 'edit', id: profile.id, step: options.step || 3, maxStep: 3, originSection, originRoute, teamPage: Math.max(0, Math.floor(NBA_TEAMS.findIndex(team => team.id === draftStore.drafts.get(profile.id).nbaTeamId) / 12)) }; draw();
+    draftStore.wizard = { kind: 'edit', id: profile.id, step: options.step || 3, maxStep: 3, playerConfigOnly: Boolean(options.playerConfigOnly), originSection, originRoute, teamPage: Math.max(0, Math.floor(NBA_TEAMS.findIndex(team => team.id === draftStore.drafts.get(profile.id).nbaTeamId) / 12)) }; draw();
   }
 
 function openTeamPicker() { if (draftStore.wizard) { draftStore.wizard.step = 2; model.feedback = ''; draw(); } }
@@ -73,7 +73,7 @@ function saveWizard() {
       profile = validateLineup(copy(draft));
     } catch (error) { model.feedback = error.message; draw(); return; }
     perform(source.kind === 'create' ? 'create' : 'update', source.kind === 'create' ? profile : { profile }, () => {
-      if (source.kind === 'create') { draftStore.createDraft = null; draftStore.createMembers = null; }
+      if (source.kind === 'create') draftStore.discard(source);
       else { draftStore.drafts.delete(source.id); draftStore.baselines.delete(source.id); }
       const savedId = source.kind === 'create' ? model.state.activeProfileId : source.id;
       const index = model.state.profiles.findIndex(item => item.id === savedId); if (index >= 0) model.profilePage = Math.floor(index / 3);

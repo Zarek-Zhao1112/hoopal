@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {writeFile} from 'node:fs/promises';
 import path from 'node:path';
 import {createLineup} from '../../shared/lineups.js';
-import {navigateLineupView} from './archive-helpers.mjs';
+import {openArchiveEditor} from './archive-helpers.mjs';
 
 /** Exercises the actual saved profile and live wizard, never the design demo. */
 export async function runCreationMotionFlow({send,evaluate,wait,waitFor,folder}) {
@@ -21,7 +21,7 @@ export async function runCreationMotionFlow({send,evaluate,wait,waitFor,folder})
  const settle=()=>waitFor(`document.querySelector('${host}')?.dataset.transitioning!=='true'`);
  const rawAction=(action,extra='')=>evaluate(`(()=>{const n=document.querySelector(${JSON.stringify(`${modal} [data-action="${action}"]${extra}`)});if(!n||n.disabled)throw Error('Missing/disabled '+${JSON.stringify(action)});n.click()})()`);
  const action=async(name,extra='')=>{await rawAction(name,extra);await settle()};
- const openEditor=async()=>{await navigateLineupView({evaluate,waitFor},'lineups');await evaluate("document.querySelector('[data-action=lineup-configure]').click()");await waitFor("document.querySelector('#lineup-wizard-dialog').dataset.phase==='open'");await settle()};
+ const openEditor=async()=>{const id=await evaluate(`JSON.parse(localStorage.getItem('${key}')).activeProfileId`);await openArchiveEditor({evaluate,waitFor},id);await settle();await step(3)};
  const closeEditor=async()=>{await action('lineup-wizard-close');if(await evaluate("Boolean(document.querySelector('#lineup-wizard-dialog [data-action=lineup-draft-discard]'))"))await action('lineup-draft-discard');await waitFor("!document.querySelector('#lineup-wizard-dialog').open")};
  const step=async number=>{await action('lineup-wizard-step',`[data-step="${number}"]`);assert.equal(await evaluate("document.querySelector('.lineup-glass-sheet').dataset.step"),String(number))};
  const shot=async name=>{const r=await send('Page.captureScreenshot',{format:'png'});await writeFile(path.join(folder,name),Buffer.from(r.data,'base64'))};
@@ -56,7 +56,7 @@ export async function runCreationMotionFlow({send,evaluate,wait,waitFor,folder})
   }
   await step(3);await action('lineup-player','[data-index="0"]');const members=await trace("document.querySelector('#lineup-wizard-dialog [data-action=lineup-wizard-player-next]').click()");assert.equal((await identity()).index,'1');assert.ok(members.some(s=>Math.abs(s.x)>1));assert.ok(members.some(s=>s.host?.duration==='280'));motions.push({label:'member-forward',samples:members});
   await action('lineup-player','[data-index="0"]');
-  const swipe=async(dx,cancel=false)=>{const p=await evaluate(`(()=>{const r=document.querySelector('${live} .lineup-player-hero svg').getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height*.55}})()`);await send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...p,id:0,radiusX:4,radiusY:4,force:1}]});for(const ratio of[.3,.65,1])await send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:p.x+dx*ratio,y:p.y,id:0,radiusX:4,radiusY:4,force:1}]});await send('Input.dispatchTouchEvent',{type:cancel?'touchCancel':'touchEnd',touchPoints:[]});await settle();await send('Emulation.setTouchEmulationEnabled',{enabled:false})};
+  const swipe=async(dx,cancel=false)=>{const p=await evaluate(`(()=>{const r=document.querySelector('${live} .lineup-player-hero').getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height*.55}})()`);await send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...p,id:0,radiusX:4,radiusY:4,force:1}]});for(const ratio of[.3,.65,1])await send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:p.x+dx*ratio,y:p.y,id:0,radiusX:4,radiusY:4,force:1}]});await send('Input.dispatchTouchEvent',{type:cancel?'touchCancel':'touchEnd',touchPoints:[]});await settle();await send('Emulation.setTouchEmulationEnabled',{enabled:false})};
   await swipe(-85);assert.equal((await identity()).index,'1');await swipe(85);assert.equal((await identity()).index,'0');await swipe(-85,true);assert.equal((await identity()).index,'0');observations.push('real touch left/right/cancel matched current member');
   await evaluate("document.querySelector('#lineup-wizard-dialog [data-action=lineup-wizard-step][data-step=\"1\"]').click();document.querySelector('#lineup-wizard-dialog [data-action=lineup-wizard-step][data-step=\"3\"]').click();document.querySelector('#lineup-wizard-dialog [data-action=lineup-player][data-index=\"2\"]').click();document.querySelector('#lineup-wizard-dialog [data-action=lineup-player][data-index=\"0\"]').click()");await settle();assert.equal((await identity()).index,'0');assert.equal(await evaluate("document.querySelectorAll('[data-wizard-snapshot=true]').length"),0);
   await send('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});await rawAction('lineup-player','[data-index="1"]');assert.equal((await identity()).index,'1');assert.equal(await evaluate(`document.querySelector('${host}').dataset.transitioning`),'false');await send('Emulation.setEmulatedMedia',{features:[]});

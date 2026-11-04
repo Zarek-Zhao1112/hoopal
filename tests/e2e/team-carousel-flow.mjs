@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import {navigateLineupView} from './archive-helpers.mjs';
+import {navigateLineupView,openArchiveEditor} from './archive-helpers.mjs';
 import { NBA_TEAMS } from '../../data/nba-teams.js';
 import { createLineup } from '../../shared/lineups.js';
 import {waitForWizardMotion} from './wizard-helpers.mjs';
@@ -108,9 +108,10 @@ export async function runTeamCarouselFlow({ send, evaluate, wait, waitFor, folde
     await send('Emulation.setEmulatedMedia', { features: [] });
     await action('lineup-wizard-close'); await action('lineup-draft-discard'); await closed();
     const legacy = createLineup('3v3', { name: '中性旧档案 · 转盘验收', nbaTeamId: null });
+    const openTeamEditor = () => openArchiveEditor({evaluate,waitFor}, legacy.id, 'lineup-team-open');
     legacy.players.forEach(member=>Object.assign(member,{height:'',build:'',mobility:'',strengths:[],weaknesses:[]}));
     await evaluate(`localStorage.setItem('${key}',${JSON.stringify(JSON.stringify({ schemaVersion: 1, profiles: [legacy], activeProfileId: legacy.id, playbackContext: null }))})`); await reload();
-    await action('lineup-configure'); await modalStable(); await action('lineup-wizard-step', '[data-step="2"]'); await settled(); assert.equal((await state()).teamId, '', 'legacy null remains neutral');
+    await openTeamEditor(); await settled(); assert.equal((await state()).teamId, '', 'legacy null remains neutral');
     await evaluate("window.hc025StaleNext=document.querySelector('[data-action=lineup-carousel-next]');window.hc025StaleAll=document.querySelector('[data-action=lineup-carousel-all-open]')");
     await action('lineup-wizard-next'); assert.equal(await evaluate("document.querySelector('.lineup-glass-sheet').dataset.step"), '3', 'legacy neutral can continue');
     await evaluate(`(()=>{window.hc025OriginalSetItem=Storage.prototype.setItem;window.hc025Writes=0;Storage.prototype.setItem=function(k,v){if(k==='${key}'){window.hc025Writes++;window.hc025StaleNext.click();window.hc025StaleAll.click();}return window.hc025OriginalSetItem.call(this,k,v)};})()`);
@@ -118,10 +119,10 @@ export async function runTeamCarouselFlow({ send, evaluate, wait, waitFor, folde
     assert.equal(await evaluate('window.hc025Writes'), 1, 'busy repeated submission writes once');
     assert.equal(await evaluate(`JSON.parse(localStorage.getItem('${key}')).profiles[0].nbaTeamId`), null, 'stale destroyed carousel cannot mutate saved draft while busy');
     await evaluate('Storage.prototype.setItem=window.hc025OriginalSetItem;delete window.hc025OriginalSetItem');
-    await action('lineup-configure'); await modalStable(); await action('lineup-wizard-step', '[data-step="2"]');
+    await openTeamEditor();
     await evaluate("(()=>{const old=document.querySelector('[data-action=lineup-carousel-next]');document.querySelector('[data-action=lineup-wizard-close]').click();old.click();})()");
     assert.equal(await evaluate("document.querySelector('#lineup-wizard-dialog').dataset.phase"), 'closing'); await closed();
-    await action('lineup-configure'); await modalStable(); await action('lineup-wizard-step', '[data-step="2"]'); assert.equal((await state()).teamId, '', 'closing controls cannot choose a hidden team');
+    await openTeamEditor(); assert.equal((await state()).teamId, '', 'closing controls cannot choose a hidden team');
     await action('lineup-wizard-close'); await closed();
     await writeFile(path.join(folder, 'hc025-team-carousel.json'), JSON.stringify({ layouts, gestures, allTeams: NBA_TEAMS.map(t => t.id), initialNeutral: true, cancelToNeutral: true, legacyNeutralSaved: true, draftOnly: true, focusIsolation: true, staleBusyAndClosingHandlers: true }, null, 2));
   } finally {

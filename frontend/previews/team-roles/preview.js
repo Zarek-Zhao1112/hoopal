@@ -6,6 +6,7 @@ import { createJerseySvg } from '../../src/lineups/components/jersey.js';
 import { createTrainingCourt } from '../../src/board/court-renderer.js';
 import { createTrainingPlayer } from '../../src/training/player.js';
 import { createLibraryPreview } from '../../src/workspace/library-preview.js';
+import { createPlayerConfig } from './player-config.js';
 
 const roleOptions = {
   start: ['持球发起', '持球、突破分球'],
@@ -55,6 +56,7 @@ const teams = {
   },
 };
 const params = new URLSearchParams(location.search);
+const combined = params.get('view') === 'players';
 let mode = params.get('mode') === '4v4' ? '4v4' : '3v3';
 const team = () => teams[mode];
 const kit = getNbaTeam('BOS');
@@ -203,13 +205,13 @@ function drawLocker() {
   controls.append(button('‹', () => inspect(playerIndex - 1), 'icon-button'), indicators, button('›', () => inspect(playerIndex + 1), 'icon-button'));
   const foot = el('footer', 'locker-footer');
   const member = members[playerIndex];
-  foot.append(el('p', 'quiet', member.role ? `${member.name} · ${roleOptions[member.role][0]}` : '可以稍后设置球员角色'), button('挑选战术', beginBody, 'button primary'), button('设置球员角色', openRoles, 'button secondary'));
+  foot.append(el('p', 'quiet', member.role ? `${member.name} · ${roleOptions[member.role][0]}` : '可以稍后设置球员角色'), button('挑选战术', beginBody, 'button primary'), button(combined ? '配置球员' : '设置球员角色', openPlayerEditor, 'button secondary'));
   card.append(head, title, cabinet, controls, foot);
   content.append(brand, card);
 }
 function drawMy() {
   const card = el('section', 'glass-card demo-about');
-  card.append(el('h2', '', '球队管理'), el('p', 'quiet', `${team().name} · ${mode} · ${bodyLabel(team().body)}`), button('设置球员角色 ›', openRoles, 'menu-row'));
+  card.append(el('h2', '', '球队管理'), el('p', 'quiet', `${team().name} · ${mode} · ${bodyLabel(team().body)}`), button(combined ? '配置球员 ›' : '设置球员角色 ›', openPlayerEditor, 'menu-row'));
   content.append(el('h1', 'demo-heading', '我的'), card);
 }
 function beginBody() { returnView = view; bodyDraft = team().body; show('body', true); }
@@ -329,6 +331,24 @@ function notify(message) {
   const toast = document.querySelector('#preview-toast');
   toast.textContent = message; toast.classList.add('visible');
   clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('visible'), 2100);
+}
+function openPlayerEditor(expandRole = false) {
+  if (!combined) return openRoles();
+  const { name, members } = team();
+  const { editor, footer } = createPlayerConfig({
+    members, playerIndex, expandRole: expandRole === true, el, button,
+    options: rolesByMode[mode].map(key => [key, ...roleOptions[key]]),
+    renderJersey: (member, index) => createJerseySvg({
+      document, team: kit, number: member.number || '—', name: member.name, idPrefix: `config-${index}`,
+    }),
+    cancel: () => closeSheet(),
+    save: draft => closeSheet(() => {
+      members.splice(0, members.length, ...draft);
+      assignment = assign(); temporarySwap = false; show(view, true);
+      notify('球员配置已应用到预览');
+    }),
+  });
+  openSheet('players', '配置球员', `${name} · ${mode}`, editor, footer);
 }
 function openRoles() {
   const list = el('div', 'role-list'), foot = el('footer', 'role-footer');
@@ -455,9 +475,24 @@ dialog.addEventListener('cancel', event => { event.preventDefault(); closeSheet(
 dialog.querySelector('.dialog-shade').addEventListener('click', () => closeSheet());
 window.addEventListener('resize', () => { if (dialog.open) fitDialog(); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) { runtime.pause({ snap: false }); paint(); } });
-const shortcuts = { roles: () => { show('locker'); openRoles(); }, body: () => { show('locker'); beginBody(); }, training: () => show('training', true) };
+const shortcuts = { roles: () => { show('locker'); openPlayerEditor(); }, body: () => { show('locker'); beginBody(); }, training: () => show('training', true) };
 for (const jump of document.querySelectorAll('[data-jump]')) jump.addEventListener('click', shortcuts[jump.dataset.jump]);
 draw();
+if (combined) {
+  document.title = '球搭 · 球员配置合并原型';
+  const caption = document.querySelector('.preview-caption');
+  caption.querySelector('h1').textContent = '配置球员';
+  caption.querySelector('p').textContent = '在同一张球员卡里填写昵称、球衣号码，再选一个适合他的角色。切换队员后，刚才填的内容会留在草稿里。';
+  const links = el('div', 'config-demo-links');
+  for (const size of ['3v3', '4v4']) {
+    const link = el('a', 'button', `${size} 原型`);
+    link.href = `?view=players&mode=${size}${size === '4v4' ? '&options=1' : ''}`;
+    if (mode === size) link.setAttribute('aria-current', 'page');
+    links.append(link);
+  }
+  caption.querySelector('.demo-shortcuts').replaceWith(links);
+  openPlayerEditor(params.get('options') === '1');
+}
 if (params.get('view') === 'roles') {
   openRoles();
   sheet.querySelectorAll('.role-trigger')[1].click();

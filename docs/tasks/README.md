@@ -8,6 +8,8 @@
 
 | 编号 | 任务 | 状态 | 负责人 | 下一步 |
 | --- | --- | --- | --- | --- |
+| [HC-065](HC-065-combined-player-config-release.md) | 统一球员配置正式接入 | `awaiting_device` | 主控集成、编辑器、存储、浏览器、独立审查 | 1.31.0 手机安装成功，双文件一致，物理操作待体验 |
+| [HC-064](HC-064-combined-player-config-preview.md) | 球员配置与角色合并原型 | `completed` | 主控原型与出图 | 3v3/4v4 网页与竖屏图已获确认，正式接入见 HC-065 |
 | [HC-063](HC-063-team-role-release.md) | 通用角色与本队演练正式接入 | `awaiting_device` | 数据、角色面板、训练场分工，主控集成与交付 | 254 项、Edge 6 组和独立审查通过；1.30.0 已覆盖安装，WV96 程序检查与双文件保留已确认，人工体验待验 |
 | [HC-062](HC-062-team-role-preview.md) | 3v3 球员角色与本队站位网页预览 | `completed` | 主控实现、team_roles_preview_review 独立审查 | 本地可操作预览，Edge 核对角色分配、体型筛选、换位、真实播放与三尺寸；供用户评审 |
 | [HC-061](HC-061-primary-page-headings-release.md) | 训练场与我的一级标题正式接入 | `awaiting_device` | 主控实现/集成，heading_review独立审查 | 248检查、三组受影响回归与独立12项/五尺寸通过；1.29.1保数据安装，WV96标题/blur/返回与双hash保持，人工观感待验 |

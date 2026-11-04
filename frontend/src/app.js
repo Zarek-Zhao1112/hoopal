@@ -122,8 +122,7 @@ async function handleLineupAction(kind, payload = {}) {
   try {
     const previous = activeLineup();
     if (kind === 'create') { await lineupSession.create(payload); toast('阵容已创建并保存在本机'); }
-    else if (kind === 'update') { await lineupSession.update(payload.profile); toast('阵容已保存在本机'); }
-    else if (kind === 'save-main-roles') { await lineupSession.saveMainRoles(payload); toast('球员角色已保存在本机'); }
+    else if (kind === 'update') { await lineupSession.update(payload.profile, { includeMainRoles: true }); toast('阵容已保存在本机'); }
     else if (kind === 'select') {
       // Reopening the current team preserves its confirmed identity.
       if (payload.id !== lineupSession.state.activeProfileId) await lineupSession.select(payload.id);

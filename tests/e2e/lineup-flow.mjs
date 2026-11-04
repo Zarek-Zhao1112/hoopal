@@ -5,7 +5,7 @@ import {createLineup} from '../../shared/lineups.js';
 import {confirmedRolePlan} from './role-fixtures.mjs';
 import {NBA_TEAMS} from '../../data/nba-teams.js';
 import {libraryControls} from './library-flow-helpers.mjs';
-import {beginArchiveCreate,selectArchive,openArchiveMenu} from './archive-helpers.mjs';
+import {beginArchiveCreate,selectArchive,openArchiveMenu,openArchiveEditor} from './archive-helpers.mjs';
 import {waitForWizardMotion} from './wizard-helpers.mjs';
 
 export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
@@ -16,6 +16,7 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
   const disk="JSON.parse(localStorage.getItem('halfcourt-lineups-v1'))";
   const modalStable=async()=>{await waitFor("(()=>{const d=document.querySelector('#lineup-wizard-dialog');return !d?.open||d.dataset.phase==='open'})()");await wait(40)};
   const openWizard=async(actionId='lineup-configure')=>{await action(actionId);await waitFor("document.querySelector('#lineup-wizard-dialog')?.open&&document.querySelector('#lineup-wizard-dialog').dataset.phase==='open'");await wait(40)};
+  const openTeamEditor=async()=>{const id=await evaluate(`${disk}.activeProfileId`);await openArchiveEditor({evaluate,waitFor},id);await wait(40)};
   const beginCreate=async()=>{await beginArchiveCreate({evaluate,waitFor});await wait(40)};
   const step=async number=>{await action('lineup-wizard-step',`[data-step="${number}"]`);assert.equal(await evaluate("document.querySelector('.lineup-glass-sheet').dataset.step"),String(number))};
   const closeWizard=async(choice='discard')=>{
@@ -157,6 +158,8 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
     await openWizard();
     await checkLayout(width,height,'editor basic identity');
     if(width===390)await screenshot('lineup-configure-phone.png');
+    await closeWizard();
+    await openTeamEditor();
     await step(1);await checkLayout(width,height,'editor team basics');
     assert.ok(await evaluate("[...document.querySelectorAll('#lineup-wizard-dialog [data-action=lineup-mode]')].every(n=>n.disabled)"),'saved roster size cannot silently change');
     await step(2);
@@ -173,6 +176,7 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
     assert.deepEqual(teams.sort(),NBA_TEAMS.map(team=>team.id).sort(),'all 30 teams and official logos are reachable');
     await action('lineup-carousel-all-close');
     await closeWizard('discard');
+    await nav('lineups');
     await checkRoster(width,height,4);
     await screenshot(`manager-roster-4v4-${width}-${height}.png`);
     if(width===390)await screenshot('lineup-profiles-phone.png');
@@ -229,12 +233,12 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
 
   async function checkNbaDrafts(){
     const before=await evaluate(`${disk}.profiles[0]`);
-    await openWizard();await step(2);
+    await openTeamEditor();await step(2);
     await chooseTeam('LAL');
     assert.deepEqual(await evaluate(`${disk}.profiles[0]`),before,'selecting a team changes only the task draft');
     await closeWizard('discard');
     assert.deepEqual(await evaluate(`${disk}.profiles[0]`),before,'canceling the configuration preserves saved kit');
-    await openWizard();await step(2);
+    await openTeamEditor();await step(2);
     assert.equal(await evaluate("document.querySelector('.lineup-wizard-kit .lineup-jersey').dataset.teamId"),'BOS','reopened task keeps the original saved team after cancellation');
     await step(1);
     await input('lineup-team-name','队名草稿仍保留');
@@ -242,14 +246,15 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
     assert.equal(await evaluate("document.querySelector('[data-action=lineup-team-name]').value"),'队名草稿仍保留','team picker preserves unrelated team name draft');
     await input('lineup-team-name',before.name);
     await step(2);await chooseTeam('LAL');await step(3);
-    await action('lineup-save');await waitFor("document.querySelector('#lineups-panel').dataset.subview==='profiles'&&document.querySelector('#lineups-panel').getAttribute('aria-busy')==='false'&&!document.querySelector('#lineup-wizard-dialog').open");
+    await action('lineup-save');await waitFor("document.querySelector('#lineups-panel').dataset.subview==='teams'&&document.querySelector('#lineups-panel').getAttribute('aria-busy')==='false'&&!document.querySelector('#lineup-wizard-dialog').open");
     await send('Page.reload');await waitFor("Boolean(document.querySelector('[data-action=lineup-configure]'))");
     const after=await evaluate(`${disk}.profiles[0]`);
     assert.equal(after.nbaTeamId,'LAL');assert.deepEqual(after.players,before.players);assert.equal(after.name,before.name);
     assert.equal(after.id,before.id);assert.equal(after.revision,before.revision+1);
     assert.ok(await evaluate("[...document.querySelectorAll('.locker-bay[data-player-id] .lineup-jersey svg')].every(n=>n.textContent.includes('LAKERS'))"),'all members share selected kit');
-    await openWizard();await step(2);await chooseTeam('BOS');await step(3);await action('lineup-save');
-    await waitFor("document.querySelector('#lineups-panel').dataset.subview==='profiles'&&document.querySelector('#lineups-panel').getAttribute('aria-busy')==='false'&&!document.querySelector('#lineup-wizard-dialog').open");
+    await openTeamEditor();await step(2);await chooseTeam('BOS');await step(3);await action('lineup-save');
+    await waitFor("document.querySelector('#lineups-panel').dataset.subview==='teams'&&document.querySelector('#lineups-panel').getAttribute('aria-busy')==='false'&&!document.querySelector('#lineup-wizard-dialog').open");
+    await nav('lineups');
   }
   async function tap(selector){await modalStable();const r=await evaluate(`(()=>{let r=document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2}})()`);await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[r]});await send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await wait(40)}
   async function screenshot(name){await waitFor('!document.body.dataset.pageTransition');await modalStable();await wait(500);await evaluate("document.querySelector('#toast-live').classList.remove('visible')");const r=await send('Page.captureScreenshot',{format:'png'});await writeFile(path.join(folder,name),Buffer.from(r.data,'base64'))}

@@ -43,3 +43,9 @@ export async function openArchiveMenu(context, id) {
   await evaluate(`document.querySelector('[data-action="lineup-archive-menu"][data-profile-id="${id}"]').click()`);
   await waitFor("document.querySelector('#lineup-archive-menu').open");
 }
+
+export async function openArchiveEditor(context, id, action = 'lineup-archive-rename') {
+  await openArchiveMenu(context, id);
+  await context.evaluate(`document.querySelector('#lineup-archive-menu [data-action="${action}"]').click()`);
+  await context.waitFor("document.querySelector('#lineup-wizard-dialog')?.dataset.phase==='open'");
+}
