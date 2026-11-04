@@ -76,6 +76,8 @@ HC-051的全26套/91职责位覆盖、稳定身份、进攻/防守阵营和未�
 
 所有26套/91位职责已与单套战术定义共置，roleVersion=1；data/templates统一注册，npm build和Android构建入口都校验人数、稳定ID、阵营及每帧棋子。shared/tactic-roles.js只处理角色与三态，未选状态是unknown；available必须有唯一现有成员，missing和unknown不绑定。旧标签和自动加权排名实现及专属排名测试退役，保留原动画、读写保护和新增替代测试。
 
+2026-11-04，依据 HC-075 手机 3v3 阵容与九套进攻起始站位对照，修正「传切配合」通用偏好为 attack-1 持球发起、attack-2 掩护策应、attack-3 空间终结。原因是 attack-2 动作为翼侧接球回传，原先标记持球发起；原偏好会把发起者配到回传职责，并将策应者挤到弱侧空间位。其他八套同队偏好对照未见该类明显错位。新增当前球衣角色分配回归样例，见 [HC-075](../tasks/HC-075-team-role-tactic-mapping.md)。
+
 条件主卡替换战术库内部区域，底栏不增加页。更衣室“找适合本队的战术”与展开战术卡“查看条件”都可进入；条件页可选择全部攻防战术，无同人数球队时明确引导选队，仍可通用示范。角色面板450ms浮起，三态、具体动作和未占用队员选择均在其中；确认失败保输入，成功才关，取消无写盘。交换需明确确认双方新的动作要求。暂无人员时按缺少动作找同人数同攻防且不含这些动作的其他候选，标明仍需确认；没有候选不虚构兜底排名。
 
 持久化沿用halfcourt-lineups-v1键，schemaVersion升级2：profiles/activeProfileId/rolePlans/playbackContext。每队每套计划含templateId/roleVersion/assignments[{roleId,status,memberId}]。来源source=role-confirmations，包含球队ID/revision和模板ID/roleVersion，必须完整有效。确认、交换、重置捕获调用时球队身份及expectedRevision，串行成功才更新状态并递增revision、清旧来源。基本改名/号码保成员ID关联与合法来源，替换成员解除相关位；换队或手选战术可靠解除旧来源后才能切换。

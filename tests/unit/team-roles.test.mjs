@@ -32,3 +32,14 @@ test('partial choices match the preferred slot and fill remaining spots by stabl
   assert.equal(assignTeamRoles(tactic('high-low'), team), null);
   assert.equal(assignTeamRoles(templates.find(t => t.kind === 'defense' && t.mode === '3v3'), team), null);
 });
+
+test('3v3 give-and-go aligns initiator, relay and weak-side space with the authored duties', () => {
+  const team = createLineup('3v3');
+  team.players[0].number = 23; team.players[0].mainRole = 'support';
+  team.players[1].number = 31; team.players[1].mainRole = 'space';
+  team.players[2].number = 7; team.players[2].mainRole = 'start';
+  const rows = assignTeamRoles(tactic('give-go'), team);
+
+  assert.deepEqual(rows.map(row => row.number), [7, 23, 31]);
+  assert.deepEqual(rows.map(row => row.title), ['传切终结者', '翼侧回传者', '弱侧接应者']);
+});

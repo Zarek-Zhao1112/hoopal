@@ -8,6 +8,7 @@
 
 | 编号 | 任务 | 状态 | 负责人 | 下一步 |
 | --- | --- | --- | --- | --- |
+| [HC-075](HC-075-team-role-tactic-mapping.md) | 通用角色与进攻战术位置对齐 | `completed` | 主控数据与验证、独立审查 | 1.33.2 已覆盖安装，两套战术实机程序核对通过 |
 | [HC-074](HC-074-locker-card-swipe-release.md) | 整卡横滑手机更新与 Git 推送 | `awaiting_device` | 主控发布、独立审查 | 已保数据安装与模拟触摸核对，待用户手动体验 |
 | [HC-073](HC-073-locker-card-swipe.md) | 整卡横滑正式接入 | `completed` | 主控 | 两种外观已在 Chrome 触摸模拟中核对 |
 | [HC-072](HC-072-locker-card-swipe-preview.md) | 整张更衣室卡片滑动原型 | `completed` | 主控原型 | 可操作网页和三帧效果图供评审 |

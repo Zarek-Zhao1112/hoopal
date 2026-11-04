@@ -15,7 +15,7 @@ const rolesByMode = {
 // in which role definitions are stored. The build gate checks every offense.
 const preferences = {
   'pick-roll': ['start', 'support', 'space'],
-  'give-go': ['space', 'start', 'support'],
+  'give-go': ['start', 'support', 'space'],
   'back-screen': ['start', 'space', 'support'],
   'dribble-handoff': ['support', 'start', 'space'],
   'pick-pop': ['start', 'support', 'space'],

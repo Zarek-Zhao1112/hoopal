@@ -1,5 +1,9 @@
 # 版本记录
 
+## 1.33.2 · 传切配合站位修正
+
+3v3「传切配合」按发起传切、翼侧回传、弱侧拉开匹配球队角色。见 [HC-075](docs/tasks/HC-075-team-role-tactic-mapping.md)。
+
 ## 1.33.1 · 整张更衣室卡片横滑
 
 写实和玻璃外观都支持从标题、留白、球衣和按钮上横滑换人。轻点「编辑球员」打开当前球员。见 [HC-074](docs/tasks/HC-074-locker-card-swipe-release.md)。

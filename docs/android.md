@@ -2,6 +2,8 @@
 
 ## 运行方式
 
+2026-11-04，1.33.2 / code 42 已覆盖安装到 M2101K9C。通过手机实际界面核对「传切配合」与「高位挡拆」的本队号码和讲解，球队资料与战术进度原文一致。见 [HC-075](tasks/HC-075-team-role-tactic-mapping.md) 和 [1.33.2 APK](../artifacts/apk/hoopal-1.33.2.apk)。
+
 2026-11-04，1.33.1 / code 41 已覆盖安装到 M2101K9C。手机 WebView 以模拟触摸核对整卡换人与对应球员编辑，球队档案及战术进度原文一致。见 [HC-074](tasks/HC-074-locker-card-swipe-release.md) 和 [1.33.1 APK](../artifacts/apk/hoopal-1.33.1.apk)。
 
 2026-11-04，1.33.0 / code 40 已覆盖安装到 M2101K9C。真机核对当前球衣对应的单人编辑、训练场和「我的」的写实与玻璃排版，球队档案与战术进度原文一致。见 [HC-071](tasks/HC-071-workspace-player-release.md) 和 [1.33.0 APK](../artifacts/apk/hoopal-1.33.0.apk)。
