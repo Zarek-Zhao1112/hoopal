@@ -63,7 +63,30 @@ export function createLineupDrafts() {
       else { store.drafts.delete(source.id); store.baselines.delete(source.id); }
     },
     isDirty(id) { return store.drafts.has(id) && JSON.stringify(store.drafts.get(id)) !== store.baselines.get(id); },
-    hasUnsavedChanges() { return [...store.drafts.keys()].some(store.isDirty) || Boolean(store.createDraft); },
+    isSinglePlayerDirty() {
+      return Boolean(store.wizard?.singlePlayerDraft && JSON.stringify(store.wizard.singlePlayerDraft) !== store.wizard.singlePlayerBaseline);
+    },
+    rebaseAfterPlayerSave(before, saved, playerId) {
+      if (!store.isDirty(before.id)) return;
+      const baseline = JSON.parse(store.baselines.get(before.id));
+      if (editableSnapshot(baseline) !== editableSnapshot(before)) return;
+      const teamDraft = store.drafts.get(before.id);
+      const previous = before.players.find(player => player.id === playerId);
+      const updated = saved.players.find(player => player.id === playerId);
+      const retained = teamDraft.players.find(player => player.id === playerId);
+      if (!previous || !updated || !retained) return;
+      const fields = ['name', 'number', 'mainRole'];
+      // Keep the old revision on a conflict so an older team draft cannot overwrite the new save.
+      if (fields.some(field => retained[field] !== previous[field] && updated[field] !== previous[field] && retained[field] !== updated[field])) return;
+      for (const field of fields) {
+        if (retained[field] !== previous[field]) continue;
+        if (Object.hasOwn(updated, field)) retained[field] = updated[field];
+        else delete retained[field];
+      }
+      Object.assign(teamDraft, { revision: saved.revision, bodyType: saved.bodyType, recentTemplateId: saved.recentTemplateId });
+      store.baselines.set(saved.id, JSON.stringify(saved));
+    },
+    hasUnsavedChanges() { return [...store.drafts.keys()].some(store.isDirty) || Boolean(store.createDraft) || store.isSinglePlayerDirty(); },
   };
   return store;
 }

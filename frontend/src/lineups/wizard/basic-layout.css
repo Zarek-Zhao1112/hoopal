@@ -181,6 +181,31 @@
 #lineup-wizard-dialog .lineup-glass-sheet[data-player-config="true"] .lineup-wizard-actions .button { min-height: 44px; }
 #lineup-wizard-dialog .lineup-glass-sheet[data-player-config="true"] .lineup-wizard-actions .button:first-child { flex: 0 0 78px; }
 
+#lineup-wizard-dialog .lineup-glass-sheet[data-single-player="true"] .lineup-sheet-heading > div {
+  min-width: 0;
+}
+#lineup-wizard-dialog .lineup-glass-sheet[data-single-player="true"] .lineup-sheet-heading h2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#lineup-wizard-dialog .lineup-glass-sheet[data-single-player="true"] .lineup-config-card .lineup-config-hero {
+  justify-content: center;
+}
+#lineup-wizard-dialog .lineup-glass-sheet[data-single-player="true"] .lineup-config-hero .lineup-wizard-uniform {
+  width: 66px;
+  height: 64px;
+}
+#lineup-wizard-dialog .lineup-glass-sheet[data-single-player="true"] .lineup-wizard-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+#lineup-wizard-dialog .lineup-glass-sheet[data-single-player="true"] .lineup-wizard-actions > .button {
+  min-width: 0;
+  min-height: 46px;
+  font-size: 14px;
+}
+
 @keyframes lineup-config-role-in { from { opacity: .25; transform: translateY(-3px); } }
 @media (prefers-reduced-motion: reduce) {
   .lineup-config-role-options { animation: none; }

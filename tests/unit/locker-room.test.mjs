@@ -42,7 +42,7 @@ function emit(target, type, values = {}) {
   }
   return event;
 }
-function fixture(count = 3, selectedIndex = 0, numbers = Array.from({ length: count }, (_, i) => i + 1), disabled = false) {
+function fixture(count = 3, selectedIndex = 0, numbers = Array.from({ length: count }, (_, i) => i + 1), disabled = false, wholeCard = false) {
   const document = {
     captures: new Map(), createElement(tag) { return new Element(tag, this); },
     createElementNS(namespace, tag) { return new Element(tag, this); },
@@ -54,12 +54,14 @@ function fixture(count = 3, selectedIndex = 0, numbers = Array.from({ length: co
   };
   document.defaultView = document.createElement('window');
   const changes = [], inspected = [];
+  const card = wholeCard ? document.createElement('article') : undefined;
   const profile = { id: 'profile', players: numbers.map((number, i) => ({ id: `member-${i}`, number, name: `队员${i}` })) };
-  const room = createLockerRoom({ document, profile, selectedIndex, disabled,
+  const room = createLockerRoom({ document, profile, selectedIndex, disabled, swipeSurface: card,
     renderJersey() { const svg = document.createElement('svg'); svg.append(document.createElement('path')); return svg; },
     renderBadge() { const svg = document.createElement('svg'); svg.append(document.createElement('path')); return svg; },
     getName: player => player.name, onChange: (...args) => changes.push(args), onInspect: (...args) => inspected.push(args),
   });
+  card?.append(room.element);
   const find = className => descendants(room.element).find(node => node.className.split(' ').includes(className));
   const viewport = find('locker-viewport'), track = find('locker-track');
   const selected = () => Number(room.element.dataset.playerIndex);
@@ -80,7 +82,7 @@ function fixture(count = 3, selectedIndex = 0, numbers = Array.from({ length: co
     send(cancelled ? 'pointercancel' : 'pointerup', target, { clientX: 100 + dx, clientY: 100 + dy });
     return move;
   };
-  return { room, document, profile, changes, inspected, find, viewport, track, selected, currentBay, shirtPath, send, swipe };
+  return { room, card, document, profile, changes, inspected, find, viewport, track, selected, currentBay, shirtPath, send, swipe };
 }
 
 test('left drag advances from the actual first member and right drag returns, with ordered bays moving with the finger', () => {
@@ -90,7 +92,8 @@ test('left drag advances from the actual first member and right drag returns, wi
     assert.deepEqual(f.track.children.filter(node => node.dataset.playerId).map(node => node.dataset.playerId), f.profile.players.map(player => player.id));
     assert.equal(f.track.children.length, count, 'only real viewport-wide cabinets are rendered');
     assert.equal(firstTransform, 'translate3d(calc(0% + 0px), 0, 0)');
-    assert.equal(f.find('locker-swipe-hint').textContent, '第一位 · 向左滑看下一位');
+    assert.equal(f.find('locker-swipe-hint'), undefined);
+    assert.equal(f.find('locker-position').textContent, `第 1 位，共 ${count} 位，队员0`);
     const child = f.shirtPath();
     f.send('pointerdown', child, { clientX: 160, clientY: 100 });
     assert.equal(f.send('pointermove', child, { clientX: 70, clientY: 100 }).defaultPrevented, true);
@@ -111,13 +114,13 @@ test('left drag advances from the actual first member and right drag returns, wi
 test('jersey number one is independent of the remembered member index and end limits', () => {
   const f = fixture(3, 2, [12, 23, 1]);
   assert.equal(f.profile.players[f.selected()].number, 1);
-  assert.equal(f.find('locker-swipe-hint').textContent, '最后一位 · 向右滑返回', 'hint follows roster position, not jersey number');
+  assert.equal(f.find('locker-position').textContent, '第 3 位，共 3 位，队员2', 'status follows roster position, not jersey number');
   f.swipe(-90); assert.equal(f.selected(), 2, 'last member cannot advance even when wearing number one');
-  assert.equal(f.find('locker-swipe-hint').textContent, '最后一位 · 向右滑返回');
+  assert.equal(f.find('locker-position').textContent, '第 3 位，共 3 位，队员2');
   f.swipe(90); assert.equal(f.selected(), 1);
-  assert.equal(f.find('locker-swipe-hint').textContent, '向左滑下一位，向右滑上一位');
+  assert.equal(f.find('locker-position').textContent, '第 2 位，共 3 位，队员1');
   f.swipe(90); assert.equal(f.selected(), 0);
-  assert.equal(f.find('locker-swipe-hint').textContent, '第一位 · 向左滑看下一位');
+  assert.equal(f.find('locker-position').textContent, '第 1 位，共 3 位，队员0');
   f.swipe(90); assert.equal(f.selected(), 0);
   f.swipe(-90); assert.equal(f.selected(), 1);
 });
@@ -191,14 +194,41 @@ test('the nameplate and its badge can start both swipe directions while a statio
   assert.equal(tapped.selected(), 0);
 });
 
-test('navigation buttons and member dots use roster indices, with only one change per large gesture', () => {
+test('swiping from a card action changes the player and a fresh tap opens the new selection', () => {
+  const f = fixture(3, 0, [1, 11, 23], false, true);
+  const action = f.document.createElement('button');
+  f.card.append(action);
+  const opened = [];
+  action.addEventListener('click', () => opened.push(f.room.element.dataset.playerId));
+
+  f.swipe(-90, 0, false, action);
+  assert.equal(f.selected(), 1);
+  assert.equal(emit(action, 'click', { detail: 1 }).defaultPrevented, true);
+  assert.deepEqual(opened, []);
+
+  f.send('pointerdown', action);
+  f.send('pointerup', action);
+  assert.equal(emit(action, 'click', { detail: 1 }).defaultPrevented, false);
+  assert.deepEqual(opened, ['member-1']);
+
+  f.swipe(0, 70, false, action);
+  assert.equal(f.selected(), 1);
+  assert.equal(emit(action, 'click', { detail: 1 }).defaultPrevented, true);
+  assert.equal(emit(action, 'click', { detail: 0 }).defaultPrevented, false);
+});
+
+test('member dots indicate roster position without acting as navigation buttons', () => {
   const f = fixture(4, 0, [23, 1, 7, 99]);
   f.swipe(-260); assert.equal(f.selected(), 1);
-  emit(f.find('locker-arrow').parentElement.children.at(-1), 'click');
+  assert.equal(f.find('locker-arrow'), undefined);
+  const dots = f.find('locker-dots').children;
+  assert.equal(dots.length, 4);
+  assert.ok(dots.every(dot => dot.tagName === 'SPAN'));
+  assert.deepEqual(dots.map(dot => dot.getAttribute('aria-current')), ['false', 'true', 'false', 'false']);
+  emit(dots[0], 'click'); assert.equal(f.selected(), 1);
+  emit(f.viewport, 'keydown', { key: 'ArrowRight' });
   assert.equal(f.selected(), 2);
-  const dot = descendants(f.room.element).find(node => node.dataset.action === 'lineup-player-go' && node.dataset.index === '0');
-  emit(dot, 'click'); assert.equal(f.selected(), 0);
-  assert.equal(f.find('locker-arrow').disabled, true);
+  assert.deepEqual(dots.map(dot => dot.getAttribute('aria-current')), ['false', 'false', 'true', 'false']);
 });
 
 test('resize and destroy cancel an active gesture without leaking listeners or committing', () => {

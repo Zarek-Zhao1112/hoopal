@@ -42,10 +42,13 @@ export async function runGlassSheetFlow({send,evaluate,wait,waitFor,folder}) {
   await waitFor("document.body.dataset.view==='lineups'&&!document.body.dataset.pageTransition");
   const archive=await evaluate(`JSON.parse(localStorage.getItem('${key}'))`),p=archive.profiles.find(p=>p.name==='完整创建与重试');assert.equal(archive.profiles.length,(saved?JSON.parse(saved).profiles.length:0)+1);assert.equal(p.players.length,4);assert.deepEqual(p.players.map(p=>p.id),ids);assert.ok(p.players.every(p=>Number.isInteger(p.number)));
   assert.deepEqual(p.players.map(p=>p.mainRole),['space',undefined,undefined,'space'],'one successful retry saves optional repeated roles with the new team');
-  await action('lineup-configure');await wait(520);await input('lineup-player-name','未保存且可保留');
+  await action('lineup-configure');await wait(520);await input('lineup-player-name','未保存昵称');
   await send('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});await send('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
-  assert.ok(await evaluate("Boolean(document.querySelector('#lineup-wizard-dialog [data-action=lineup-draft-keep]'))"));await action('lineup-draft-keep');await closed();await action('lineup-configure');await wait(520);assert.equal(await evaluate("document.querySelector('[data-action=lineup-player-name]').value"),'未保存且可保留');
+  assert.equal(await evaluate("Boolean(document.querySelector('#lineup-wizard-dialog [data-action=lineup-draft-keep]'))"),false);
+  await action('lineup-draft-continue');
+  assert.equal(await evaluate("document.querySelector('[data-action=lineup-player-name]').value"),'未保存昵称');
   await action('lineup-wizard-close');await action('lineup-draft-discard');await closed();
+  assert.deepEqual(await evaluate(`JSON.parse(localStorage.getItem('${key}')).profiles.find(p=>p.id===${JSON.stringify(p.id)})`),p,'discarding a single-player draft preserves the saved profile');
   await action('lineup-configure');await wait(520);
   const rapidClose=await evaluate("(()=>{const d=document.querySelector('#lineup-wizard-dialog'),old=[...d.querySelectorAll('[data-action=lineup-player],[data-action=lineup-edit-section],[data-action=lineup-save]')];d.querySelector('[data-action=lineup-wizard-close]').click();old.forEach(n=>n.click());return{phase:d.dataset.phase,disabled:old.every(n=>n.disabled)};})()");
   assert.equal(rapidClose.phase,'closing');assert.equal(rapidClose.disabled,true);await closed();
@@ -59,7 +62,7 @@ export async function runGlassSheetFlow({send,evaluate,wait,waitFor,folder}) {
     if(trigger==='lineup-create')await action('lineup-draft-discard');await closed();const returned=await evaluate('document.activeElement.dataset.action');assert.equal(returned,trigger==='lineup-archive-rename'?'lineup-archive-menu':trigger,'focus returns to the visible trigger for '+trigger);focusReturn.push({trigger,returned});
   }
   assert.ok(await evaluate("document.querySelector('.lineup-brand-icon').complete&&document.querySelector('.lineup-brand-icon').naturalWidth>0"),'real bundled brand icon loads over HTTP');
-  await writeFile(path.join(folder,'hc021-glass-flow.json'),JSON.stringify({motion,createdProfile:p.id,memberIds:ids,failedWritePreservedDisk:true,modeRoundtrip:true,oneCompleteArchive:true,escapeDraftConfirmation:true,sessionDraftKept:true,rapidClose,focusReturn},null,2));
+  await writeFile(path.join(folder,'hc021-glass-flow.json'),JSON.stringify({motion,createdProfile:p.id,memberIds:ids,failedWritePreservedDisk:true,modeRoundtrip:true,oneCompleteArchive:true,escapeDraftConfirmation:true,singlePlayerDraftDiscarded:true,rapidClose,focusReturn},null,2));
  } finally {
   await evaluate(`(()=>{if(window.hc021OriginalSetItem)Storage.prototype.setItem=window.hc021OriginalSetItem;${saved===null?`localStorage.removeItem('${key}')`:`localStorage.setItem('${key}',${JSON.stringify(saved)})`};})()`);
   await send('Page.reload');await waitFor("Boolean(document.querySelector('[data-action=lineup-open-archives],[data-action=lineup-configure]'))");

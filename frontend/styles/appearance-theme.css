@@ -1,0 +1,315 @@
+/* HC-067: paint only the realistic appearance. Keep glass and court geometry in the existing sheets. */
+body[data-appearance="realistic"] {
+  color-scheme: dark;
+  --navy: #14212b;
+  --navy-soft: #263744;
+  --paper: #1b2833;
+  --surface: #21313e;
+  --ink: #f2f6f8;
+  --muted: #b4c5d2;
+  --line: #405665;
+  --orange: #80c6e9;
+  --orange-soft: #25485e;
+  --blue: #80c6e9;
+  --appearance-primary: #326c89;
+  --appearance-primary-edge: #5088a4;
+  --appearance-secondary: #283946;
+  --appearance-selected: #284a60;
+  --appearance-overlay: #0a1219a6;
+  --appearance-shadow: 0 7px 24px #040b142b;
+  color: var(--ink);
+  background: radial-gradient(ellipse at 12% 0%, #203340 0%, transparent 62%), #111a23;
+}
+
+/* Shared controls. Primary fills, secondary outlines and selected states are distinct. */
+body[data-appearance="realistic"] .button-subtle,
+body[data-appearance="realistic"] .icon-button,
+body[data-appearance="realistic"] .lineups-heading > .button:not(.button-primary),
+body[data-appearance="realistic"] .lineup-profile-actions .button:not(.button-primary),
+body[data-appearance="realistic"] .lineup-pagination > .button {
+  color: var(--ink);
+  background: var(--appearance-secondary);
+  border-color: var(--line);
+  box-shadow: none;
+}
+
+body[data-appearance="realistic"] .button-primary,
+body[data-appearance="realistic"] .play-button,
+body[data-appearance="realistic"] .lineup-profile-actions .button-primary {
+  color: var(--ink);
+  background: var(--appearance-primary);
+  border-color: var(--appearance-primary-edge);
+  box-shadow: none;
+}
+
+body[data-appearance="realistic"] :is(button, a, input, select, textarea):focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+body[data-appearance="realistic"] :is(button, select):disabled {
+  opacity: .47;
+  filter: saturate(.45);
+  cursor: not-allowed;
+}
+
+body[data-appearance="realistic"] button:not(:disabled):hover { filter: brightness(1.1); }
+body[data-appearance="realistic"] button:not(:disabled):active { filter: brightness(.9); }
+body[data-appearance="realistic"] :is(input, select, textarea) { accent-color: var(--blue); }
+body[data-appearance="realistic"] .switch { background: #526876; }
+body[data-appearance="realistic"] .toggle-label input:checked + .switch { background: var(--appearance-primary); }
+
+body[data-appearance="realistic"] .view-nav {
+  border-color: var(--line);
+  background: #1e2e39ee;
+  box-shadow: 0 5px 16px #050c1440, inset 0 1px #a9c4d318;
+}
+body[data-appearance="realistic"] .view-nav button { color: var(--muted); }
+body[data-appearance="realistic"] .view-nav button[aria-pressed="true"] {
+  color: var(--ink);
+  border-color: #507184;
+  background: #345064;
+  box-shadow: inset 0 1px #a9c4d329;
+}
+body[data-appearance="realistic"] #startup-screen,
+body[data-appearance="realistic"] #startup-frame { background: radial-gradient(ellipse at 50% 14%, #2b4657, #111a23 72%); }
+body[data-appearance="realistic"] #startup-brand strong,
+body[data-appearance="realistic"] #startup-message { color: var(--ink); }
+body[data-appearance="realistic"] #startup-brand span,
+body[data-appearance="realistic"] #startup-status { color: var(--muted); }
+body[data-appearance="realistic"] #startup-skip,
+body[data-appearance="realistic"] #startup-error { color: var(--ink); border-color: var(--line); background: var(--appearance-secondary); box-shadow: none; }
+body[data-appearance="realistic"] #lineup-brand-header strong,
+body[data-appearance="realistic"].page-layout[data-view="play"]:not([data-tactic-selection="true"]) #primary-training-title,
+body[data-appearance="realistic"].page-layout[data-view="archives"]:not([data-lineup-route="teams"]):not([data-tactic-selection="true"]) #primary-account-title,
+body[data-appearance="realistic"] .lineups-heading,
+body[data-appearance="realistic"] .lineup-profile-title h2,
+body[data-appearance="realistic"] .lineup-secondary-heading h1,
+body[data-appearance="realistic"] .selection-heading h1 { color: var(--ink); }
+
+body[data-appearance="realistic"] #lineup-brand-header span,
+body[data-appearance="realistic"] .lineup-profile-title p,
+body[data-appearance="realistic"] .lineup-secondary-heading p,
+body[data-appearance="realistic"] .selection-heading p { color: var(--muted); }
+
+body[data-appearance="realistic"] .lineup-crest-neutral { color: #c6e8fb; border-color: #648599; background: var(--appearance-selected); }
+body[data-appearance="realistic"] .locker-dot > span { background: #8599a7; }
+body[data-appearance="realistic"] .locker-dot[aria-current="true"] > span { background: var(--blue); }
+body[data-appearance="realistic"] #lineups-panel .lineup-main-empty,
+body[data-appearance="realistic"] #lineups-panel .lineup-read-error {
+  color: var(--ink);
+  border-color: var(--line);
+  background: var(--paper);
+  box-shadow: var(--appearance-shadow);
+}
+body[data-appearance="realistic"] #lineups-panel :is(.lineup-main-empty, .lineup-read-error) :is(h1, h2) { color: var(--ink); }
+body[data-appearance="realistic"] #lineups-panel :is(.lineup-main-empty, .lineup-read-error) p { color: var(--muted); }
+
+/* Training: apply the theme to the interface, with the wood, lines and players in original colors. */
+body[data-appearance="realistic"].page-layout[data-view="play"] .training-panel {
+  background: var(--paper);
+  border-color: var(--line);
+  box-shadow: var(--appearance-shadow);
+}
+body[data-appearance="realistic"].page-layout[data-view="play"] #training-title,
+body[data-appearance="realistic"].page-layout[data-view="play"] .training-panel .training-step-heading { color: var(--ink); }
+body[data-appearance="realistic"].page-layout[data-view="play"] .training-panel :is(#frame-counter, #play-progress, .live-step-note, .toggle-label, .loop-label) { color: var(--muted); }
+body[data-appearance="realistic"].page-layout[data-view="play"] .training-panel #tactic-kind-label {
+  color: #bde4fb;
+  border-color: #426278;
+  background: var(--appearance-selected);
+}
+body[data-appearance="realistic"].page-layout[data-view="play"] .training-panel :is(.playback-bar, .lineup-legend, .legend-row) {
+  background: var(--surface);
+  border-color: var(--line);
+  box-shadow: none;
+}
+body[data-appearance="realistic"].page-layout[data-view="play"] .training-panel :is(.legend-heading, .legend-role) { color: #bde4fb; }
+body[data-appearance="realistic"].page-layout[data-view="play"] .training-panel .legend-name { color: var(--ink); }
+body[data-appearance="realistic"].page-layout[data-view="play"] .training-panel .legend-role-detail { color: var(--muted); }
+body[data-appearance="realistic"].page-layout[data-view="play"] .training-panel :is(#open-tactic-library, #open-menu, #speed, #restart-play, .playback-controls .icon-button, .note-open-button) {
+  color: var(--ink);
+  border-color: var(--line);
+  background: var(--appearance-secondary);
+  box-shadow: none;
+}
+body[data-appearance="realistic"].page-layout[data-view="play"] .training-panel .play-button {
+  color: var(--ink);
+  border-color: var(--appearance-primary-edge);
+  background: var(--appearance-primary);
+  box-shadow: none;
+}
+body[data-appearance="realistic"].page-layout[data-view="play"] .training-panel .frame-item { color: var(--muted); }
+body[data-appearance="realistic"].page-layout[data-view="play"] .training-panel .frame-number {
+  border-color: var(--line);
+  background: var(--appearance-secondary);
+}
+body[data-appearance="realistic"].page-layout[data-view="play"] .training-panel .frame-item.is-complete .frame-number {
+  color: #bde4fb;
+  border-color: #50778e;
+  background: var(--appearance-selected);
+}
+body[data-appearance="realistic"].page-layout[data-view="play"] .training-panel .frame-item.active .frame-number {
+  color: var(--ink);
+  border-color: var(--blue);
+  background: var(--appearance-primary);
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 3px #5995b5;
+}
+body[data-appearance="realistic"].page-layout[data-view="play"] .training-panel #timeline-scrub { color-scheme: dark; }
+body[data-appearance="realistic"].page-layout[data-view="play"] .training-panel #timeline-scrub::-webkit-slider-runnable-track { background: #496271; box-shadow: none; }
+body[data-appearance="realistic"].page-layout[data-view="play"] .training-panel #timeline-scrub::-moz-range-track { background: #496271; box-shadow: none; }
+body[data-appearance="realistic"].page-layout[data-view="play"] .training-panel #timeline-scrub::-webkit-slider-thumb { background: var(--appearance-primary); border-color: #bde4fb; box-shadow: none; }
+body[data-appearance="realistic"].page-layout[data-view="play"] .training-panel #timeline-scrub::-moz-range-thumb { background: var(--appearance-primary); border-color: #bde4fb; box-shadow: none; }
+
+/* My, team management and their menus. */
+body[data-appearance="realistic"] #lineups-panel[data-section="archives"] > .lineup-archives-card,
+body[data-appearance="realistic"] #lineups-panel > .lineup-teams-page > .lineup-account-teams {
+  border-color: var(--line);
+  background: var(--paper);
+  box-shadow: var(--appearance-shadow);
+}
+body[data-appearance="realistic"] #lineups-panel :is(.lineup-account-glass, .lineup-archive-card) {
+  border-color: var(--line);
+  background: var(--surface);
+  box-shadow: none;
+}
+body[data-appearance="realistic"] #lineups-panel .lineup-archive-card[data-current="true"] {
+  border-color: #5b8da9;
+  background: #253c4b;
+}
+body[data-appearance="realistic"] #lineups-panel :is(.lineup-account-avatar, .lineup-archive-members i, .lineup-archive-current) {
+  color: #c6e8fb;
+  border-color: var(--line);
+  background: var(--appearance-selected);
+  box-shadow: none;
+}
+body[data-appearance="realistic"] .lineup-account-avatar .lineup-account-icon { fill: #88abc2; stroke: #b7d2e3; }
+body[data-appearance="realistic"] #lineups-panel :is(.lineup-account-copy h2, .lineup-account-teams-heading h2, .lineup-account-tool-copy strong, .lineup-team-overview-copy strong, .lineup-archive-select, .lineup-archives-empty h2) { color: var(--ink); }
+body[data-appearance="realistic"] #lineups-panel :is(.lineup-account-copy p, .lineup-account-copy > span, .lineup-account-tool-copy small, .lineup-account-tool-arrow, .lineup-account-icon, .lineup-team-overview-copy p, .lineup-team-draft-hint, .lineup-teams-count, .lineup-archive-copy > p, .lineup-archive-members > span, .lineup-archives-empty p, .lineup-pagination > span) { color: var(--muted); }
+body[data-appearance="realistic"] #lineups-panel .lineup-account-tool + .lineup-account-tool { border-top-color: var(--line); }
+body[data-appearance="realistic"] #lineups-panel :is(.lineup-account-card > .lineup-account-entry, .lineup-account-teams .lineup-archive-create, .lineup-archive-manage, .lineup-secondary-heading > .icon-button, .lineup-pagination > .button) {
+  color: var(--ink);
+  border-color: var(--line);
+  background: var(--appearance-secondary);
+  box-shadow: none;
+}
+
+/* Tactic library, body type and related dialog controls. */
+body[data-appearance="realistic"] #tactic-library-dialog,
+body[data-appearance="realistic"] #lineup-wizard-dialog,
+body[data-appearance="realistic"] #lineup-account-dialog { color: var(--ink); }
+body[data-appearance="realistic"] :is(#tactic-library-dialog, #lineup-wizard-dialog, #lineup-account-dialog) .lineup-sheet-shade { background: var(--appearance-overlay); }
+body[data-appearance="realistic"] #tactic-library-dialog .tactic-library-sheet,
+body[data-appearance="realistic"] #lineup-wizard-dialog .lineup-glass-sheet,
+body[data-appearance="realistic"] #lineup-account-dialog .lineup-account-sheet {
+  color: var(--ink);
+  border-color: #5e7889;
+  background: linear-gradient(150deg, #273b49f5, #1b2934fa 78%);
+  box-shadow: 0 -12px 40px #080e1766;
+}
+body[data-appearance="realistic"] .tactic-library-sheet::before,
+body[data-appearance="realistic"] #lineup-wizard-dialog .lineup-glass-sheet[data-player-config="true"]::before { background: #6e8da1; }
+body[data-appearance="realistic"] :is(.selection-library-heading h2, .selection-card-heading, .lineup-account-sheet-heading h2) { color: var(--ink); }
+body[data-appearance="realistic"] :is(.selection-library-heading p, .selection-card-heading > span, .selection-helper, .selection-tactic-note, .selection-intro, .selection-preview-error, .selection-notice, .lineup-account-sheet-heading p, .lineup-account-sheet-body > p) { color: var(--muted); }
+body[data-appearance="realistic"] .selection-notice[role="alert"] { color: #f1b1a8; }
+body[data-appearance="realistic"] :is(.selection-close, .selection-mode, .selection-body-pill, #lineup-account-dialog .lineup-account-sheet-close, .lineup-account-availability) {
+  color: var(--ink);
+  border-color: var(--line);
+  background: var(--appearance-secondary);
+}
+body[data-appearance="realistic"] .selection-kind-tabs { border-color: var(--line); background: #182631; }
+body[data-appearance="realistic"] .selection-kind-tabs > .button { color: var(--muted); }
+body[data-appearance="realistic"] .selection-kind-tabs > .button[aria-pressed="true"] {
+  color: var(--ink);
+  background: var(--appearance-primary);
+  box-shadow: none;
+}
+body[data-appearance="realistic"] :is(.selection-tactic-card, .selection-body-card, .body-type-card) {
+  color: var(--ink);
+  border-color: var(--line);
+  background: var(--surface);
+  box-shadow: none;
+}
+body[data-appearance="realistic"] .selection-tactic-card.expanded { border-color: #50788e; }
+body[data-appearance="realistic"] .body-type-card[aria-pressed="true"] { border-color: var(--blue); background: var(--appearance-selected); box-shadow: none; }
+body[data-appearance="realistic"] .body-type-copy small { color: var(--muted); }
+body[data-appearance="realistic"] .body-type-check { border-color: #7794a6; background: #17242e; }
+body[data-appearance="realistic"] .body-type-card[aria-pressed="true"] .body-type-check { border-color: var(--blue); background: var(--appearance-primary); color: var(--ink); }
+body[data-appearance="realistic"] #lineup-account-dialog .lineup-account-local { border-color: var(--appearance-primary-edge); background: var(--appearance-primary); color: var(--ink); }
+
+/* Player configuration and creation reuse the same sheet with the same button roles. */
+body[data-appearance="realistic"] #lineup-wizard-dialog .lineup-glass-sheet[data-player-config="true"] .lineup-sheet-heading .lineup-config-team { color: var(--muted); }
+body[data-appearance="realistic"] #lineup-wizard-dialog :is(.lineup-sheet-heading h2, .lineup-wizard-basics > h3, .lineup-mode-cards .button > strong, .lineup-config-hero .lineup-config-caption strong, .lineup-wizard-page .lineup-wizard-player-name) { color: var(--ink); }
+body[data-appearance="realistic"] #lineup-wizard-dialog :is(.lineup-glass-sheet .lineup-sheet-heading p, .lineup-sheet-heading .lineup-config-team, .lineup-wizard-page .lineup-field, .lineup-config-fields .lineup-field, .lineup-config-role-label, .lineup-config-caption small, .lineup-config-role-option small, .lineup-config-note, .lineup-wizard-page .lineup-form-hint, .lineup-wizard-page .lineup-player-caption, .lineup-wizard-kit small, .lineup-wizard-page .lineup-choice-group legend, .lineup-sheet-footer > small, .lineup-sheet-confirmation p) { color: var(--muted); }
+body[data-appearance="realistic"] #lineup-wizard-dialog :is(.lineup-config-card, .lineup-config-hero .lineup-wizard-uniform, .lineup-wizard-kit) {
+  color: var(--ink);
+  border-color: var(--line);
+  background: var(--surface);
+  box-shadow: none;
+}
+body[data-appearance="realistic"] #lineup-wizard-dialog :is(.button, .lineup-sheet-close, .lineup-glass-sheet .lineup-wizard-progress button, .lineup-config-role-trigger, .lineup-config-role-option, .lineup-config-tabs .button, .lineup-wizard-page .lineup-mode-cards .button, .lineup-wizard-page .lineup-wizard-player-arrow, .lineup-team-option) {
+  color: var(--ink);
+  border-color: var(--line);
+  background: var(--appearance-secondary);
+  box-shadow: none;
+}
+body[data-appearance="realistic"] #lineup-wizard-dialog .lineup-wizard-progress button span { background: #415967; }
+body[data-appearance="realistic"] #lineup-wizard-dialog :is(.lineup-config-tabs .button, .lineup-config-role-option, .lineup-glass-sheet .lineup-wizard-progress button, .lineup-mode-cards .button, .lineup-team-option, .lineup-choice-options .button, .lineup-player-tabs .button)[aria-pressed="true"] {
+  color: var(--ink);
+  border-color: var(--blue);
+  background: var(--appearance-selected);
+  box-shadow: none;
+}
+body[data-appearance="realistic"] #lineup-wizard-dialog .lineup-config-role-option[aria-pressed="true"] strong::after { color: var(--blue); }
+body[data-appearance="realistic"] #lineup-wizard-dialog :is(.lineup-wizard-actions, .lineup-sheet-confirmation) .button.button-primary {
+  color: var(--ink);
+  border-color: var(--appearance-primary-edge);
+  background: var(--appearance-primary);
+  box-shadow: none;
+}
+body[data-appearance="realistic"] #lineup-wizard-dialog :is(input, .lineup-config-fields input, .lineup-wizard-page .lineup-wizard-basics input) {
+  color: var(--ink);
+  background: #15242f;
+  border-color: var(--line);
+  box-shadow: none;
+}
+body[data-appearance="realistic"] #lineup-wizard-dialog :is(input, .lineup-config-fields input):focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 2px #76c2eb35;
+}
+body[data-appearance="realistic"] #lineup-wizard-dialog :is(.lineup-config-tabs [data-ready="false"] strong, .lineup-wizard-error) { color: #f2b4a4; }
+body[data-appearance="realistic"] #lineup-wizard-dialog .lineup-wizard-carousel :is(.lineup-carousel-name, .all-teams-panel h3) { color: var(--ink); }
+body[data-appearance="realistic"] #lineup-wizard-dialog .lineup-wizard-carousel :is(.carousel-caption, .carousel-caption button, .lineup-carousel-position, .swipe-hint, .all-teams-panel header p, .team-pager, .lineup-wizard-kit small) { color: var(--muted); }
+body[data-appearance="realistic"] #lineup-wizard-dialog .lineup-wizard-carousel .carousel-arc { background: radial-gradient(ellipse at 50% 60%, #4561744d, transparent 65%); }
+body[data-appearance="realistic"] #lineup-wizard-dialog .lineup-wizard-carousel > .lineup-wizard-kit { border-color: var(--line); background: var(--surface); box-shadow: none; }
+body[data-appearance="realistic"] #lineup-wizard-dialog .lineup-wizard-carousel > .lineup-wizard-kit .lineup-text-link { color: var(--ink); }
+body[data-appearance="realistic"] #lineup-wizard-dialog .lineup-wizard-carousel :is(.selection-heading > button, [data-action="lineup-carousel-all-close"], .all-team-option, .team-pager button) {
+  color: var(--ink);
+  border-color: var(--line);
+  background: var(--appearance-secondary);
+  box-shadow: none;
+}
+body[data-appearance="realistic"] #lineup-wizard-dialog .lineup-wizard-carousel .all-team-option[aria-pressed="true"] { border-color: var(--blue); background: var(--appearance-selected); box-shadow: none; }
+
+/* Secondary dialogs and destructive controls. */
+body[data-appearance="realistic"] :is(.workspace-dialog, .team-role-swap-dialog[open], #lineup-archive-menu) {
+  color: var(--ink);
+  border-color: var(--line);
+  background: var(--paper);
+  box-shadow: 0 13px 40px #070e16a8;
+}
+body[data-appearance="realistic"] :is(.workspace-dialog, #lineup-archive-menu)::backdrop { background: var(--appearance-overlay); }
+body[data-appearance="realistic"] :is(.workspace-dialog .menu-action, .team-role-swap-dialog select, #lineup-archive-menu > .button, #lineup-archive-menu .lineup-archive-menu-close) {
+  color: var(--ink);
+  border-color: var(--line);
+  background: var(--appearance-secondary);
+  box-shadow: none;
+}
+body[data-appearance="realistic"] :is(.workspace-dialog .menu-action > .icon, .team-role-swap-dialog label, #lineup-archive-menu .lineup-archive-menu-name) { color: var(--muted); }
+body[data-appearance="realistic"] #lineup-archive-menu > .lineup-danger,
+body[data-appearance="realistic"] #lineup-wizard-dialog .lineup-sheet-confirmation .button.lineup-danger {
+  color: #f4bdb0;
+  border-color: #81554f;
+  background: #4a3338;
+}
+body[data-appearance="realistic"] #lineup-archive-menu .lineup-archive-menu-error { color: #f2b4a4; }

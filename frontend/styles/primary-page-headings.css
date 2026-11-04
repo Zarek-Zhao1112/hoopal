@@ -40,3 +40,57 @@ body.page-layout[data-view=archives] .lineup-account-page>.lineup-account-tools{
  body.page-layout[data-view=archives] .lineup-account-page>.lineup-account-tools{grid-row:2}
 }
 @media(prefers-reduced-motion:reduce){.page-top-space{transition:none}}
+
+/* Tall phone views share the locker brand row and place the title in the card. */
+.workspace-card-heading { display: none; }
+
+@media (max-width: 599px) and (min-height: 701px) {
+  body.page-layout[data-view="play"]:not([data-tactic-selection="true"]) .page-top-space,
+  body.page-layout[data-view="archives"]:not([data-lineup-route="teams"]):not([data-tactic-selection="true"]) .page-top-space {
+    display: none;
+  }
+
+  body.page-layout[data-view="play"]:not([data-tactic-selection="true"]) #lineup-brand-header,
+  body.page-layout[data-view="archives"]:not([data-lineup-route="teams"]):not([data-tactic-selection="true"]) #lineup-brand-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 28px 20px 12px;
+  }
+
+  .workspace-card-heading {
+    display: block;
+    margin: 0;
+    color: #355d77;
+    font-size: 20px;
+    line-height: 1.3;
+    font-weight: 650;
+  }
+
+  body[data-appearance="realistic"] .workspace-card-heading { color: #f2f7fa; }
+
+  body.page-layout[data-view="play"] .training-panel .training-header {
+    grid-template-rows: 36px auto auto;
+    align-items: center;
+    gap: 4px 8px;
+  }
+
+  body.page-layout[data-view="play"] #training-title { font-size: 16px; }
+  body.page-layout[data-view="play"] #open-tactic-library { min-width: 88px; }
+  body.page-layout[data-view="play"] #play-header-controls { grid-column: 2; grid-row: 1; }
+  body.page-layout[data-view="play"] .training-title-static { grid-column: 1 / -1; grid-row: 2; }
+  body.page-layout[data-view="play"] .training-context { grid-row: 3; }
+
+  body.page-layout[data-view="archives"] #lineups-panel > .lineup-account-page {
+    grid-template-rows: 36px 92px minmax(0, 1fr) 124px;
+  }
+
+  .lineup-account-page > .workspace-card-heading { align-self: center; grid-row: 1; }
+  body.page-layout[data-view="archives"] .lineup-account-page > .lineup-account-card { grid-row: 2; }
+  body.page-layout[data-view="archives"] .lineup-account-page > .lineup-account-teams { grid-row: 3; }
+  body.page-layout[data-view="archives"] .lineup-account-page > .lineup-account-tools { grid-row: 4; }
+  body.page-layout[data-view="archives"] #lineups-panel .lineup-team-overview > .lineup-teams-open {
+    min-height: 46px;
+    font-size: 14px;
+  }
+}

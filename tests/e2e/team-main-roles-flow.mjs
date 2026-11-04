@@ -47,7 +47,9 @@ export async function runTeamMainRolesFlow(context) {
   try {
     await restoreFixture(context, { schemaVersion: 2, profiles: [four, three], activeProfileId: four.id, rolePlans: {}, playbackContext: null }, { templateId: 'pick-roll', frameIndex: 1 });
     const beforeEdit = await saved();
-    await click(`[data-action=lineup-configure][data-profile-id="${four.id}"]`);
+    await teams();
+    await click(`[data-action=lineup-archive-menu][data-profile-id="${four.id}"]`);
+    await click('#lineup-archive-menu [data-action=lineup-configure]');
     await opened();
     assert.equal(await evaluate(`document.querySelectorAll(${JSON.stringify(action('player'))}).length`), 4);
     assert.equal(await evaluate("document.querySelectorAll('[data-action=lineup-role-settings]').length"), 0);
@@ -74,6 +76,7 @@ export async function runTeamMainRolesFlow(context) {
     assert.deepEqual(savedFour.players.map(p => [p.name, p.number, p.mainRole]), [
       ['新阿杰', 17, 'start'], ['老周', 23, 'relay'], ['小林', 11, 'space'], ['阿凯', 30, 'relay'],
     ]);
+    await nav('lineups');
     await click('[data-action=lineup-conditions]'); await phase('open'); await choose('high-low');
     await waitFor("document.body.dataset.view==='play' && document.body.dataset.lineupContext==='main-roles' && !document.body.dataset.pageTransition");
     assert.deepEqual(await numbers(), ['17','23','11','30']);

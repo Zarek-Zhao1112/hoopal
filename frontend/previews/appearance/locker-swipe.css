@@ -1,0 +1,195 @@
+body[data-locker-preview="swipe"][data-view="lineups"] #lineups-panel .locker-scene {
+  grid-template-rows: minmax(0, 1fr) 14px;
+  gap: 5px;
+}
+
+body[data-locker-preview="swipe"] #lineups-panel :is(.locker-arrow, .locker-swipe-hint) {
+  display: none;
+}
+
+body[data-locker-preview="swipe"] #lineups-panel .locker-position {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+body[data-locker-preview="swipe"] #lineups-panel .locker-controls {
+  display: flex;
+  grid-row: 2;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+body[data-locker-preview="swipe"] #lineups-panel .locker-dots { gap: 7px; }
+
+body[data-locker-preview="swipe"] #lineups-panel .locker-dot {
+  width: 6px;
+  height: 6px;
+  min-height: 0;
+}
+
+body[data-locker-preview="swipe"] #lineups-panel .locker-dot > span {
+  width: 6px;
+  height: 6px;
+  box-shadow: none;
+}
+
+body[data-locker-preview="swipe"] #lineups-panel .locker-viewport { cursor: grab; }
+body[data-locker-preview="swipe"] #lineups-panel .locker-viewport[data-dragging="true"] { cursor: grabbing; }
+
+body[data-locker-preview="swipe"][data-appearance="realistic"] #lineups-panel .locker-controls {
+  position: absolute;
+  inset: 64% auto auto 50%;
+  transform: translateX(-50%);
+  height: 14px;
+}
+
+@media (min-width: 900px), (min-width: 600px) and (max-height: 600px) {
+  body[data-locker-preview="swipe"][data-appearance="realistic"] #lineups-panel .locker-controls {
+    top: 69%;
+  }
+}
+
+@media (max-width: 599px) and (max-height: 500px) {
+  body[data-locker-preview="swipe"][data-appearance="realistic"] #lineups-panel .locker-controls {
+    top: 75%;
+    left: 30.5%;
+  }
+}
+
+body[data-player-card-preview] #lineups-panel .locker-duty-hint {
+  display: none;
+}
+
+body[data-player-card-preview][data-view="lineups"] #lineups-panel .locker-detail-top {
+  padding-bottom: 0;
+  margin-bottom: 0;
+  border-bottom: 0;
+}
+
+body[data-player-card-preview] #lineups-panel .locker-player-number {
+  font-variant-numeric: tabular-nums;
+}
+
+body[data-player-card-preview="hidden"] #lineups-panel .locker-player-detail {
+  display: none;
+}
+
+body[data-player-card-preview="hidden"] #lineups-panel .lineup-profile-actions {
+  grid-row: -2 / -1;
+}
+
+body[data-locker-layout] #lineups-panel .lineup-profile-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+body[data-locker-layout] #lineups-panel .lineup-profile-title h2 { min-width: 0; }
+
+body[data-locker-layout] #lineups-panel .lineup-profile-title p {
+  flex-shrink: 0;
+  margin: 0;
+  white-space: nowrap;
+}
+
+body[data-locker-layout] #lineups-panel .lineup-profile-team { display: none; }
+
+body[data-locker-controls-preview] #lineups-panel .lineup-profile-team { display: none; }
+
+@media (max-width: 599px) and (min-height: 501px) {
+  body[data-locker-controls-preview] #lineups-panel .lineup-profile-card {
+    grid-template-rows: auto auto minmax(0, 1fr) 46px;
+  }
+
+  body[data-locker-controls-preview] #lineups-panel .lineup-profile-card .lineups-title h1 {
+    font-size: 20px;
+  }
+
+  body[data-locker-controls-preview] #lineups-panel .lineup-profile-card [data-action="lineup-switch-archive"] {
+    width: 88px;
+    min-height: 36px;
+    font-size: 12px;
+  }
+
+  body[data-locker-controls-preview] #lineups-panel .lineup-profile-top {
+    gap: 9px;
+  }
+
+  body[data-locker-controls-preview] #lineups-panel .lineup-profile-top > .lineup-crest {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+  }
+
+  body[data-locker-controls-preview] #lineups-panel .lineup-profile-title h2 {
+    font-size: 16px;
+    line-height: 1.35;
+  }
+
+  body[data-locker-controls-preview] #lineups-panel .lineup-profile-title p {
+    margin: 2px 0 0;
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  body[data-locker-controls-preview] #lineups-panel .lineup-profile-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  body[data-locker-controls-preview] #lineups-panel .lineup-profile-actions > .button {
+    min-height: 46px;
+    font-size: 14px;
+  }
+
+  body[data-locker-controls-preview][data-appearance="glass"] #lineups-panel .locker-scene {
+    align-content: center;
+    grid-template-rows: minmax(0, 238px) 14px;
+  }
+}
+
+@media (max-width: 599px) and (min-height: 501px) and (max-height: 700px) {
+  body[data-locker-controls-preview][data-appearance="glass"] #lineups-panel .locker-scene {
+    grid-template-rows: minmax(0, 207px) 14px;
+  }
+}
+
+@media (max-width: 599px) and (min-height: 501px), (min-width: 600px) and (max-width: 899px) and (min-height: 601px) {
+  body.page-layout[data-locker-layout][data-view="lineups"] #lineups-panel .lineup-profile-card {
+    grid-template-rows: auto auto minmax(0, 1fr) 42px;
+  }
+
+  body.page-layout[data-locker-layout][data-appearance="realistic"][data-view="lineups"] #lineups-panel .lineup-profile-card {
+    background-size: 100% 100%, 112% 111%;
+    background-position: center, center 25%;
+  }
+
+  body[data-locker-layout][data-appearance="realistic"] #lineups-panel .locker-scene .locker-viewport {
+    inset: 33% 15% 33.5%;
+  }
+
+  body[data-locker-layout][data-appearance="realistic"] #lineups-panel .locker-scene .locker-uniform {
+    inset: 17% 13% 0;
+  }
+
+  body[data-locker-layout][data-appearance="realistic"] #lineups-panel .locker-controls {
+    top: 70%;
+  }
+
+  body[data-locker-layout][data-appearance="glass"][data-view="lineups"] #lineups-panel .locker-scene {
+    align-content: center;
+    grid-template-rows: minmax(0, 310px) 14px;
+    gap: 9px;
+  }
+
+  body[data-locker-layout][data-appearance="glass"] #lineups-panel .locker-viewport {
+    width: 100%;
+    max-height: 310px;
+  }
+}

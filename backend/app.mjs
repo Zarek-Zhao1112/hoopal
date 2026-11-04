@@ -5,7 +5,14 @@ import path from 'node:path';
 
 // Serve exactly the bundle copied into the APK. No Node process is needed on Android.
 const defaultRoot = path.resolve(fileURLToPath(new URL('../dist/', import.meta.url)));
-const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png' };
+const types = {
+  '.html': 'text/html; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.svg': 'image/svg+xml',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+};
 
 export function createAppServer({ rootDirectory = defaultRoot } = {}) {
   const root = path.resolve(rootDirectory);

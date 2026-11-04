@@ -41,7 +41,7 @@ export function createEmptyLocker({ document }) {
 }
 
 /** One viewport-wide cabinet at rest; the whole cabinet follows the finger. */
-export function createLockerRoom({ document, profile, selectedIndex = 0, renderJersey, renderBadge, getName, onChange, onInspect, disabled = false }) {
+export function createLockerRoom({ document, profile, swipeSurface, selectedIndex = 0, renderJersey, renderBadge, getName, onChange, onInspect, disabled = false }) {
   const make = (tag, className, text) => {
     const node = document.createElement(tag);
     if (className) node.className = className;
@@ -50,18 +50,23 @@ export function createLockerRoom({ document, profile, selectedIndex = 0, renderJ
   };
   const scene = make('section', 'locker-scene');
   scene.dataset.profileId = profile.id;
-  scene.setAttribute('aria-label', '更衣室，左右滑动或按按钮切换球员');
+  scene.setAttribute('aria-label', '更衣室');
   const viewport = make('div', 'locker-viewport');
+  const surface = swipeSurface ?? viewport;
   viewport.dataset.action = 'lineup-locker-swipe';
+  viewport.tabIndex = disabled ? -1 : 0;
+  viewport.setAttribute('role', 'group');
+  viewport.setAttribute('aria-label', '球衣展示，左右滑动或按方向键切换球员');
   const track = make('div', 'locker-track');
   const controls = make('div', 'locker-controls');
   const dots = make('div', 'locker-dots');
-  const position = make('span', 'locker-position');
+  dots.setAttribute('aria-hidden', 'true');
+  const position = make('span', 'locker-position sr-only');
   position.setAttribute('aria-live', 'polite');
   position.setAttribute('aria-atomic', 'true');
   let index = Math.max(0, Math.min(profile.players.length - 1, selectedIndex));
   let gesture = null, destroyed = false, suppressClickUntil = 0;
-  const realBays = [], nameplates = [], dotButtons = [];
+  const realBays = [], nameplates = [], indicators = [];
   const eventBindings = [];
   const listen = (node, event, callback, options) => {
     node.addEventListener(event, callback, options);
@@ -86,25 +91,14 @@ export function createLockerRoom({ document, profile, selectedIndex = 0, renderJ
   }
   for (let memberIndex = 0; memberIndex < profile.players.length; memberIndex++) track.append(roomBay(profile.players[memberIndex], memberIndex));
   viewport.append(track);
-  function control(label, action, callback) {
-    const button = make('button', 'locker-arrow', label);
-    button.type = 'button'; button.dataset.action = action; button.addEventListener('click', callback);
-    return button;
-  }
-  const previous = control('‹', 'lineup-player-prev', () => select(index - 1));
-  previous.setAttribute('aria-label', '上一位球员');
-  const next = control('›', 'lineup-player-next', () => select(index + 1));
-  next.setAttribute('aria-label', '下一位球员');
-  profile.players.forEach((player, memberIndex) => {
-    const dot = make('button', 'locker-dot');
-    dot.type = 'button'; dot.dataset.action = 'lineup-player-go'; dot.dataset.index = String(memberIndex); dot.dataset.playerId = player.id;
-    dot.setAttribute('aria-label', `查看${getName(player, memberIndex)}，第${memberIndex + 1}位`);
+  for (let memberIndex = 0; memberIndex < profile.players.length; memberIndex++) {
+    const dot = make('span', 'locker-dot');
     dot.append(make('span'));
-    dot.addEventListener('click', () => select(memberIndex)); dots.append(dot); dotButtons.push(dot);
-  });
-  controls.append(previous, dots, position, next);
-  const hint = make('p', 'locker-swipe-hint');
-  scene.append(viewport, controls, hint);
+    dots.append(dot);
+    indicators.push(dot);
+  }
+  controls.append(dots, position);
+  scene.append(viewport, controls);
   function setTransform(delta = 0) {
     // Each bay is exactly one viewport wide; no adjacent cabinet peeks at rest.
     track.style.transform = `translate3d(calc(${-index * 100}% + ${delta}px), 0, 0)`;
@@ -112,15 +106,9 @@ export function createLockerRoom({ document, profile, selectedIndex = 0, renderJ
   function sync() {
     scene.dataset.playerId = profile.players[index].id;
     scene.dataset.playerIndex = String(index);
-    hint.textContent = index === 0 ? '第一位 · 向左滑看下一位'
-      : index === profile.players.length - 1 ? '最后一位 · 向右滑返回'
-        : '向左滑下一位，向右滑上一位';
-    previous.disabled = disabled || index === 0;
-    next.disabled = disabled || index === profile.players.length - 1;
-    position.textContent = `${index + 1} / ${profile.players.length}`;
-    dotButtons.forEach((dot, memberIndex) => {
-      dot.disabled = disabled;
-      dot.setAttribute('aria-pressed', String(memberIndex === index));
+    position.textContent = `第 ${index + 1} 位，共 ${profile.players.length} 位，${getName(profile.players[index], index)}`;
+    indicators.forEach((dot, memberIndex) => {
+      dot.setAttribute('aria-current', String(memberIndex === index));
       realBays[memberIndex].dataset.selected = String(memberIndex === index);
       realBays[memberIndex].setAttribute('aria-hidden', String(memberIndex !== index));
       realBays[memberIndex].inert = disabled || memberIndex !== index;
@@ -143,7 +131,7 @@ export function createLockerRoom({ document, profile, selectedIndex = 0, renderJ
     index = bounded; sync(); onChange(profile.players[index].id, index);
   }
   function release(pointerId) {
-    try { if (viewport.hasPointerCapture?.(pointerId)) viewport.releasePointerCapture(pointerId); } catch { /* Pointer may already be released by the browser. */ }
+    try { if (surface.hasPointerCapture?.(pointerId)) surface.releasePointerCapture(pointerId); } catch { /* Pointer may already be released by the browser. */ }
   }
   function cancelGesture() {
     const active = gesture; gesture = null;
@@ -152,12 +140,13 @@ export function createLockerRoom({ document, profile, selectedIndex = 0, renderJ
     setTransform();
   }
   function pointerDown(event) {
-    if (gesture) cancelGesture();
     if (disabled || destroyed || event.isPrimary === false || event.button !== undefined && event.button !== 0) return;
-    const control = event.target?.closest?.('button,input,select,textarea,a');
-    // The nameplate and its badge are part of the draggable bay. Keep a tap
-    // available for inspection; a horizontal drag suppresses the later click.
-    if (control && control.dataset.action !== 'lineup-inspect-locker-name') return;
+    if (gesture) cancelGesture();
+    suppressClickUntil = 0;
+    if (!swipeSurface) {
+      const control = event.target?.closest?.('button,input,select,textarea,a');
+      if (control && control.dataset.action !== 'lineup-inspect-locker-name') return;
+    }
     gesture = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, lastX: event.clientX, lastY: event.clientY, axis: 'pending', width: viewport.getBoundingClientRect().width || 320 };
   }
   function pointerMove(event) {
@@ -170,7 +159,7 @@ export function createLockerRoom({ document, profile, selectedIndex = 0, renderJ
       gesture.axis = Math.abs(dx) > Math.abs(dy) * 1.25 ? 'horizontal' : 'vertical';
       if (gesture.axis === 'horizontal') {
         viewport.dataset.dragging = 'true';
-        try { viewport.setPointerCapture?.(event.pointerId); } catch { /* Capture is optional for simulated input. */ }
+        try { surface.setPointerCapture?.(event.pointerId); } catch { /* Capture is optional for simulated input. */ }
       }
     }
     if (gesture.axis !== 'horizontal') return;
@@ -184,22 +173,33 @@ export function createLockerRoom({ document, profile, selectedIndex = 0, renderJ
     const endX = Number.isFinite(event.clientX) ? event.clientX : active.lastX;
     const endY = Number.isFinite(event.clientY) ? event.clientY : active.lastY;
     const dx = endX - active.startX, dy = endY - active.startY;
-    if (active.axis === 'horizontal') suppressClickUntil = Date.now() + 400;
+    if (active.axis === 'horizontal' || (swipeSurface && active.axis === 'vertical')) {
+      suppressClickUntil = Date.now() + 400;
+    }
     const nextIndex = resolveLockerSwipe({ index, count: profile.players.length, dx, dy, width: active.width, axis: active.axis, cancelled });
     cancelGesture();
     if (!cancelled && nextIndex !== index) select(nextIndex);
   }
-  listen(viewport, 'pointerdown', pointerDown);
-  listen(viewport, 'pointermove', pointerMove, { passive: false });
-  listen(viewport, 'pointerup', event => finish(event));
-  listen(viewport, 'pointercancel', event => finish(event, true));
-  // Touch initially captures its hit child. Moving capture to the viewport
-  // releases that child's capture; its bubbling event must not cancel our drag.
-  listen(viewport, 'lostpointercapture', event => {
-    if (event.target === viewport) finish(event, true);
+  listen(surface, 'pointerdown', pointerDown);
+  listen(viewport, 'keydown', event => {
+    if (disabled || event.target !== viewport || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    event.preventDefault();
+    select(index + (event.key === 'ArrowLeft' ? -1 : 1));
   });
-  listen(viewport, 'click', event => {
-    if (Date.now() >= suppressClickUntil) return;
+  listen(surface, 'pointermove', pointerMove, { passive: false });
+  listen(surface, 'pointerup', event => finish(event));
+  listen(surface, 'pointercancel', event => finish(event, true));
+  listen(surface, 'pointerleave', event => {
+    if (gesture?.pointerId === event.pointerId && !surface.hasPointerCapture?.(event.pointerId)) finish(event, true);
+  });
+  // Touch initially captures its hit child. Moving capture to the surface
+  // releases that child's capture; its bubbling event must not cancel our drag.
+  listen(surface, 'lostpointercapture', event => {
+    if (event.target === surface) finish(event, true);
+  });
+  listen(surface, 'click', event => {
+    if (event.detail === 0 || Date.now() >= suppressClickUntil) return;
     event.preventDefault(); event.stopPropagation();
   }, true);
   if (document.defaultView?.addEventListener) listen(document.defaultView, 'resize', cancelGesture);

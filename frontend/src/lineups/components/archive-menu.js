@@ -76,7 +76,7 @@ function renderArchiveMenu() {
         perform('delete', { id }, () => { draftStore.drafts.delete(id); draftStore.baselines.delete(id); closeArchiveMenu({ force: true }); model.route = model.section === 'archives' ? 'teams' : 'profiles'; });
       }, { className: 'button lineup-danger', data: { profileId: profile.id } }));
     } else {
-      archiveMenu.append(button(dirty(profile.id) ? '继续未保存配置' : '配置球员', 'lineup-configure', () => editFromMenu(3), { data: { profileId: profile.id } }));
+      archiveMenu.append(button(dirty(profile.id) ? '继续未保存配置' : '编辑球员', 'lineup-configure', () => editFromMenu(3), { data: { profileId: profile.id } }));
       archiveMenu.append(button('修改球队名称', 'lineup-archive-rename', () => editFromMenu(1), { data: { profileId: profile.id } }));
       archiveMenu.append(button('更换 NBA 球队', 'lineup-team-open', () => editFromMenu(2), { data: { profileId: profile.id } }));
       archiveMenu.append(button('删除球队', 'lineup-delete', () => { menuState.deleting = true; renderArchiveMenu(); }, { className: 'button lineup-danger', data: { profileId: profile.id } }));

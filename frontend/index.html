@@ -40,6 +40,7 @@
     <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></symbol>
     <symbol id="i-tactics" viewBox="0 0 24 24"><path d="M8 4H5v17h14V4h-3M9 2h6v5H9Z"/><circle cx="9" cy="12" r="1"/><path d="m13 11 3 3m0-3-3 3M8 17h7"/></symbol>
     <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 5Q7 2 2 4v15q5-2 10 1 5-3 10-1V4q-5-2-10 1v15"/></symbol>
+    <symbol id="i-appearance" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/></symbol>
   </svg>
 
   <header class="app-header" hidden aria-hidden="true">
@@ -50,12 +51,14 @@
     <header id="primary-page-header" class="primary-page-header">
       <h1 id="primary-training-title">训练场</h1>
       <h1 id="primary-account-title">我的</h1>
+      <button class="appearance-toggle" type="button" aria-label="暗色写实外观" aria-pressed="false" disabled><svg class="icon" aria-hidden="true"><use href="#i-appearance"/></svg><span>外观 · 玻璃</span></button>
     </header>
   </div>
 
   <header id="lineup-brand-header" class="lineup-brand-header" aria-label="球搭 HOOPAL">
     <img src="./assets/app-icon.png" alt="球搭图标" class="lineup-brand-icon">
     <div><strong>HOOPAL</strong><span>球搭</span></div>
+    <button class="appearance-toggle" type="button" aria-label="暗色写实外观" aria-pressed="false" disabled><svg class="icon" aria-hidden="true"><use href="#i-appearance"/></svg><span>外观 · 玻璃</span></button>
   </header>
 
   <main class="workspace">
@@ -64,6 +67,7 @@
 
     <section class="training-panel panel" aria-label="训练场">
       <header class="training-header">
+        <h1 class="workspace-card-heading">训练场</h1>
         <div class="training-title-static">
           <h1 id="training-title">载入战术…</h1>
           <select id="template-picker" aria-label="选择内置战术" hidden aria-hidden="true" tabindex="-1"><option value="">选择示例</option></select>
@@ -120,6 +124,7 @@
   </dialog>
 
   <div id="toast-live" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+  <div id="appearance-status" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
   <script type="module" src="./src/main.js"></script>
 </body>
 </html>

@@ -8,6 +8,15 @@
 
 | 编号 | 任务 | 状态 | 负责人 | 下一步 |
 | --- | --- | --- | --- | --- |
+| [HC-074](HC-074-locker-card-swipe-release.md) | 整卡横滑手机更新与 Git 推送 | `awaiting_device` | 主控发布、独立审查 | 已保数据安装与模拟触摸核对，待用户手动体验 |
+| [HC-073](HC-073-locker-card-swipe.md) | 整卡横滑正式接入 | `completed` | 主控 | 两种外观已在 Chrome 触摸模拟中核对 |
+| [HC-072](HC-072-locker-card-swipe-preview.md) | 整张更衣室卡片滑动原型 | `completed` | 主控原型 | 可操作网页和三帧效果图供评审 |
+| [HC-071](HC-071-workspace-player-release.md) | 三页排版与单人编辑正式接入 | `awaiting_device` | 主控集成、页面排版、编辑面板、独立审查 | 1.33.0 已保数据安装，双外观及单人入口已在手机核对 |
+| [HC-070](HC-070-workspace-player-preview.md) | 三页排版与单人编辑原型 | `completed` | 主控原型 | 三张手机竖屏效果图与可操作网页供评审 |
+| [HC-069](HC-069-locker-controls-release.md) | 更衣室排版正式接入 | `awaiting_device` | 主控集成、双外观样式、回归维护、独立审查 | 1.32.1 已保数据覆盖安装，两种外观均已在真机核对，待用户查看 |
+| [HC-068](HC-068-locker-swipe-preview.md) | 更衣室纯滑动网页原型 | `completed` | 主控原型 | 用户确认等宽按钮方案，正式接入见 HC-069 |
+| [HC-067](HC-067-appearance-release.md) | 双外观正式接入 | `awaiting_device` | 主控集成与构建、暗色控件、整卡场景、系统栏、独立审查 | 1.32.0 已保数据覆盖安装，启动与开关已核对，暗色真机体验待确认 |
+| [HC-066](HC-066-appearance-web-preview.md) | 双外观网页预览 | `completed` | 主控预览与铺图、暗色控件、独立审查 | 本地交互和效果图已交付，供用户评审 |
 | [HC-065](HC-065-combined-player-config-release.md) | 统一球员配置正式接入 | `awaiting_device` | 主控集成、编辑器、存储、浏览器、独立审查 | 1.31.0 手机安装成功，双文件一致，物理操作待体验 |
 | [HC-064](HC-064-combined-player-config-preview.md) | 球员配置与角色合并原型 | `completed` | 主控原型与出图 | 3v3/4v4 网页与竖屏图已获确认，正式接入见 HC-065 |
 | [HC-063](HC-063-team-role-release.md) | 通用角色与本队演练正式接入 | `awaiting_device` | 数据、角色面板、训练场分工，主控集成与交付 | 254 项、Edge 6 组和独立审查通过；1.30.0 已覆盖安装，WV96 程序检查与双文件保留已确认，人工体验待验 |

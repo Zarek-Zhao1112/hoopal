@@ -19,3 +19,5 @@
 @import '../src/selection/styles.css';
 @import './library-integration.css';
 @import './primary-page-headings.css';
+@import './appearance-theme.css';
+@import './appearance-locker.css';

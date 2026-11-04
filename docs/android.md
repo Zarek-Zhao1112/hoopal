@@ -2,6 +2,14 @@
 
 ## 运行方式
 
+2026-11-04，1.33.1 / code 41 已覆盖安装到 M2101K9C。手机 WebView 以模拟触摸核对整卡换人与对应球员编辑，球队档案及战术进度原文一致。见 [HC-074](tasks/HC-074-locker-card-swipe-release.md) 和 [1.33.1 APK](../artifacts/apk/hoopal-1.33.1.apk)。
+
+2026-11-04，1.33.0 / code 40 已覆盖安装到 M2101K9C。真机核对当前球衣对应的单人编辑、训练场和「我的」的写实与玻璃排版，球队档案与战术进度原文一致。见 [HC-071](tasks/HC-071-workspace-player-release.md) 和 [1.33.0 APK](../artifacts/apk/hoopal-1.33.0.apk)。
+
+2026-11-04，1.32.1 / code 39 已覆盖安装到 M2101K9C。写实和玻璃更衣室均已在手机核对，底部按钮等宽，球队档案和战术进度原文一致。见 [HC-069](tasks/HC-069-locker-controls-release.md) 和 [1.32.1 APK](../artifacts/apk/hoopal-1.32.1.apk)。
+
+2026-11-04，1.32.0 / code 38 已覆盖安装指定手机 M2101K9C。安装前后球队档案与战术进度原文一致。真机打开玻璃更衣室并显示右上角外观开关，暗色真机体验待确认。见 [HC-067](tasks/HC-067-appearance-release.md) 和 [1.32.0 APK](../artifacts/apk/hoopal-1.32.0.apk)。
+
 2026-11-04，1.30.0 / code36 已覆盖安装指定手机 M2101K9C。新增 3v3 三种和 4v4 四种球员角色、重复选项与本队进攻站位。254 项检查、Edge 6 组及独立审查通过；Android 原签名、离线资源和安装前后阵容/进度文件校验一致。手机实际打开三人角色面板并取消。见 [HC-063](tasks/HC-063-team-role-release.md) 和 [1.30.0 APK](../artifacts/apk/hoopal-1.30.0.apk)。
 
 2026-11-03，1.29.1/code35已保数据覆盖安装同一新手机：训练场/我的一级标题卡外同起线，利用原留白不挤球场，账号内容上移补空。248检查、三组受影响浏览器与独立12项通过；21秒构建、30网页同dist/15原图标/原v2/无server.url。install-r Success，COLD602/Wait608；WV96真实标题几何/玻璃blur/管理返回程序验证通过，两原文hash严格保持，人工观感待确认。见[HC-061](tasks/HC-061-primary-page-headings-release.md)与[当前APK](../artifacts/apk/hoopal-1.29.1.apk)。

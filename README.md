@@ -2,6 +2,8 @@
 
 手机本地离线的半场3v3 / 4v4战术动画工具，同时支持电脑浏览器。原生JavaScript / SVG、Vite与Capacitor Android，无账号或业务服务器。
 
+更衣室、训练场和「我的」右上角可在玻璃和暗色写实外观之间切换。暗色更衣室场景铺满主卡，外观选择保存于本机。见 [HC-067](docs/tasks/HC-067-appearance-release.md)。
+
 目前提供26套内置战术（18进攻、8防守）、本地球队档案与按整体体型「挑选战术」。球队入口只显示对应人数，先选一大两小等体型，在训练场内的玻璃战术库浏览攻防配合；分类按队记忆。训练场支持步骤讲解、倍速、循环和导出；战术库展开单卡即可循环预览。手机竖屏一屏操作，横屏和平板扩大球场。
 
 在更衣室或球队管理点「配置球员」，可在同一张球员卡里编辑昵称、号码和角色，建队时也可以一起填写。3v3 三种角色、4v4 四种，允许重复或留空。从更衣室挑选进攻战术后，设置过角色的球队可按本队号码演练，训练场支持临时交换站位。设计与交付记录见 [HC-065](docs/tasks/HC-065-combined-player-config-release.md)。
@@ -40,6 +42,8 @@ node scripts/preview-training-library.mjs
 ~~~
 
 打开终端打印的本地URL（默认127.0.0.1:4188）。预览含三底栏、玻璃战术库、真实循环动画、体型选择与球队管理，只使用内存示例；刷新即重置，不读写正式档案，也不进入APK。体验与验收见[HC-058](docs/tasks/HC-058-training-library-interactive-preview.md)。
+
+玻璃与暗色写实双外观网页可运行 `node scripts/preview-appearance.mjs`，打开 [交互预览](http://127.0.0.1:4196/) 或 [静态效果图](http://127.0.0.1:4196/previews/appearance/concepts.html)。预览使用独立端口和内存示例队。详细范围见 [HC-066](docs/tasks/HC-066-appearance-web-preview.md)。
 
 ## 项目目录
 

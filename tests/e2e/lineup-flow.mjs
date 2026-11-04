@@ -83,28 +83,35 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
   await create('3v3','周末三人组');
   await configure(3);
   assert.equal(await evaluate(`${disk}.profiles[0].nbaTeamId`),'BOS');
-  await action('lineup-player-next');
+  await showLocker(1);
   await screenshot('nba-locker-BOS-phone.png');
-  await action('lineup-player-prev');
+  await showLocker(0);
   await checkNbaDrafts();
   await screenshot('hc010-before-gesture.png');
   await checkLockerInteraction(3);
   await screenshot('manager-roster-3v3-phone.png');
   assert.equal(await evaluate(`${disk}.profiles.length`),1);
   assert.deepEqual(await evaluate(`Object.keys(${disk}).sort()`),['activeProfileId','playbackContext','profiles','rolePlans','schemaVersion']);
+  const beforeSingleEdit=await evaluate(`${disk}.profiles[0]`);
   await openWizard();
   await input('lineup-player-number',12);await action('lineup-save');assert.ok(await evaluate("document.querySelector('.lineup-wizard-error').textContent.includes('重复')"));await input('lineup-player-number',7);
-  await input('lineup-player-name','保留的草稿');
+  await input('lineup-player-name','未保存昵称');
   await nav('play');await nav('lineups');
   assert.equal(await evaluate('document.body.dataset.view'),'lineups','modal blocks background navigation');
   assert.equal(await evaluate("document.querySelector('#lineup-wizard-dialog').open"),true);
-  assert.equal(await evaluate("document.querySelector('[data-action=lineup-player-name]').value"),'保留的草稿');
-  await closeWizard('keep');
+  assert.equal(await evaluate("document.querySelector('[data-action=lineup-player-name]').value"),'未保存昵称');
+  await closeWizard('discard');
+  assert.deepEqual(await evaluate(`${disk}.profiles[0]`),beforeSingleEdit,'canceling one player does not write the roster');
   await nav('play');await nav('lineups');
   await beginCreate();await input('lineup-name','待放弃的新队');await closeWizard('discard');
   await nav('lineups');
-  await openWizard();assert.equal(await evaluate("document.querySelector('[data-action=lineup-player-name]').value"),'保留的草稿');
-  await closeWizard('discard');
+  await showLocker(1);
+  await openWizard();assert.equal(await evaluate("document.querySelector('[data-action=lineup-player-name]').value"),'大李');
+  await input('lineup-player-name','新大李');await action('lineup-save');
+  await waitFor("!document.querySelector('#lineup-wizard-dialog').open");
+  assert.equal(await selectedLocker(),1,'saving returns to the same locker');
+  const afterSingleEdit=await evaluate(`${disk}.profiles[0]`);
+  assert.deepEqual(afterSingleEdit.players,beforeSingleEdit.players.map((player,index)=>index===1?{...player,name:'新大李'}:player),'only the open locker member was saved');
   await startTeamPractice();
   assert.equal(await evaluate("document.querySelector('#lineup-legend').hidden"),true);
   const template=await evaluate("document.querySelector('#template-picker').value");
@@ -220,7 +227,7 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
   const beforeLegacy=await evaluate(`(()=>{let s=${disk};s.profiles.forEach(p=>delete p.nbaTeamId);localStorage.setItem('halfcourt-lineups-v1',JSON.stringify(s));return localStorage.getItem('halfcourt-lineups-v1')})()`);
   await send('Page.reload');await waitFor("Boolean(document.querySelector('[data-action=lineup-configure]'))");
   assert.equal(await evaluate("localStorage.getItem('halfcourt-lineups-v1')"),beforeLegacy,'reading legacy profiles does not rewrite archive');
-  assert.ok(await evaluate("document.querySelector('#lineups-panel').textContent.includes('选择 NBA 球队')||document.querySelector('#lineups-panel').textContent.includes('选择NBA球队')"));
+  assert.ok(await evaluate("Boolean(document.querySelector('.lineup-profile-top > .lineup-crest-neutral'))"), 'profiles without an NBA team show the neutral crest');
 
   async function startTeamPractice(){
     await action('lineup-conditions');await lc.phase('open');
@@ -260,23 +267,34 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
   async function screenshot(name){await waitFor('!document.body.dataset.pageTransition');await modalStable();await wait(500);await evaluate("document.querySelector('#toast-live').classList.remove('visible')");const r=await send('Page.captureScreenshot',{format:'png'});await writeFile(path.join(folder,name),Buffer.from(r.data,'base64'))}
   async function checkRoster(width,height,count) {
     await wait(380);
-    const scene=await evaluate("(()=>{const s=document.querySelector('.locker-scene'),b=s.getBoundingClientRect(),index=Number(s.dataset.playerIndex),bay=[...s.querySelectorAll('.locker-bay[data-player-id]')].find(n=>n.dataset.playerId===s.dataset.playerId),j=bay.querySelector('.locker-uniform svg').getBoundingClientRect(),v=s.querySelector('.locker-viewport').getBoundingClientRect(),r=bay.getBoundingClientRect();return{count:s.querySelectorAll('.locker-bay[data-player-id]').length,index,id:s.dataset.playerId,detail:document.querySelector('.locker-player-detail').textContent,centerError:Math.abs(r.x+r.width/2-v.x-v.width/2),widthError:Math.abs(r.width-v.width),jersey:j.width>15&&j.height>15&&j.left>=b.left-2&&j.right<=b.right+2}})()");
+    const scene=await evaluate("(()=>{const s=document.querySelector('.locker-scene'),b=s.getBoundingClientRect(),index=Number(s.dataset.playerIndex),bay=[...s.querySelectorAll('.locker-bay[data-player-id]')].find(n=>n.dataset.playerId===s.dataset.playerId),j=bay.querySelector('.locker-uniform svg').getBoundingClientRect(),v=s.querySelector('.locker-viewport').getBoundingClientRect(),r=bay.getBoundingClientRect();return{count:s.querySelectorAll('.locker-bay[data-player-id]').length,index,id:s.dataset.playerId,dots:[...s.querySelectorAll('.locker-dot')].map(n=>n.getAttribute('aria-current')),centerError:Math.abs(r.x+r.width/2-v.x-v.width/2),widthError:Math.abs(r.width-v.width),jersey:j.width>15&&j.height>15&&j.left>=b.left-2&&j.right<=b.right+2}})()");
     assert.equal(scene.count,count,`${width}x${height}: all roster members remain in the scene`);
-    assert.ok(scene.jersey&&scene.id&&scene.detail.length,`${width}x${height}: current player jersey and detail visible`);
+    assert.ok(scene.jersey&&scene.id,`${width}x${height}: current player jersey is visible`);
+    assert.deepEqual(scene.dots,Array.from({length:count},(_,index)=>String(index===scene.index)),`${width}x${height}: dots reflect the current player`);
     assert.ok(scene.centerError<=2,`${width}x${height}: selected locker settles in the center: ${scene.centerError}`);
     assert.ok(scene.widthError<=3,`${width}x${height}: one cabinet fills the viewport without neighboring peeks`);
   }
+  function selectedLocker() {
+    return evaluate("Number(document.querySelector('.locker-scene').dataset.playerIndex)");
+  }
+  async function showLocker(target) {
+    const current=await selectedLocker();
+    for(let i=0;i<Math.abs(target-current);i++) await gesture(target>current?-105:105,0);
+    assert.equal(await selectedLocker(),target,'swipe to requested roster position');
+  }
   async function checkLockerInteraction(count) {
-    const selected=()=>evaluate("Number(document.querySelector('.locker-scene').dataset.playerIndex)");
+    const selected=selectedLocker;
     const diskBefore=await evaluate(`localStorage.getItem('halfcourt-lineups-v1')`);
-    await action('lineup-player-go','[data-index="0"]');
+    await showLocker(0);
     await gesture(-105,0);assert.equal(await selected(),1,'first locker left drag from jersey moves to second member');
     await gesture(105,0);assert.equal(await selected(),0,'right drag returns to first member');
     await gesture(-105,0,false,'.locker-bay[data-selected=true] .locker-nameplate');assert.equal(await selected(),1,'nameplate supports the same left drag');
     assert.equal(await evaluate("document.querySelector('#note-dialog').open"),false,'nameplate drag does not inspect');
     await gesture(105,0,false,'.locker-bay[data-selected=true] .locker-nameplate');assert.equal(await selected(),0);
-    await action('lineup-player-next');assert.equal(await selected(),1);
+    await showLocker(1);
     await openWizard();
+    assert.equal(await evaluate("document.querySelector('#lineup-wizard-title').textContent"),'大李 · #12');
+    assert.equal(await evaluate("document.querySelectorAll('#lineup-wizard-dialog [data-action=lineup-player],#lineup-wizard-dialog [data-action=lineup-wizard-player-next],#lineup-wizard-dialog [data-action=lineup-wizard-player-prev]').length"),0,'locker editor does not offer member switching');
     assert.equal(await evaluate("document.querySelector('[data-action=lineup-player-name]').value"),'大李','configure opens the focused locker member');
     await closeWizard();
     await gesture(-105,0);
@@ -287,20 +305,18 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
     await gesture(90,0,true);assert.equal(await selected(),2,'canceled gesture cannot switch player');
     await gesture(105,0);assert.equal(await selected(),1,'right swipe moves to previous player');
     assert.notEqual(await evaluate("getComputedStyle(document.querySelector('.locker-track')).transform"),moved,'locker scenery moves with selection');
-    for(let i=1;i<count-1;i++)await action('lineup-player-next');
-    assert.equal(await selected(),count-1);assert.equal(await evaluate("document.querySelector('[data-action=lineup-player-next]').disabled"),true);
+    await showLocker(count-1);
     await gesture(-105,0);assert.equal(await selected(),count-1,'last locker clamps movement');
-    await action('lineup-player-go','[data-index="0"]');
-    assert.equal(await evaluate("document.querySelector('[data-action=lineup-player-prev]').disabled"),true);
+    await showLocker(0);
     await gesture(105,0);assert.equal(await selected(),0,'first locker clamps movement');
     if(count===4) {
       const profileIds=await evaluate(`${disk}.profiles.map(p=>p.id)`),otherId=profileIds[0],currentId=await evaluate(`${disk}.activeProfileId`);
-      await action('lineup-player-go','[data-index="2"]');
+      await showLocker(2);
       await selectArchive({evaluate,waitFor},otherId);assert.equal(await selected(),0,'each lineup keeps separate selected member');
-      await action('lineup-player-go','[data-index="1"]');
+      await showLocker(1);
       await selectArchive({evaluate,waitFor},currentId);assert.equal(await selected(),2,'returning restores this lineup member');
       await selectArchive({evaluate,waitFor},otherId);assert.equal(await selected(),1,'other lineup focus is preserved');
-      await selectArchive({evaluate,waitFor},currentId);await action('lineup-player-go','[data-index="0"]');
+      await selectArchive({evaluate,waitFor},currentId);await showLocker(0);
     }
     assert.equal(await evaluate("localStorage.getItem('halfcourt-lineups-v1')"),diskBefore,'viewing lockers never changes stored lineup/context');
     assert.equal(await evaluate("document.querySelector('#note-dialog').open"),false,'drag does not open an accidental inspection');
@@ -308,9 +324,9 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
     assert.ok(await evaluate("!document.activeElement?.closest('.locker-bay[data-selected=false]')"),'focus never remains on a hidden neighboring cabinet');
     if(count===3) {
       await send('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
-      await action('lineup-player-next');assert.equal(await selected(),1);
+      await showLocker(1);
       assert.equal(await evaluate("getComputedStyle(document.querySelector('.locker-track')).transitionDuration"),'0s');
-      await action('lineup-player-go','[data-index="0"]');
+      await showLocker(0);
       await send('Emulation.setEmulatedMedia',{features:[]});
     }
   }
