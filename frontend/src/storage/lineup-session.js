@@ -1,7 +1,7 @@
 import { createLineup, validateLineup, MAX_LINEUPS } from '../../../shared/lineups.js';
 import { createRolePlan, getRolePlanState, setRoleResponse, swapRoleMembers } from '../../../shared/tactic-roles.js';
 import { isBodyTypeForMode } from '../../../shared/tactic-body-types.js';
-import { isMainRoleForMode } from '../../../shared/team-roles.js';
+import { isMainRoleForMode, isSecondaryRoleForMode } from '../../../shared/team-roles.js';
 
 const copy = value => JSON.parse(JSON.stringify(value));
 const plansFor = (state, id) => Object.hasOwn(state.rolePlans, id) ? state.rolePlans[id] : {};
@@ -62,9 +62,13 @@ export function createLineupSession({ repository, builtinRepository, templates, 
         const profile = validateLineup({ ...snapshot, bodyType: previous.bodyType, revision: previous.revision + 1, recentTemplateId: previous.recentTemplateId });
         if (!includeMainRoles) {
           for (const player of profile.players) {
-            const role = previous.players.find(member => member.id === player.id)?.mainRole;
+            const previousMember = previous.players.find(member => member.id === player.id);
+            const role = previousMember?.mainRole;
+            const secondaryRole = previousMember?.secondaryRole;
             if (role) player.mainRole = role;
             else delete player.mainRole;
+            if (secondaryRole) player.secondaryRole = secondaryRole;
+            else delete player.secondaryRole;
           }
         }
         const teamPlans = {};
@@ -110,15 +114,16 @@ export function createLineupSession({ repository, builtinRepository, templates, 
         const members = new Set(profile.players.map(player => player.id));
         const chosen = new Map();
         for (const row of snapshot.roles) {
-          if (!members.has(row?.memberId) || chosen.has(row.memberId) || (row.role !== '' && !isMainRoleForMode(profile.mode, row.role))) {
+          if (!members.has(row?.memberId) || chosen.has(row.memberId) || (row.role !== '' && !isMainRoleForMode(profile.mode, row.role)) || (row.secondaryRole !== '' && row.secondaryRole != null && !isSecondaryRoleForMode(profile.mode, row.secondaryRole)) || row.role && row.role === row.secondaryRole) {
             throw new Error('球员身份或角色无效');
           }
-          chosen.set(row.memberId, row.role);
+          const previousSecondary = profile.players.find(player => player.id === row.memberId)?.secondaryRole;
+          chosen.set(row.memberId, { mainRole: row.role, secondaryRole: Object.hasOwn(row, 'secondaryRole') ? row.secondaryRole || '' : previousSecondary || '' });
         }
-        if (profile.players.every(player => (player.mainRole ?? '') === chosen.get(player.id))) return copy(profile);
-        const players = profile.players.map(({ mainRole: _previousRole, ...player }) => {
-          const role = chosen.get(player.id);
-          return role ? { ...player, mainRole: role } : player;
+        if (profile.players.every(player => (player.mainRole ?? '') === chosen.get(player.id)?.mainRole && (player.secondaryRole ?? '') === chosen.get(player.id)?.secondaryRole)) return copy(profile);
+        const players = profile.players.map(({ mainRole: _previousRole, secondaryRole: _previousSecondaryRole, ...player }) => {
+          const roles = chosen.get(player.id);
+          return { ...player, ...(roles?.mainRole ? { mainRole: roles.mainRole } : {}), ...(roles?.secondaryRole ? { secondaryRole: roles.secondaryRole } : {}) };
         });
         const nextProfile = { ...profile, players, revision: profile.revision + 1 };
         const playbackContext = state.playbackContext?.profileId === profile.id ? null : state.playbackContext;

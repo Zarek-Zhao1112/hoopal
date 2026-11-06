@@ -118,7 +118,7 @@ export async function runLineupFlow({send,evaluate,wait,waitFor,folder}) {
   assert.equal(await evaluate(`${disk}.playbackContext`),null);
   assert.equal(await evaluate(`${disk}.profiles[0].bodyType`),'one-big');
   assert.equal(await evaluate("[...document.querySelectorAll('#players-layer [data-player^=\"attack-\"] text')].map(p=>p.textContent).join(',')"),'1,2,3');
-  await evaluate("document.querySelector('#restart-play').click()");
+  await evaluate("document.querySelector('#play-toggle').click()");
   await waitFor("Number(document.querySelector('#timeline-scrub').value)>1");
   await send('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape'});
   await send('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',code:'Escape'});

@@ -4,6 +4,26 @@ import { createStartupTimeline, startupProgress, STARTUP_TIMING, STARTUP_DURATIO
 const PAINT = ('display position box-sizing width height min-width min-height max-width max-height top right bottom left inset margin padding border-top border-right border-bottom border-left border-radius background background-size background-position background-repeat box-shadow opacity overflow overflow-x overflow-y transform transform-origin filter clip-path isolation z-index flex flex-direction flex-wrap align-items align-self justify-content justify-self gap grid-template-columns grid-template-rows grid-column grid-row font-family font-size font-weight font-style line-height letter-spacing text-align text-overflow white-space color fill fill-opacity fill-rule stroke stroke-width stroke-opacity stroke-linecap stroke-linejoin stop-color stop-opacity visibility object-fit object-position vertical-align').split(' ');
 
 function cabinetSnapshot(source, document) {
+  // The full-card room leaves only a jersey in this viewport. Freeze the original
+  // cabinet in a separate paint host so the established intro keeps its cabinet.
+  // Its final target remains the live viewport measured by the controller.
+  const card = source.closest('.lineup-profile-card');
+  if (card && document.body.dataset.appearance === 'glass' && document.defaultView.getComputedStyle(card).getPropertyValue('--locker-room-image').trim()) {
+    const host = document.createElement('section');
+    host.className = 'locker-scene';
+    host.setAttribute('aria-hidden', 'true');
+    host.inert = true;
+    host.style.cssText = 'position:fixed;left:-10000px;top:0;width:260px;height:300px;opacity:0;pointer-events:none';
+    const cabinet = source.cloneNode(true);
+    host.append(cabinet);
+    document.body.append(host);
+    try { return freezeCabinet(cabinet, document); }
+    finally { host.remove(); }
+  }
+  return freezeCabinet(source, document);
+}
+
+function freezeCabinet(source, document) {
   const win = document.defaultView;
   const clone = source.cloneNode(true), originals = [source, ...source.querySelectorAll('*')], copies = [clone, ...clone.querySelectorAll('*')];
   if (originals.length > 600) throw new Error('启动柜体超出安全快照范围');

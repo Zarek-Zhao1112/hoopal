@@ -320,6 +320,39 @@ test('main-role saves keep duplicate roles, persist a call-time snapshot and rej
   assert.equal(f.disk.profiles[0].players[0].mainRole, 'relay');
 });
 
+test('3v3 secondary roles save independently and older role payloads preserve them', async () => {
+  const f = await fixture('3v3', (_state, profile) => {
+    profile.players[0].mainRole = 'start'; profile.players[0].secondaryRole = 'space';
+  });
+  const p = f.profile;
+  const roles = p.players.map((player, index) => ({ memberId: player.id, role: ['support', '', 'spacing'][index] }));
+  await f.session.saveMainRoles({ profileId: p.id, expectedRevision: p.revision, roles });
+  assert.equal(f.disk.profiles[0].players[0].secondaryRole, 'space');
+
+  const current = f.session.state.profiles[0];
+  const withSecondary = current.players.map(player => ({ memberId: player.id, role: player.mainRole ?? '', secondaryRole: player.id === current.players[0].id ? 'spacing' : '' }));
+  await f.session.saveMainRoles({ profileId: p.id, expectedRevision: current.revision, roles: withSecondary });
+  assert.equal(f.disk.profiles[0].players[0].secondaryRole, 'spacing');
+});
+
+test('4v4 secondary roles accept new categories and ordinary profile edits preserve them', async () => {
+  const f = await fixture('4v4'), p = f.profile;
+  const roles = p.players.map((player, index) => ({
+    memberId: player.id,
+    role: ['space', 'screen', 'relay', 'spacing'][index],
+    secondaryRole: index === 0 ? 'finisher' : '',
+  }));
+  const saved = await f.session.saveMainRoles({ profileId: p.id, expectedRevision: p.revision, roles });
+  assert.equal(saved.players[0].mainRole, 'space');
+  assert.equal(saved.players[0].secondaryRole, 'finisher');
+  const reloaded = await f.repository.load();
+  assert.equal(reloaded.state.profiles[0].players[0].mainRole, 'space');
+  assert.equal(reloaded.state.profiles[0].players[0].secondaryRole, 'finisher');
+  const draft = structuredClone(saved); draft.players[0].name = '保留副角色';
+  await f.session.update(draft);
+  assert.equal(f.disk.profiles[0].players[0].secondaryRole, 'finisher');
+});
+
 test('failed main-role writes preserve prior state and can retry without affecting an independent team', async () => {
   const f = await fixture('4v4'), p = f.profile;
   const other = await f.session.create({ mode: '3v3', name: '另一队' });

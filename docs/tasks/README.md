@@ -1,6 +1,6 @@
 # 协作任务看板
 
-更新日期：2026-11-04。
+更新日期：2026-11-06。
 
 这里记录需要多 agent 协作的开发任务：目标、模块边界、接口、依赖、审查与验收证据。主 agent 维护任务状态并负责最终整合，各 agent 在约定范围内开发或审查。
 
@@ -8,6 +8,14 @@
 
 | 编号 | 任务 | 状态 | 负责人 | 下一步 |
 | --- | --- | --- | --- | --- |
+| [HC-083](HC-083-glass-locker-scene.md) | 玻璃更衣室浅蓝雾面与暖灯整卡场景 | `awaiting_device` | 主控、独立审查 | 1.36.1 已保数据安装，双外观/滑动/单人编辑真机核对通过，待用户手动体验 |
+| [HC-082](HC-082-training-scene-release.md) | 连续球场整卡与进度步骤联动正式接入 | `awaiting_device` | 主控、样式、回归、独立审查 | 1.36.0已保数据安装，双外观及联动真机核对通过，待用户手动体验 |
+| [HC-081](HC-081-training-capsule-concept.md) | 训练场板内说明与步骤节点播放栏效果图 | `completed` | 主控原型 | 连续球场整卡修正版已获确认，标题、说明与播放栏悬浮其上 |
+| [HC-080](HC-080-local-my-center-release.md) | 本机「我的」与纯图标外观按钮正式接入 | `awaiting_device` | 主控、样式、独立审查 | 1.35.0已保数据安装，双外观真机核对通过，待用户手动体验 |
+| [HC-079](HC-079-local-my-center-concept.md) | 本机「我的」与纯图标外观按钮原型 | `completed` | 主控原型 | 项目实拍玻璃 / 写实双屏供用户看图讨论 |
+| [HC-078](HC-078-dual-player-roles-release.md) | 球员主副角色界面与手机更新 | `awaiting_device` | 主控、独立审查 | 1.34.0 已安装，真机两种外观核对通过，待手动体验 |
+| [HC-077](HC-077-team-role-mapping-4v4.md) | 4v4 主副通用角色与战术位置映射 | `awaiting_device` | 主控、独立审查 | 写实 4v4 浏览器流程通过，随 HC-078 安装，待真机体验 |
+| [HC-076](HC-076-team-role-secondary-3v3.md) | 3v3 主副通用角色与战术映射 | `awaiting_device` | 主控 | 玻璃 3v3 浏览器流程通过，随 HC-078 安装并核对控件，待手动体验 |
 | [HC-075](HC-075-team-role-tactic-mapping.md) | 通用角色与进攻战术位置对齐 | `completed` | 主控数据与验证、独立审查 | 1.33.2 已覆盖安装，两套战术实机程序核对通过 |
 | [HC-074](HC-074-locker-card-swipe-release.md) | 整卡横滑手机更新与 Git 推送 | `awaiting_device` | 主控发布、独立审查 | 已保数据安装与模拟触摸核对，待用户手动体验 |
 | [HC-073](HC-073-locker-card-swipe.md) | 整卡横滑正式接入 | `completed` | 主控 | 两种外观已在 Chrome 触摸模拟中核对 |

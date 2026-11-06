@@ -47,6 +47,20 @@ test('discarding creation and editing keeps the unrelated session draft', () => 
   assert.equal(drafts.hasUnsavedChanges(), true);
 });
 
+test('single-player save cannot rebase a team draft into duplicate primary and secondary roles', () => {
+  const drafts = createLineupDrafts(), before = profile();
+  before.players[0].mainRole = 'start';
+  const draft = drafts.beginEdit(before);
+  draft.players[0].mainRole = 'spacing';
+  const saved = structuredClone(before);
+  saved.revision++;
+  saved.players[0].secondaryRole = 'spacing';
+  drafts.rebaseAfterPlayerSave(before, saved, before.players[0].id);
+  assert.equal(draft.revision, before.revision);
+  assert.equal(draft.players[0].mainRole, 'spacing');
+  assert.equal(draft.players[0].secondaryRole, undefined);
+});
+
 test('opening a non-current member binds the edit to that profile and member', () => {
   const h = harness(); h.model.route = 'profiles';
   h.selectedByProfile.set(h.saved.id, h.saved.players[2].id);

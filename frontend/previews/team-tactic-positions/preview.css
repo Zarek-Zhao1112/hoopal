@@ -1,0 +1,36 @@
+*{box-sizing:border-box}
+html{min-height:100%;background:#0b1821}
+body{margin:0;color:#edf5f8;font:14px/1.45 "Microsoft YaHei",system-ui,sans-serif}
+body:has(.role-map){background:#0b1821!important;color:#edf5f8!important}
+.role-map{width:min(1120px,100%);margin:auto;padding:22px 18px 40px}
+.role-map header{margin-bottom:16px}
+.role-map header>p:first-child{margin:0;color:#86b7c9;font-size:11px;letter-spacing:.15em}
+.role-map h1{margin:4px 0 10px;font-size:24px}
+.members{display:flex;flex-wrap:wrap;gap:8px}
+.members span{padding:5px 10px;border:1px solid #527080;border-radius:99px;background:#162934;color:#cbdce3}
+.members b{color:#71dfd0}
+.intro{margin:8px 0 0;color:#9eb3bd;font-size:12px}
+.tactics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:start;gap:10px}
+.tactic{min-width:0;overflow:hidden;border:1px solid #304955;border-radius:11px;background:#13232c}
+.tactic-heading{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:42px;padding:9px 11px;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer}
+.tactic.selected{grid-column:span 2;border-color:#70dbcf}
+.title{font-size:13px;font-weight:750}
+.score{color:#80b7c8;font-size:10px;white-space:nowrap}
+.tactic-body{padding:0 8px 9px}
+.court{display:block;width:100%;aspect-ratio:10/7;border-radius:8px}
+.wood{fill:#b78659}
+.lines{fill:none;stroke:#f4e4c8;stroke-width:5;opacity:.8}
+.hoop{fill:none;stroke:#ec754e;stroke-width:6}
+.player{fill:#137c72;stroke:#d7fff5;stroke-width:4}
+.number{fill:#fff;font-size:24px;font-weight:800;text-anchor:middle}
+.position{fill:#fff9e9;font-size:15px;font-weight:700;text-anchor:middle;paint-order:stroke;stroke:#25332e;stroke-width:4px;stroke-linejoin:round}
+.duties{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:7px}
+.duties{display:none}
+.tactic.selected .duties{display:grid}
+.duties article{min-width:0;padding:8px;border-radius:7px;background:#1a303a}
+.duties b,.duties span{display:block}
+.duties b{color:#78e2d0;font-size:11px}
+.duties span{margin-top:3px;color:#dbe9ed;font-size:10px;font-weight:650}
+.duties p{margin:5px 0 0;color:#9fb4bd;font-size:10px;line-height:1.45}
+@media(max-width:720px){.role-map{padding:17px 12px 28px}.role-map h1{font-size:20px}.tactics{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.tactic.selected{grid-column:1/-1}.duties{grid-template-columns:1fr}.duties article{padding:8px 10px}}
+@media(max-width:380px){.tactics{grid-template-columns:1fr}}

@@ -40,7 +40,7 @@
     <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></symbol>
     <symbol id="i-tactics" viewBox="0 0 24 24"><path d="M8 4H5v17h14V4h-3M9 2h6v5H9Z"/><circle cx="9" cy="12" r="1"/><path d="m13 11 3 3m0-3-3 3M8 17h7"/></symbol>
     <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 5Q7 2 2 4v15q5-2 10 1 5-3 10-1V4q-5-2-10 1v15"/></symbol>
-    <symbol id="i-appearance" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/></symbol>
+    <symbol id="i-appearance" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17Z" fill="currentColor" stroke="none"/></symbol>
   </svg>
 
   <header class="app-header" hidden aria-hidden="true">
@@ -51,21 +51,21 @@
     <header id="primary-page-header" class="primary-page-header">
       <h1 id="primary-training-title">训练场</h1>
       <h1 id="primary-account-title">我的</h1>
-      <button class="appearance-toggle" type="button" aria-label="暗色写实外观" aria-pressed="false" disabled><svg class="icon" aria-hidden="true"><use href="#i-appearance"/></svg><span>外观 · 玻璃</span></button>
+      <button class="appearance-toggle" type="button" aria-label="切换到写实外观" aria-pressed="false" disabled><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-appearance"/></svg></button>
     </header>
   </div>
 
   <header id="lineup-brand-header" class="lineup-brand-header" aria-label="球搭 HOOPAL">
     <img src="./assets/app-icon.png" alt="球搭图标" class="lineup-brand-icon">
     <div><strong>HOOPAL</strong><span>球搭</span></div>
-    <button class="appearance-toggle" type="button" aria-label="暗色写实外观" aria-pressed="false" disabled><svg class="icon" aria-hidden="true"><use href="#i-appearance"/></svg><span>外观 · 玻璃</span></button>
+    <button class="appearance-toggle" type="button" aria-label="切换到写实外观" aria-pressed="false" disabled><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-appearance"/></svg></button>
   </header>
 
   <main class="workspace">
     <section id="lineups-panel" class="lineups-panel panel" aria-label="更衣室与我的球队"></section>
 <section id="tactic-selection-panel" class="tactic-selection-panel" aria-label="按整体体型挑选战术" hidden></section>
 
-    <section class="training-panel panel" aria-label="训练场">
+    <section class="training-panel panel training-scene-card" aria-label="训练场">
       <header class="training-header">
         <h1 class="workspace-card-heading">训练场</h1>
         <div class="training-title-static">
@@ -85,18 +85,17 @@
         <div class="training-detail">
           <div id="lineup-legend" class="lineup-legend" aria-label="本队职责与队员对应"></div>
           <div class="play-note-summary">
-            <div class="training-step-copy"><div class="training-step-heading"><span id="frame-counter">1 / 4</span><strong id="training-step-title">准备站位</strong></div><p id="live-step-note" class="live-step-note">载入战术讲解…</p></div>
+            <div class="training-step-copy"><div class="training-step-heading"><strong id="training-step-title">准备站位</strong></div><p id="live-step-note" class="live-step-note">载入战术讲解…</p></div>
             <button id="open-note" type="button" class="note-open-button" title="分页阅读完整讲解" aria-haspopup="dialog">讲解 <svg class="icon"><use href="#i-right"/></svg></button>
           </div>
         </div>
-        <div class="training-timeline">
-          <div class="training-scrub"><label class="sr-only" for="timeline-scrub">战术播放进度</label><input id="timeline-scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="战术播放进度"><span id="play-progress">0%</span></div>
-          <div id="frame-list" class="frame-list" aria-label="选择战术步骤"></div>
-        </div>
-        <div class="training-actions">
-          <div class="training-secondary"><label class="sr-only" for="speed">播放速度</label><select id="speed" aria-label="播放速度"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select><button id="restart-play" class="icon-button" title="重新播放" aria-label="重新播放"><svg class="icon"><use href="#i-reset"/></svg></button></div>
-          <div class="playback-controls"><button id="prev-frame" class="icon-button" title="上一步" aria-label="上一步"><svg class="icon"><use href="#i-left"/></svg></button><button id="play-toggle" class="play-button" title="播放或暂停（空格）" aria-label="播放战术" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-play"/></svg></button><button id="next-frame" class="icon-button" title="下一步" aria-label="下一步"><svg class="icon"><use href="#i-right"/></svg></button></div>
-          <label class="loop-label"><input id="loop-play" type="checkbox" checked><span>循环</span></label>
+        <div class="training-capsule" aria-label="战术播放控制">
+          <label class="sr-only" for="speed">播放速度</label><select id="speed" aria-label="播放速度"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select>
+          <div class="training-timeline">
+            <div class="training-progress-heading"><span id="frame-counter">1 / 4</span><span id="play-progress">0%</span></div>
+            <div class="training-scrub"><label class="sr-only" for="timeline-scrub">战术播放进度</label><input id="timeline-scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="战术播放进度"><div id="frame-list" class="frame-list" aria-label="选择战术步骤"></div></div>
+          </div>
+          <button id="play-toggle" class="play-button" title="播放或暂停（空格）" aria-label="播放战术" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-play"/></svg></button>
         </div>
       </section>
     </section>

@@ -1,25 +1,17 @@
 import { createLineupSheet } from './sheet.js';
 
 const CONTENT = Object.freeze({
-  account: {
-    title: '个人账号', subtitle: '备份球队，换手机恢复',
-    message: '账号功能尚未开放。\n\n今后可使用个人账号备份自己的球队，并在换手机时恢复。\n\n现在仍可在本机管理球队、查看条件和演练战术。',
-  },
-  backup: {
-    title: '同步与备份', subtitle: '球队资料留在这台设备上',
-    message: '云端备份与换机恢复尚未开放。\n\n当前球队档案保存在本机，不会自动上传或从其他设备恢复。\n\n请继续使用本机球队；本页不会更改已有资料。',
-  },
   settings: {
-    title: '本机使用', subtitle: '无需账号，也能离线练配合',
-    message: '球队档案、队员名号、战术分工和播放进度保存在本机。\n\n可以在训练场调整播放速度、查看讲解，并导出战术图片或 JSON。\n\n账号与云端备份尚未开放。',
+    title: '本机使用', subtitle: '随时打开，离线练配合',
+    message: '球队档案、队员资料、球场角色、外观偏好与战术进度保存在这台设备上。\n\n在更衣室编辑当前球员，在训练场按本队号码演练 3v3 / 4v4 内置战术。\n\n可以调整播放速度、查看步骤讲解，并导出战术图片或 JSON。',
   },
   about: {
     title: '关于球搭', subtitle: 'HOOPAL · 与熟悉的队友练好配合',
-    message: '球搭是一款本机离线的半场篮球战术工具。\n\n支持 3v3 / 4v4 球队、战术条件确认、本队分工与内置攻防演练。\n\n账号与云端备份功能尚未开放，本机使用不受影响。',
+    message: `球搭是一款本机离线的半场篮球战术工具。\n\n支持 3v3 / 4v4 球队管理、球员主副角色、内置攻防战术与本队号码演练。\n\n版本 ${__APP_VERSION__}`,
   },
 });
 
-/** Honest service information. It has no account state, credentials or persistence. */
+/** Read-only local information using the shared modal behavior. */
 export function createAccountSheet({ document, onModalChange, isBlocked = () => false }) {
   const sheet = createLineupSheet({ document, id: 'lineup-account-dialog', labelledBy: 'lineup-account-title', onRequestClose: () => sheet.close(), onModalChange });
   sheet.dialog.classList.add('lineup-account-dialog');
@@ -43,9 +35,9 @@ export function createAccountSheet({ document, onModalChange, isBlocked = () => 
     close.type = 'button'; close.dataset.action = 'lineup-account-close'; close.setAttribute('aria-label', '关闭说明');
     close.addEventListener('click', () => sheet.close()); heading.append(title, close);
     const body = node('section', 'lineup-account-sheet-body');
-    const badge = node('span', 'lineup-account-availability', kind === 'settings' ? '本机离线可用' : kind === 'about' ? '球搭 · HOOPAL' : '尚未开放');
+    const badge = node('span', 'lineup-account-availability', kind === 'settings' ? '本机离线可用' : '球搭 · HOOPAL');
     body.append(badge, node('p', '', content.message));
-    const local = node('button', 'button button-primary lineup-account-local', '继续本地使用');
+    const local = node('button', 'button button-primary lineup-account-local', '知道了');
     local.type = 'button'; local.dataset.action = 'lineup-account-local'; local.addEventListener('click', () => sheet.close());
     sheet.panel.replaceChildren(heading, body, local);
     sheet.dialog.dataset.kind = kind;

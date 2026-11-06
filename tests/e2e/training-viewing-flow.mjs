@@ -10,7 +10,7 @@ import {confirmedRoleArchive} from './role-fixtures.mjs';
 export async function runTrainingViewingFlow({ send, evaluate, wait, waitFor, folder }) {
   const archiveKey = 'halfcourt-lineups-v1', selectionKey = 'halfcourt-builtin-selection-v1';
   const sizes = [[390, 844], [360, 640], [360, 400], [844, 390], [1024, 768], [835, 340]];
-  const backup = await evaluate(`({archive:localStorage.getItem('${archiveKey}'),selection:localStorage.getItem('${selectionKey}')})`);
+  const backup = await evaluate(`({archive:localStorage.getItem('${archiveKey}'),selection:localStorage.getItem('${selectionKey}'),appearance:localStorage.getItem('hoopal-appearance-v1')})`);
   const layouts = [], actions = [], natural = [];
   const settled = () => waitFor("document.body.dataset.appReady==='true'&&!document.querySelector('#startup-screen')&&!document.body.dataset.pageTransition&&!document.body.classList.contains('is-loading')&&!document.querySelector('dialog[open]')");
   const click = async selector => {
@@ -19,19 +19,25 @@ export async function runTrainingViewingFlow({ send, evaluate, wait, waitFor, fo
     await send('Input.dispatchMouseEvent', { type: 'mouseReleased', ...point, button: 'left', buttons: 0, clickCount: 1 });
   };
   const key = async name => {
-    await send('Input.dispatchKeyEvent', { type: 'keyDown', key: name, code: name });
-    await send('Input.dispatchKeyEvent', { type: 'keyUp', key: name, code: name });
+    const windowsVirtualKeyCode=({Home:36,End:35,ArrowLeft:37,ArrowUp:38,ArrowRight:39,ArrowDown:40,Enter:13,Escape:27,Tab:9})[name]||0;
+    await send('Input.dispatchKeyEvent', { type: 'keyDown', key: name, code: name, windowsVirtualKeyCode });
+    await send('Input.dispatchKeyEvent', { type: 'keyUp', key: name, code: name, windowsVirtualKeyCode });
+  };
+  const tap = async selector => {
+    const point = await evaluate(`(()=>{const n=document.querySelector(${JSON.stringify(selector)}),r=n.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,h=document.elementFromPoint(x,y);if(n.disabled||!(h===n||n.contains(h)))throw Error('Cannot touch '+${JSON.stringify(selector)});return{x,y}})()`);
+    await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[point]});
+    await send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
   };
   const nav = async view => { await click(`[data-view-target=${view}]`); await waitFor(`document.body.dataset.view==='${view}'&&!document.body.dataset.pageTransition`); };
   const pause = async () => { if (await evaluate("document.querySelector('#play-toggle').getAttribute('aria-pressed')==='true'")) await click('#play-toggle'); };
   const facts = () => evaluate(`({archive:localStorage.getItem('${archiveKey}'),selection:localStorage.getItem('${selectionKey}'),template:document.querySelector('#template-picker').value,source:document.body.dataset.lineupContext,progress:document.querySelector('#timeline-scrub').value,counter:document.querySelector('#frame-counter').textContent,players:document.querySelector('#players-layer').innerHTML})`);
   const shot = async name => { const result = await send('Page.captureScreenshot', { format: 'png' }); await writeFile(path.join(folder, name), Buffer.from(result.data, 'base64')); };
-  async function documentWith(archive, selection) {
+  async function documentWith(archive, selection, appearance = 'glass') {
     await pause();
     await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
     // Incoming-document injection avoids the outgoing pagehide persisting over
     // the fixture. This never reads or writes a real phone's files.
-    const script = await send('Page.addScriptToEvaluateOnNewDocument', { source: `${archive === null ? `localStorage.removeItem('${archiveKey}')` : `localStorage.setItem('${archiveKey}',${JSON.stringify(archive)})`};${selection === null ? `localStorage.removeItem('${selectionKey}')` : `localStorage.setItem('${selectionKey}',${JSON.stringify(selection)})`};window.__hc048Ready=true;` });
+    const script = await send('Page.addScriptToEvaluateOnNewDocument', { source: `${archive === null ? `localStorage.removeItem('${archiveKey}')` : `localStorage.setItem('${archiveKey}',${JSON.stringify(archive)})`};${selection === null ? `localStorage.removeItem('${selectionKey}')` : `localStorage.setItem('${selectionKey}',${JSON.stringify(selection)})`};${appearance === null ? "localStorage.removeItem('hoopal-appearance-v1')" : `localStorage.setItem('hoopal-appearance-v1',${JSON.stringify(appearance)})`};window.__hc048Ready=true;` });
     try { await evaluate('window.__hc048Ready=false'); await send('Page.reload'); await waitFor("window.__hc048Ready===true&&document.body?.dataset.appReady==='true'&&!document.querySelector('#startup-screen')&&Boolean(document.querySelector('#players-layer [data-player]'))"); }
     finally { await send('Page.removeScriptToEvaluateOnNewDocument', { identifier: script.identifier }); await send('Emulation.setEmulatedMedia', { features: [] }); }
   }
@@ -50,10 +56,10 @@ export async function runTrainingViewingFlow({ send, evaluate, wait, waitFor, fo
     { id: 'screen-the-screener', profile: profileFor('screen-the-screener') },
   ];
   try {
-    for (const entry of cases) {
+    for (const appearance of ['glass','realistic']) for (const entry of cases) {
       const template = templates.find(t => t.id === entry.id), play = template.build(), profile = entry.profile;
 
-      await documentWith(JSON.stringify(confirmedRoleArchive(profile?[profile]:[],profile?.id||null,template.id)), JSON.stringify({ templateId: template.id, frameIndex: 1 }));
+      await documentWith(JSON.stringify(confirmedRoleArchive(profile?[profile]:[],profile?.id||null,template.id)), JSON.stringify({ templateId: template.id, frameIndex: 1 }), appearance);
       await nav('play'); const original = await facts();
       assert.equal(original.counter, `2 / ${play.frames.length}`, 'saved nonzero progress restores into the new controls');
       assert.equal(original.source, '', 'new training keeps generic numbering even with historical role data');
@@ -61,24 +67,25 @@ export async function runTrainingViewingFlow({ send, evaluate, wait, waitFor, fo
         await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width < 1000 }); await wait(100); await settled();
         const geometry = await layout(entry, width, height);
         layouts.push(geometry);
-        await click(`#frame-list [data-frame-index="${play.frames.length - 1}"]`);
+        await tap(`#frame-list [data-frame-index="${play.frames.length - 1}"]`);
         await waitFor(`document.querySelector('#frame-counter').textContent==='${play.frames.length} / ${play.frames.length}'`);
         const actual = await evaluate("Object.fromEntries([...document.querySelectorAll('#players-layer [data-player]')].map(n=>{const m=n.transform.baseVal.consolidate().matrix;return[n.dataset.player,[m.e,m.f]]}))");
         for (const player of play.frames.at(-1).players) assert.ok(actual[player.id] && Math.hypot(actual[player.id][0] - player.x, actual[player.id][1] - player.y) < .001, `${template.id}: pointer chooses the real last frame, including steps seven/eight`);
-        await click('#frame-list [data-frame-index="1"]');
+        await assertExplanation(play.frames.at(-1).note);
+        await tap('#frame-list [data-frame-index="1"]');
         await waitFor(`document.querySelector('#frame-counter').textContent==='2 / ${play.frames.length}'`);
         assert.deepEqual(await facts(), original, 'resizing and returning to the same real step preserve raw archives, selection and source');
-        if (width === 390 || width === 844 || width === 360 && height === 400 || width === 1024 && profile) await shot(`hc048-${profile ? 'recommended' : 'plain'}-${template.id}-${width}x${height}.png`);
+        if (width === 390 || width === 844 || width === 360 && height === 400 || width === 1024 && profile) await shot(`hc082-${appearance}-${profile ? 'historical' : 'plain'}-${template.id}-${width}x${height}.png`);
         if (profile) await checkLegend(profile, template.id);
       }
       await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true }); await wait(80);
       await exerciseControls(template, original);
     }
-    await checkNaturalPlayback();
-    await writeFile(path.join(folder, 'hc048-training-viewing.json'), JSON.stringify({ layouts, actions, natural, rawArchiveProtected: true, note: 'Desktop Chrome real DOM/SVG and pointer/keyboard input; not physical touch, native Back, or frame-rate measurement.' }, null, 2) + '\n');
+    for (const appearance of ['glass','realistic']) await checkNaturalPlayback(appearance);
+    await writeFile(path.join(folder, 'hc082-training-viewing.json'), JSON.stringify({ layouts, actions, natural, rawArchiveProtected: true, note: 'Desktop Chrome real DOM/SVG and CDP touch, pointer and keyboard input; not physical touch, native Back, or frame-rate measurement.' }, null, 2) + '\n');
   } finally {
     await evaluate('window.__hc048StopSampling?.()');
-    await documentWith(backup.archive, backup.selection);
+    await documentWith(backup.archive, backup.selection, backup.appearance);
     await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
     await nav('lineups');
   }
@@ -95,7 +102,14 @@ export async function runTrainingViewingFlow({ send, evaluate, wait, waitFor, fo
     assert.equal(result.markers.filter(n => n.current === 'step').length, 1); assert.equal(result.markers.find(n => n.current === 'step').index, 1);
     assert.ok(result.markers.every(n => n.name.trim()), `${label}: step markers have understandable accessible names`);
     assert.equal(result.legendVisible, false);
-    for (const control of result.controls) assert.ok(control.fit && control.hit, `${label}: actionable control ${JSON.stringify(control)}`);
+    for (const control of result.controls) assert.ok(control.fit && (control.hit || control.id === 'timeline-scrub'), `${label}: actionable control ${JSON.stringify(control)}`);
+    const scene = await evaluate(`(()=>{const card=document.querySelector('.training-scene-card'),r=card.getBoundingClientRect(),floor=document.querySelector('.training-floor')?.getBoundingClientRect(),speed=document.querySelector('#speed').getBoundingClientRect();return{appearance:document.body.dataset.appearance,card:r.toJSON(),floor:floor?.toJSON(),speed:speed.toJSON(),capsule:Boolean(document.querySelector('.training-capsule #frame-counter')),legacy:Boolean(document.querySelector('#prev-frame,#next-frame,#restart-play,#loop-play')),numbers:[...document.querySelectorAll('.frame-number')].map(n=>n.textContent)}})()`);
+    assert.ok(scene.floor && Math.abs(scene.floor.width-scene.card.width)<=3 && Math.abs(scene.floor.height-scene.card.height)<=3,`${label}: continuous floor fills the card`);
+    assert.equal(scene.capsule,true,`${label}: step counter belongs to the playback capsule`);
+    assert.equal(scene.legacy,false,`${label}: removed standalone controls do not remain in the page`);
+    assert.ok(scene.numbers.every(n=>!n.trim()),`${label}: progress nodes do not duplicate step numbers`);
+    assert.ok(scene.speed.width>=60,`${label}: speed label and multiplication sign have reserved width`);
+    result.scene=scene;
     const m = result.courtMatrix, [vbw, vbh] = result.viewBox;
     assert.ok(m.a > 0 && Math.abs(m.a - m.d) < .001 && Math.abs(m.b) < .001 && Math.abs(m.c) < .001, `${label}: SVG keeps uniform court scale`);
     assert.ok(m.e >= result.stage.left - 1 && m.f >= result.stage.top - 1 && m.e + vbw * m.a <= result.stage.right + 1 && m.f + vbh * m.d <= result.stage.bottom + 1, `${label}: the complete court is visible without cropping`);
@@ -114,44 +128,72 @@ export async function runTrainingViewingFlow({ send, evaluate, wait, waitFor, fo
 
   async function exerciseControls(template, original) {
     const count = template.build().frames.length;
-    await click('#next-frame'); assert.equal(await evaluate("document.querySelector('#frame-counter').textContent"), `3 / ${count}`);
-    await click('#prev-frame'); assert.equal(await evaluate("document.querySelector('#frame-counter').textContent"), `2 / ${count}`);
-    // A real drag exercises the existing continuous input followed by change
-    // snapping; it is deliberately not a direct value/event assignment.
-    const slider = await evaluate("(()=>{const r=document.querySelector('#timeline-scrub').getBoundingClientRect();return{x:r.x+Math.min(12,r.width/5),y:r.y+r.height/2,end:r.x+r.width*.72}})()");
+    await tap('#frame-list [data-frame-index="2"]'); assert.equal(await evaluate("document.querySelector('#frame-counter').textContent"), `3 / ${count}`);
+    await tap('#frame-list [data-frame-index="1"]'); assert.equal(await evaluate("document.querySelector('#frame-counter').textContent"), `2 / ${count}`);
+    // A real drag exercises continuous input and commit without jumping
+    // forward to another node; no direct value/event assignment is used.
+    const slider = await evaluate("(()=>{const n=document.querySelector('#timeline-scrub'),r=n.getBoundingClientRect(),end=r.x+7+(r.width-14)*.72;for(const yf of [.2,.5,.8])for(let xf=.03;xf<.35;xf+=.01){const x=r.x+r.width*xf,y=r.y+r.height*yf;if(document.elementFromPoint(x,y)===n)return{x,y,end,native:true}}const node=document.querySelector('#frame-list [data-frame-index=\"1\"]').getBoundingClientRect();return{x:node.x+node.width/2,y:node.y+node.height/2,end,native:false}})()");
     await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: slider.x, y: slider.y, button: 'left', buttons: 1, clickCount: 1 });
     await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: slider.end, y: slider.y, button: 'left', buttons: 1 });
+    await wait(35);
+    const inputProgress=Number(await evaluate("document.querySelector('#timeline-scrub').value"));
     await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: slider.end, y: slider.y, button: 'left', buttons: 0 });
     const progress = Number(await evaluate("document.querySelector('#timeline-scrub').value")); assert.ok(progress >= 400 && progress <= 900, 'pointer drag seeks to a later real step');
-    await click('#open-note'); await waitFor("document.querySelector('#note-dialog').open");
-    const notes = [];
-    for (;;) { notes.push(await evaluate("document.querySelector('#note-preview').textContent")); if (await evaluate("document.querySelector('#note-page-next').disabled")) break; await click('#note-page-next'); }
-    const index = Number((await evaluate("document.querySelector('#frame-counter').textContent")).split('/')[0]) - 1;
-    assert.equal(notes.join(''), template.build().frames[index].note, 'full explanation remains available from the compact action row');
-    await click('#close-note');
+    assert.ok(Math.abs(progress-inputProgress)<=2,'range change preserves the continuous input position instead of rounding forward');
+    const index=Math.floor(progress/1000*(count-1));
+    assert.equal(await evaluate("document.querySelector('#frame-counter').textContent"),`${index+1} / ${count}`,'drag shows the step at or before the current node');
+    await assertExplanation(template.build().frames[index].note);
+    await tap('#frame-list [data-frame-index="1"]');
+    const dragNode=await evaluate("(()=>{const n=document.querySelector('#frame-list [data-frame-index=\"1\"]'),b=n.getBoundingClientRect(),r=document.querySelector('#timeline-scrub').getBoundingClientRect();return{x:b.x+b.width/2,y:b.y+b.height/2,end:r.x+7+(r.width-14)*.68}})()");
+    await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:dragNode.x,y:dragNode.y}]});
+    for(let step=1;step<=6;step++){await send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:dragNode.x+(dragNode.end-dragNode.x)*step/6,y:dragNode.y}]});await wait(18);}
+    await send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await wait(60);
+    const nodeProgress=Number(await evaluate("document.querySelector('#timeline-scrub').value"));
+    assert.ok(nodeProgress>=620&&nodeProgress<=740,'dragging from a progress node seeks continuously rather than swallowing the gesture');
+    assert.equal(await evaluate("document.querySelector('#frame-counter').textContent"),`${Math.floor(nodeProgress/1000*(count-1))+1} / ${count}`,'node-origin drag commits the same floor step');
+    await assertExplanation(template.build().frames[Math.floor(nodeProgress/1000*(count-1))].note);
+    await evaluate("document.querySelector('#timeline-scrub').focus()");
+    await waitFor("document.activeElement.id==='timeline-scrub'");
+    await key('Home');await key('ArrowRight');
+    const keyboardProgress=Number(await evaluate("document.querySelector('#timeline-scrub').value"));
+    assert.ok(keyboardProgress>0&&keyboardProgress<20,`native keyboard range input remains usable beneath the visual nodes: ${keyboardProgress}`);
+    assert.equal(await evaluate("document.querySelector('#frame-counter').textContent"),`1 / ${count}`);
+    await evaluate('document.activeElement.blur()');
     const before = await evaluate("document.querySelectorAll('#players-layer [data-player]').length");
     await click('.toggle-label'); assert.equal(await evaluate("document.querySelectorAll('#players-layer [data-player]').length"), before / 2);
     await click('.toggle-label'); assert.equal(await evaluate("document.querySelectorAll('#players-layer [data-player]').length"), before);
-    await click('#restart-play'); await waitFor("document.querySelector('#play-toggle').getAttribute('aria-pressed')==='true'&&Number(document.querySelector('#timeline-scrub').value)>1");
+    await tap('#frame-list [data-frame-index="0"]'); await click('#play-toggle'); await waitFor("document.querySelector('#play-toggle').getAttribute('aria-pressed')==='true'&&Number(document.querySelector('#timeline-scrub').value)>30");
     assert.equal(await evaluate("document.querySelector('#play-toggle').getAttribute('aria-label')"), '暂停战术');
     assert.equal(await evaluate("document.querySelector('#template-picker').disabled&&document.querySelector('#mode').disabled"), true, 'changing tactics or size is blocked while playing');
     assert.equal(await evaluate("!document.querySelector('#open-tactic-library').disabled"), true, 'library entry can pause current playback without snapping');
+    await evaluate("document.querySelector('#play-toggle').addEventListener('click',()=>window.__hc082PauseProgress=Number(document.querySelector('#timeline-scrub').value),{capture:true,once:true})");
     await click('#play-toggle'); assert.equal(await evaluate("document.querySelector('#play-toggle').getAttribute('aria-pressed')"), 'false');
+    assert.equal(Number(await evaluate("document.querySelector('#timeline-scrub').value")),await evaluate('window.__hc082PauseProgress'),'manual pause preserves its exact displayed position');
     const paused = await facts(); await wait(120); assert.deepEqual(await facts(), paused, 'pause has no continuing animation or delayed source writes');
     await click('#frame-list [data-frame-index="1"]');
     const final = await facts(); assert.equal(final.archive, original.archive); assert.equal(final.source, original.source); assert.equal(final.template, original.template);
-    actions.push({ templateId: template.id, recommended: Boolean(original.source), dragProgress: progress, explanationPages: notes.length, realLastStep: count - 1, pausedLabel: await evaluate("document.querySelector('#play-toggle').getAttribute('aria-label')") });
+    actions.push({ templateId: template.id, appearance:await evaluate('document.body.dataset.appearance'), recommended: Boolean(original.source), dragProgress: progress, inputProgress, pointerOrigin:slider.native?'native-range':'overlaid-node', nodeDragProgress:nodeProgress, keyboardProgress, realLastStep: count - 1, pausedLabel: await evaluate("document.querySelector('#play-toggle').getAttribute('aria-label')") });
   }
 
-  async function checkNaturalPlayback() {
-    await documentWith(JSON.stringify({ schemaVersion: 2, rolePlans: {}, profiles: [], activeProfileId: null, playbackContext: null }), JSON.stringify({ templateId: 'pick-roll', frameIndex: 0 }));
+  async function assertExplanation(expected) {
+    await click('#open-note'); await waitFor("document.querySelector('#note-dialog').open");
+    const pages=[];
+    for(;;){pages.push(await evaluate("document.querySelector('#note-preview').textContent"));if(await evaluate("document.querySelector('#note-page-next').disabled"))break;await click('#note-page-next');}
+    assert.equal(pages.join(''),expected,'explanation matches the exact selected or dragged-to step');
+    await click('#close-note');await wait(40);
+  }
+
+  async function checkNaturalPlayback(appearance) {
+    await documentWith(JSON.stringify({ schemaVersion: 2, rolePlans: {}, profiles: [], activeProfileId: null, playbackContext: null }), JSON.stringify({ templateId: 'pick-roll', frameIndex: 0 }),appearance);
     await nav('play');
     // Select uses actual pointer focus and keyboard navigation, matching a
     // standard native Android/browser selector rather than a fake speed toggle.
-    await click('#speed'); await key('End'); await key('Enter');
+    for(const [index,value] of ['0.5','1','1.5','2'].entries()){
+      await click('#speed');await key('Home');for(let i=0;i<index;i++)await key('ArrowDown');await key('Enter');
+      assert.equal(await evaluate("document.querySelector('#speed').value"),value,'native speed selector exposes each supported rate');
+    }
     assert.equal(await evaluate("document.querySelector('#speed').value"), '2');
-    if (!await evaluate("document.querySelector('#loop-play').checked")) await click('.loop-label');
-    await evaluate(`(()=>{const samples=[];let id;window.__hc048Samples=samples;window.__hc048StopSampling=()=>{cancelAnimationFrame(id);delete window.__hc048StopSampling};const tick=t=>{samples.push({t,progress:Number(document.querySelector('#timeline-scrub').value),counter:document.querySelector('#frame-counter').textContent,current:document.querySelector('#frame-list [aria-current=step]')?.dataset.frameIndex,playing:document.querySelector('#play-toggle').getAttribute('aria-pressed'),positions:[...document.querySelectorAll('#players-layer [data-player]')].map(n=>n.getAttribute('transform')).join('|')});id=requestAnimationFrame(tick)};id=requestAnimationFrame(tick)})()`);
+    await evaluate(`(()=>{const samples=[];let id;window.__hc048Samples=samples;window.__hc048StopSampling=()=>{cancelAnimationFrame(id);delete window.__hc048StopSampling};const tick=t=>{samples.push({t,progress:Number(document.querySelector('#timeline-scrub').value),counter:document.querySelector('#frame-counter').textContent,current:document.querySelector('#frame-list [aria-current=step]')?.dataset.frameIndex,note:document.querySelector('#live-step-note').textContent,playing:document.querySelector('#play-toggle').getAttribute('aria-pressed'),positions:[...document.querySelectorAll('#players-layer [data-player]')].map(n=>n.getAttribute('transform')).join('|')});id=requestAnimationFrame(tick)};id=requestAnimationFrame(tick)})()`);
     await click('#play-toggle');
     await waitFor("window.__hc048Samples.some((s,i,a)=>i>0&&a[i-1].progress>990&&s.progress<80&&s.playing==='true')");
     await click('#play-toggle'); await evaluate('window.__hc048StopSampling()');
@@ -159,12 +201,13 @@ export async function runTrainingViewingFlow({ send, evaluate, wait, waitFor, fo
     assert.ok(new Set(samples.map(s => s.positions)).size > 15, 'real SVG players move continuously during the whole tactic');
     assert.ok(samples.some(s => s.counter === '4 / 4') && samples.some(s => s.progress > 100 && s.progress < 900));
     assert.ok(samples.filter(s => s.playing === 'true').every(s => s.current === String(Number(s.counter.split('/')[0]) - 1)), 'active timeline marker follows natural animation steps');
-    natural.push({ kind: 'natural-full-cycle-2x', samples });
-    await click('.loop-label'); assert.equal(await evaluate("document.querySelector('#loop-play').checked"), false);
-    await click('#frame-list [data-frame-index="2"]'); await click('#play-toggle');
-    await waitFor("document.querySelector('#play-toggle').getAttribute('aria-pressed')==='false'&&document.querySelector('#frame-counter').textContent==='4 / 4'");
-    assert.equal(await evaluate("document.querySelector('#timeline-scrub').value"), '1000', 'non-loop playback stops at the actual final frame');
-    await click('.loop-label'); await click('#restart-play');
+    const frames=templates.find(t=>t.id==='pick-roll').build().frames;
+    assert.ok(samples.filter(s=>s.playing==='true').every(s=>s.note.startsWith(frames[Number(s.current)].note.slice(0,16))),'the displayed explanation changes with each natural playback node');
+    natural.push({ kind: 'natural-full-cycle-2x', appearance, samples });
+    await tap('#frame-list [data-frame-index="3"]');
+    assert.equal(await evaluate("document.querySelector('#timeline-scrub').value"),'1000','last progress node remains directly reachable');
+    await assertExplanation(frames.at(-1).note);
+    await click('#play-toggle');
     await waitFor("Number(document.querySelector('#timeline-scrub').value)>10");
     await nav('archives'); const left = await facts(); await wait(180); assert.deepEqual(await facts(), left, 'leaving training stops the main animation');
     assert.equal(await evaluate("document.querySelector('#play-toggle').getAttribute('aria-pressed')"), 'false');
@@ -175,6 +218,6 @@ export async function runTrainingViewingFlow({ send, evaluate, wait, waitFor, fo
     const target = templates.filter(t => t.mode === '3v3' && t.kind === 'offense').at(-1);
     await lc.choose(target.id);
     assert.equal(await evaluate("document.querySelector('#training-title').textContent"),target.title,'library selects a real builtin under the static training title');
-    natural.push({kind:'loop-off-final-stop-leave-resize-library-selection',stoppedProgress:1000,selectedTemplate:target.id});
+    natural.push({kind:'automatic-loop-last-node-leave-resize-library-selection',appearance,selectedTemplate:target.id});
   }
 }

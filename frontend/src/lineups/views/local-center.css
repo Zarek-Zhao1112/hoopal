@@ -1,0 +1,81 @@
+/* HC-080: local teams own the My page; the management list keeps its layout. */
+#lineups-panel[data-section=archives] > .lineup-archives-card.lineup-account-page.lineup-local-center {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 22px;
+}
+.lineup-local-center > .workspace-card-heading { display: none; }
+#lineups-panel .lineup-local-center > .lineup-account-teams {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 1;
+  padding: 18px;
+}
+.lineup-local-center .lineup-account-teams-heading { display: flex; height: 24px; flex-shrink: 0; }
+.lineup-local-center .lineup-account-teams-heading > div:first-child { justify-content: space-between; width: 100%; }
+.lineup-local-center .lineup-account-teams-heading h2 { font-size: 16px; }
+.lineup-local-center .lineup-teams-count { font-size: 11px; }
+.lineup-local-center .lineup-team-overview-copy { flex: 1; gap: 16px; padding: 20px 0 16px; }
+.lineup-local-center .lineup-team-overview-copy > .lineup-crest { width: 65px; height: 65px; }
+.lineup-local-center .lineup-team-overview-copy strong { margin-top: 6px; font-size: 20px; }
+.lineup-local-center .lineup-team-overview-copy p { margin-top: 7px; font-size: 11px; }
+.lineup-local-current { color: #52839d; font-size: 10px; }
+.lineup-local-roster { display: flex; flex-shrink: 0; gap: 7px; min-width: 0; margin-bottom: 20px; }
+.lineup-local-roster > span { display: flex; align-items: center; flex: 1 1 0; gap: 6px; min-width: 0; color: #628297; font-size: 11px; }
+.lineup-local-roster > span > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lineup-local-roster i { display: grid; place-items: center; flex: 0 0 24px; width: 24px; height: 26px; border: 1px solid #c5dce9; border-radius: 6px; background: #e7f2f9; font-size: 10px; font-style: normal; }
+.lineup-local-actions { display: flex; flex-shrink: 0; gap: 10px; min-width: 0; }
+#lineups-panel .lineup-local-actions > .button { flex: 1 1 0; min-width: 0; width: 0; min-height: 40px; margin: 0; padding: 7px; border-radius: 10px; font-size: 12px; }
+#lineups-panel .lineup-local-actions > .button:not(.button-primary) { border: 1px solid #b8d4e5; background: linear-gradient(#f5fbff,#e1eef7); color: #47758f; box-shadow: inset 0 1px #fff; }
+.lineup-local-center > .lineup-account-tools { display: flex; flex-direction: column; flex: 0 0 136px; padding: 0 15px; }
+#lineups-panel .lineup-local-center .lineup-account-tool { flex: 1; gap: 12px; padding: 12px 0; }
+.lineup-local-center .lineup-account-tool-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+.lineup-local-center .lineup-account-tool-copy strong { font-size: 13px; }
+.lineup-local-center .lineup-account-tool-copy small { max-width: 100%; overflow: hidden; text-overflow: ellipsis; font-size: 10px; }
+.lineup-local-footer { flex-shrink: 0; margin: 0; color: #89a2b3; font-size: 10px; line-height: 1.6; text-align: center; }
+.lineup-local-center .lineup-team-draft-hint { margin: 0 0 10px; }
+
+@media (max-height: 720px) {
+  #lineups-panel[data-section=archives] > .lineup-archives-card.lineup-account-page.lineup-local-center { gap: 12px; padding: 14px; }
+  #lineups-panel .lineup-local-center > .lineup-account-teams { padding: 12px; }
+  .lineup-local-center .lineup-account-teams-heading { height: 22px; }
+  .lineup-local-center .lineup-account-teams-heading h2 { font-size: 15px; }
+  .lineup-local-center .lineup-team-overview-copy { gap: 12px; padding: 12px 0; }
+  .lineup-local-center .lineup-team-overview-copy > .lineup-crest { width: 48px; height: 48px; }
+  .lineup-local-center .lineup-team-overview-copy strong { font-size: 17px; }
+  .lineup-local-roster { margin-bottom: 12px; }
+  .lineup-local-center > .lineup-account-tools { flex-basis: 112px; padding: 0 12px; }
+  #lineups-panel .lineup-local-center .lineup-account-tool { padding: 8px 0; }
+}
+
+@media (min-width: 600px) {
+  #lineups-panel[data-section=archives] > .lineup-archives-card.lineup-account-page.lineup-local-center { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,1fr); grid-template-rows: minmax(0,1fr) auto; }
+  #lineups-panel .lineup-local-center > .lineup-account-teams { grid-column: 1; grid-row: 1 / 3; }
+  #lineups-panel .lineup-local-center > .lineup-account-tools { grid-column: 2; grid-row: 1; }
+  .lineup-local-footer { grid-column: 2; grid-row: 2; }
+}
+
+@media (max-height: 500px) {
+  #lineups-panel[data-section=archives] > .lineup-archives-card.lineup-account-page.lineup-local-center { gap: 8px; padding: 10px; }
+  #lineups-panel .lineup-local-center > .lineup-account-teams { padding: 10px; }
+  .lineup-local-center .lineup-account-teams-heading { height: 20px; }
+  .lineup-local-center .lineup-account-teams-heading h2 { font-size: 13px; }
+  .lineup-local-center .lineup-teams-count { font-size: 9px; }
+  .lineup-local-center .lineup-team-overview-copy { gap: 10px; padding: 6px 0; }
+  .lineup-local-center .lineup-team-overview-copy > .lineup-crest { width: 36px; height: 36px; }
+  .lineup-local-center .lineup-team-overview-copy strong { margin-top: 3px; font-size: 14px; }
+  .lineup-local-center .lineup-team-overview-copy p { margin-top: 3px; font-size: 10px; }
+  .lineup-local-current { font-size: 9px; }
+  .lineup-local-roster { gap: 5px; margin-bottom: 8px; }
+  .lineup-local-roster > span { gap: 4px; font-size: 10px; }
+  .lineup-local-roster i { flex-basis: 22px; width: 22px; height: 22px; }
+  #lineups-panel .lineup-local-actions > .button { min-height: 34px; padding: 5px; font-size: 11px; }
+  .lineup-local-center > .lineup-account-tools { flex-basis: 88px; padding: 0 10px; }
+  #lineups-panel .lineup-local-center .lineup-account-tool { gap: 8px; padding: 5px 0; }
+  .lineup-local-center .lineup-account-tool-copy { gap: 3px; }
+  .lineup-local-center .lineup-account-tool-copy strong { font-size: 11px; }
+  .lineup-local-center .lineup-account-tool-copy small { font-size: 9px; }
+  .lineup-local-footer { display: none; }
+}

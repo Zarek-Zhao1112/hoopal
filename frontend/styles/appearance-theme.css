@@ -187,6 +187,11 @@ body[data-appearance="realistic"] .lineup-account-avatar .lineup-account-icon { 
 body[data-appearance="realistic"] #lineups-panel :is(.lineup-account-copy h2, .lineup-account-teams-heading h2, .lineup-account-tool-copy strong, .lineup-team-overview-copy strong, .lineup-archive-select, .lineup-archives-empty h2) { color: var(--ink); }
 body[data-appearance="realistic"] #lineups-panel :is(.lineup-account-copy p, .lineup-account-copy > span, .lineup-account-tool-copy small, .lineup-account-tool-arrow, .lineup-account-icon, .lineup-team-overview-copy p, .lineup-team-draft-hint, .lineup-teams-count, .lineup-archive-copy > p, .lineup-archive-members > span, .lineup-archives-empty p, .lineup-pagination > span) { color: var(--muted); }
 body[data-appearance="realistic"] #lineups-panel .lineup-account-tool + .lineup-account-tool { border-top-color: var(--line); }
+body[data-appearance="realistic"] .lineup-local-current { color: #94b6c9; }
+body[data-appearance="realistic"] .lineup-local-roster > span { color: #b1c0cc; }
+body[data-appearance="realistic"] .lineup-local-roster i { border-color: #49606f; background: #2a3c48; }
+body[data-appearance="realistic"] .lineup-local-footer { color: #8196a6; }
+body[data-appearance="realistic"] #lineups-panel .lineup-local-actions > .button:not(.button-primary) { border-color: #4c6575; background: #2a3d49; color: #e1ecf3; box-shadow: none; }
 body[data-appearance="realistic"] #lineups-panel :is(.lineup-account-card > .lineup-account-entry, .lineup-account-teams .lineup-archive-create, .lineup-archive-manage, .lineup-secondary-heading > .icon-button, .lineup-pagination > .button) {
   color: var(--ink);
   border-color: var(--line);

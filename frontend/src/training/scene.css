@@ -1,0 +1,202 @@
+/* HC-082: a continuous floor under the whole training card and its controls. */
+body.page-layout[data-view=play] .training-panel.training-scene-card {
+  --scene-ink:#294d63;--scene-muted:#46697e;--scene-edge:#b9d1df;
+  --scene-track:#b5cedb;--scene-progress:#4c96b9;--scene-node:#8cb2c7;
+  --scene-capsule:#eaf5f9cf;--scene-focus:#1f78a5;
+  position:relative;isolation:isolate;overflow:hidden;display:grid;
+  grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;
+  gap:12px;padding:16px;border:1px solid var(--scene-edge);border-radius:24px;
+  background:#d8cbb7;box-shadow:0 12px 28px #294e6526;
+}
+body.page-layout[data-view=play] .training-scene-card .training-floor {
+  position:absolute;inset:0;z-index:-2;width:100%;height:100%;pointer-events:none;filter:saturate(.65);
+}
+body.page-layout[data-view=play] .training-scene-card::before {
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(180deg,#eaf3fbd9 0%,#eaf3fb90 16%,#eaf3fb0a 35%,#eaf3fb0a 58%,#eaf3fb9c 78%,#eaf3fbd9 100%);
+}
+body.page-layout[data-view=play] .training-scene-card .training-header {
+  position:relative;grid-column:1;grid-row:1;display:grid;grid-template-columns:minmax(0,1fr) auto;
+  grid-template-rows:16px auto 28px;gap:2px 8px;padding:0;min-width:0;min-height:0;
+  background:transparent;border:0;box-shadow:none;
+}
+body.page-layout[data-view=play] .training-scene-card .workspace-card-heading {
+  display:block;grid-column:1;grid-row:1;margin:0;font-size:10px;line-height:1.3;font-weight:650;color:var(--scene-muted);
+}
+body.page-layout[data-view=play] .training-scene-card .training-title-static {grid-column:1;grid-row:2;min-width:0;align-self:center}
+body.page-layout[data-view=play] .training-scene-card #training-title {font-size:18px;line-height:1.4;color:var(--scene-ink);font-weight:750;letter-spacing:0}
+body.page-layout[data-view=play] .training-scene-card #play-header-controls {grid-column:2;grid-row:1/3;align-self:center;justify-content:end;gap:5px}
+body.page-layout[data-view=play] .training-scene-card #open-tactic-library {min-width:0;min-height:34px;padding:4px 10px;border-radius:10px;font-size:11px}
+body.page-layout[data-view=play] .training-scene-card #play-header-controls #mode {min-height:32px;height:32px;padding:3px 5px;font-size:11px}
+body.page-layout[data-view=play] .training-scene-card #play-header-controls #open-menu {width:32px;min-width:32px;height:32px;min-height:32px;padding:5px;border-radius:10px}
+body.page-layout[data-view=play] .training-scene-card .training-context {grid-column:1/-1;grid-row:3;min-height:28px;gap:8px}
+body.page-layout[data-view=play] .training-scene-card #tactic-kind-label {padding:3px 7px;min-height:23px;border:1px solid #b7cddd;border-radius:7px;background:#edf7fbc9;color:var(--scene-muted);font-size:10px}
+body.page-layout[data-view=play] .training-scene-card .toggle-label {min-height:28px;font-size:10px;gap:5px;color:var(--scene-muted)}
+body.page-layout[data-view=play] .training-scene-card .court-stage {
+  position:relative;grid-column:1;grid-row:2;min-width:0;min-height:0;width:calc(100% + 32px);margin:0 -16px;
+  border:0;border-radius:0;background:transparent;box-shadow:none;overflow:hidden;
+}
+body.page-layout[data-view=play] .training-scene-card #court {display:block;width:100%;height:100%;min-height:0;border:0;border-radius:0;background:transparent;box-shadow:none;object-fit:contain}
+body.page-layout[data-view=play] .training-scene-card #court>rect[width="1000"],
+body.page-layout[data-view=play] .training-scene-card #court>rect[width="860"] {fill:transparent}
+body.page-layout[data-view=play] .training-scene-card #court>text {display:none}
+body.page-layout[data-view=play] .training-scene-card .playback-bar {
+  grid-column:1;grid-row:3;display:flex;flex-direction:column;gap:16px;margin:0;padding:0;min-width:0;min-height:0;
+  border:0;border-radius:0;background:transparent;box-shadow:none;
+}
+body.page-layout[data-view=play] .training-scene-card .training-detail {display:flex;flex-direction:column;gap:8px;min-width:0;min-height:0}
+body.page-layout[data-view=play] .training-scene-card .play-note-summary {display:flex;align-items:center;gap:10px;min-width:0;min-height:0;margin:0;padding:0;border:0;background:transparent;box-shadow:none}
+body.page-layout[data-view=play] .training-scene-card .training-step-copy {flex:1;min-width:0}
+body.page-layout[data-view=play] .training-scene-card .training-step-heading {display:block;min-width:0;color:var(--scene-ink)}
+body.page-layout[data-view=play] .training-scene-card #training-step-title {display:block;min-width:0;font-size:15px;line-height:1.5;font-weight:750;color:var(--scene-ink)}
+body.page-layout[data-view=play] .training-scene-card #live-step-note {display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;-webkit-line-clamp:3;min-height:0;max-height:60px;margin:4px 0 0;font-size:12px;line-height:1.6;color:var(--scene-muted)}
+body.page-layout[data-view=play] .training-scene-card #open-note {flex:none;min-width:42px;min-height:36px;margin:0;padding:5px 0;border:0;border-radius:0;background:transparent;color:var(--scene-ink);box-shadow:none;font-size:11px}
+body.page-layout[data-view=play] .training-scene-card #open-note .icon {height:12px;width:12px}
+body.page-layout[data-view=play] .training-scene-card .training-capsule {
+  display:grid;grid-template-columns:64px minmax(0,1fr) 40px;align-items:center;gap:7px;
+  width:100%;min-width:0;min-height:56px;padding:7px 10px;border:1px solid #ffffffa6;border-radius:999px;
+  background:var(--scene-capsule);box-shadow:inset 0 1px #fff9,0 4px 16px #253b4e24;
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+}
+body.page-layout[data-view=play] .training-scene-card .training-capsule #speed {
+  grid-column:1;grid-row:1;
+  appearance:none;-webkit-appearance:none;width:64px;max-width:64px;min-width:64px;min-height:38px;height:38px;
+  margin:0;padding:3px 20px 3px 6px;border:0;border-radius:999px;background-color:#fff;color:#173c52;
+  font-size:14px;line-height:1;font-weight:750;letter-spacing:0;text-align:center;text-align-last:center;
+  background-image:url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"%3E%3Cpath d="m3 4.5 3 3 3-3" fill="none" stroke="%23315b76" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/%3E%3C/svg%3E');
+  background-repeat:no-repeat;background-position:right 7px center;box-shadow:none;
+}
+body.page-layout[data-view=play] .training-scene-card .training-timeline {grid-column:2;grid-row:1;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:14px 24px;gap:0;min-width:0;min-height:0}
+body.page-layout[data-view=play] .training-scene-card .training-progress-heading {display:flex;align-items:center;justify-content:space-between;gap:5px;padding:0 2px;font-variant-numeric:tabular-nums}
+body.page-layout[data-view=play] .training-scene-card #frame-counter {font-size:11px;line-height:14px;font-weight:750;white-space:nowrap;color:var(--scene-ink)}
+body.page-layout[data-view=play] .training-scene-card #play-progress {font-size:10px;line-height:14px;min-width:24px;text-align:right;font-weight:650;color:var(--scene-muted)}
+body.page-layout[data-view=play] .training-scene-card .training-scrub {position:relative;display:block;grid-column:1;grid-row:2;width:100%;height:24px;min-width:0;min-height:24px;padding:0;gap:0;touch-action:none}
+body.page-layout[data-view=play] .training-scene-card #timeline-scrub {position:absolute;inset:0;display:block;width:100%;height:24px;min-height:24px;margin:0;padding:0;border:0;background:transparent;appearance:none;-webkit-appearance:none;color-scheme:light;touch-action:none}
+body.page-layout[data-view=play] .training-scene-card #timeline-scrub::-webkit-slider-runnable-track {height:4px;border:0;border-radius:999px;background:linear-gradient(to right,var(--scene-progress) var(--training-progress,0%),var(--scene-track) var(--training-progress,0%));box-shadow:none}
+body.page-layout[data-view=play] .training-scene-card #timeline-scrub::-moz-range-track {height:4px;border:0;border-radius:999px;background:linear-gradient(to right,var(--scene-progress) var(--training-progress,0%),var(--scene-track) var(--training-progress,0%));box-shadow:none}
+body.page-layout[data-view=play] .training-scene-card #timeline-scrub::-webkit-slider-thumb {appearance:none;-webkit-appearance:none;width:14px;height:14px;margin-top:-5px;border:2px solid #fff;border-radius:50%;background:var(--scene-progress);box-shadow:0 0 0 1px #6ca5bd70}
+body.page-layout[data-view=play] .training-scene-card #timeline-scrub::-moz-range-thumb {width:10px;height:10px;border:2px solid #fff;border-radius:50%;background:var(--scene-progress);box-shadow:0 0 0 1px #6ca5bd70}
+body.page-layout[data-view=play] .training-scene-card #frame-list {position:absolute;inset:0 7px;display:block;grid-template:none;gap:0;margin:0;padding:0;min-width:0;min-height:0;height:24px;pointer-events:none}
+body.page-layout[data-view=play] .training-scene-card .frame-item {position:absolute;left:var(--step-position,0%);top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;width:24px;min-width:24px;height:32px;min-height:32px;padding:0;border:0;border-radius:8px;background:transparent;box-shadow:none;pointer-events:auto;touch-action:none}
+body.page-layout[data-view=play] .training-scene-card .frame-number {display:block;width:6px;height:6px;min-width:6px;border:0;border-radius:50%;background:var(--scene-node);box-shadow:0 0 0 2px var(--scene-capsule);font-size:0;line-height:0}
+body.page-layout[data-view=play] .training-scene-card .frame-item.is-complete .frame-number {border:0;background:var(--scene-progress);box-shadow:0 0 0 2px var(--scene-capsule)}
+body.page-layout[data-view=play] .training-scene-card .frame-item.active .frame-number {width:10px;height:10px;border:2px solid #fff;background:var(--scene-progress);box-shadow:0 0 0 2px #98bed3}
+body.page-layout[data-view=play] .training-scene-card #play-toggle {grid-column:3;grid-row:1;display:grid;place-items:center;width:40px;min-width:40px;height:40px;min-height:40px;margin:0;padding:0;border:1px solid #ffffffb0;border-radius:50%;background:#f9fdff;color:#2f7393;box-shadow:0 2px 8px #264b6420}
+body.page-layout[data-view=play] .training-scene-card #play-toggle .icon {width:17px;height:17px;stroke:none;fill:currentColor}
+body.page-layout[data-view=play] .training-scene-card :is(#speed,#play-toggle,#open-note,.frame-item):focus-visible {outline:2px solid var(--scene-focus);outline-offset:2px}
+body.page-layout[data-view=play] .training-scene-card #lineup-legend {margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;max-height:none}
+body.page-layout[data-view=play] .training-scene-card .legend-heading {min-height:22px;gap:5px;color:var(--scene-ink);font-size:10px}
+body.page-layout[data-view=play] .training-scene-card .legend-heading button {min-height:24px;padding:2px 6px;font-size:10px}
+body.page-layout[data-view=play] .training-scene-card .legend-rows {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin-top:3px}
+body.page-layout[data-view=play] .training-scene-card .lineup-legend[data-player-count="4"] .legend-rows {grid-template-columns:repeat(4,minmax(0,1fr))}
+body.page-layout[data-view=play] .training-scene-card .legend-row,
+body.page-layout[data-view=play] .training-scene-card .lineup-legend[data-player-count="4"] .legend-row {display:grid;grid-template-columns:minmax(0,1fr);gap:1px;min-height:32px;padding:3px 5px;border-radius:6px;background:#edf6f86e;box-shadow:none}
+body.page-layout[data-view=play] .training-scene-card .legend-name {color:var(--scene-ink);font-size:10px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.page-layout[data-view=play] .training-scene-card .legend-row .legend-task {display:block;color:var(--scene-muted);font-size:9px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+body.page-layout[data-view=play][data-appearance=realistic] .training-panel.training-scene-card {
+  --scene-ink:#f3f6f8;--scene-muted:#d2e0e7;--scene-edge:#60717b;
+  --scene-track:#688899;--scene-progress:#bee7f9;--scene-node:#89aaba;
+  --scene-capsule:#203746d9;--scene-focus:#d1f0ff;
+  border-color:var(--scene-edge);background:#615f56;box-shadow:0 12px 28px #0007;
+}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card .training-floor {filter:brightness(.78) saturate(.7)}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card::before {background:linear-gradient(180deg,#112331b8 0%,#1123315e 22%,transparent 37%,transparent 53%,#1123318a 78%,#112331c7 100%)}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card .playback-bar {background:transparent;border:0;box-shadow:none}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card #tactic-kind-label {background:#304857b0;border-color:#627c8c;color:#d0e1e9}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card #open-note {color:var(--scene-ink);border:0;background:transparent;box-shadow:none}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card .training-capsule {background:var(--scene-capsule);border-color:#9bb2be85;box-shadow:inset 0 1px #ffffff17}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card .training-capsule #speed {color:#173c52;background-color:#fff;border:0;box-shadow:none}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card #play-toggle {background:#f3faff;color:#315d76;border-color:#ffffffb0;box-shadow:none}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card #live-step-note {color:var(--scene-muted)}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card #frame-counter {color:var(--scene-ink)}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card #play-progress {color:var(--scene-muted)}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card #timeline-scrub::-webkit-slider-runnable-track {background:linear-gradient(to right,var(--scene-progress) var(--training-progress,0%),var(--scene-track) var(--training-progress,0%));box-shadow:none}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card #timeline-scrub::-moz-range-track {background:linear-gradient(to right,var(--scene-progress) var(--training-progress,0%),var(--scene-track) var(--training-progress,0%));box-shadow:none}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card #timeline-scrub::-webkit-slider-thumb {border:2px solid #fff;background:var(--scene-progress);box-shadow:0 0 0 1px #6ca5bd70}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card #timeline-scrub::-moz-range-thumb {border:2px solid #fff;background:var(--scene-progress);box-shadow:0 0 0 1px #6ca5bd70}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card #frame-list .frame-number {border:0;background:var(--scene-node);box-shadow:0 0 0 2px var(--scene-capsule)}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card #frame-list .frame-item.is-complete .frame-number {border:0;background:var(--scene-progress);box-shadow:0 0 0 2px var(--scene-capsule)}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card #frame-list .frame-item.active .frame-number {border:2px solid #fff;background:var(--scene-progress);box-shadow:0 0 0 2px #98bed3}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card #lineup-legend {border:0;background:transparent;box-shadow:none}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card .legend-heading {color:var(--scene-ink)}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card .legend-row {background:#233e4a66;box-shadow:none}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card .lineup-legend[data-player-count="4"] .legend-row {background:#233e4a99;box-shadow:none}
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card .legend-name,
+body.page-layout[data-view=play][data-appearance=realistic] .training-scene-card .legend-row .legend-task {color:var(--scene-muted)}
+
+@media(max-width:699px) and (max-height:700px) {
+  body.page-layout[data-view=play] .training-panel.training-scene-card {gap:7px;padding:12px;border-radius:20px}
+  body.page-layout[data-view=play] .training-scene-card .training-header {grid-template-rows:auto 24px;gap:1px 6px}
+  body.page-layout[data-view=play] .training-scene-card .workspace-card-heading {display:none}
+  body.page-layout[data-view=play] .training-scene-card .training-title-static {grid-row:1}
+  body.page-layout[data-view=play] .training-scene-card #play-header-controls {grid-row:1}
+  body.page-layout[data-view=play] .training-scene-card .training-context {grid-row:2}
+  body.page-layout[data-view=play] .training-scene-card #training-title {font-size:16px}
+  body.page-layout[data-view=play] .training-scene-card .training-context {min-height:24px}
+  body.page-layout[data-view=play] .training-scene-card #tactic-kind-label {min-height:21px;font-size:9px}
+  body.page-layout[data-view=play] .training-scene-card .toggle-label {min-height:24px;font-size:9px}
+  body.page-layout[data-view=play] .training-scene-card #open-tactic-library {min-height:30px;padding:3px 8px;font-size:10px}
+  body.page-layout[data-view=play] .training-scene-card #play-header-controls #open-menu {width:30px;min-width:30px;min-height:30px;height:30px}
+  body.page-layout[data-view=play] .training-scene-card .court-stage {width:calc(100% + 24px);margin-inline:-12px}
+  body.page-layout[data-view=play] .training-scene-card .playback-bar {gap:9px}
+  body.page-layout[data-view=play] .training-scene-card .training-detail {gap:5px}
+  body.page-layout[data-view=play] .training-scene-card #training-step-title {font-size:13px}
+  body.page-layout[data-view=play] .training-scene-card #live-step-note {-webkit-line-clamp:2;max-height:34px;font-size:11px;line-height:1.5}
+  body.page-layout[data-view=play] .training-scene-card .legend-row,
+  body.page-layout[data-view=play] .training-scene-card .lineup-legend[data-player-count="4"] .legend-row {min-height:24px;padding:3px}
+  body.page-layout[data-view=play] .training-scene-card .legend-row .legend-task {display:none}
+  body.page-layout[data-view=play] .training-scene-card .training-capsule {min-height:54px;padding:6px 9px;gap:5px}
+}
+@media(min-width:600px) and (max-height:600px), (min-width:900px) and (min-height:601px) {
+  body.page-layout[data-view=play] .training-panel.training-scene-card {grid-template-columns:minmax(0,1fr) minmax(270px,35%);grid-template-rows:auto minmax(0,1fr);gap:10px 16px;padding:16px}
+  body.page-layout[data-view=play] .training-scene-card .training-header {grid-column:2;grid-row:1;grid-template-rows:auto 26px;gap:3px 7px}
+  body.page-layout[data-view=play] .training-scene-card .workspace-card-heading {display:none}
+  body.page-layout[data-view=play] .training-scene-card .training-title-static {grid-column:1;grid-row:1}
+  body.page-layout[data-view=play] .training-scene-card #play-header-controls {grid-column:2;grid-row:1}
+  body.page-layout[data-view=play] .training-scene-card .training-context {grid-row:2}
+  body.page-layout[data-view=play] .training-scene-card .court-stage {grid-column:1;grid-row:1/-1;width:100%;margin:0}
+  body.page-layout[data-view=play] .training-scene-card .playback-bar {grid-column:2;grid-row:2;justify-content:end;gap:16px;padding:0;background:transparent}
+  body.page-layout[data-view=play] .training-scene-card .training-detail {gap:12px}
+  body.page-layout[data-view=play] .training-scene-card #training-title {font-size:17px}
+  body.page-layout[data-view=play] .training-scene-card #live-step-note {-webkit-line-clamp:4;max-height:80px;font-size:12px;line-height:1.6}
+  body.page-layout[data-view=play] .training-scene-card .legend-rows,
+  body.page-layout[data-view=play] .training-scene-card .lineup-legend[data-player-count="4"] .legend-rows {grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(min-width:600px) and (max-height:600px) {
+  body.page-layout[data-view=play] .training-panel.training-scene-card {grid-template-columns:minmax(0,1fr) 290px;gap:6px 12px;padding:10px}
+  body.page-layout[data-view=play] .training-scene-card .training-header {grid-template-rows:auto 22px;gap:1px 5px}
+  body.page-layout[data-view=play] .training-scene-card #training-title {font-size:15px}
+  body.page-layout[data-view=play] .training-scene-card .training-context {min-height:22px}
+  body.page-layout[data-view=play] .training-scene-card #open-tactic-library {min-height:28px;padding:2px 7px;font-size:10px}
+  body.page-layout[data-view=play] .training-scene-card #play-header-controls #open-menu {min-height:28px;height:28px;width:28px;min-width:28px}
+  body.page-layout[data-view=play] .training-scene-card .playback-bar {gap:7px}
+  body.page-layout[data-view=play] .training-scene-card .training-detail {gap:5px}
+  body.page-layout[data-view=play] .training-scene-card #live-step-note {display:-webkit-box;-webkit-line-clamp:2;max-height:32px;font-size:10px;line-height:1.5}
+  body.page-layout[data-view=play] .training-scene-card #training-step-title {font-size:12px;line-height:1.4}
+  body.page-layout[data-view=play] .training-scene-card #open-note {min-width:34px;min-height:30px;font-size:10px}
+  body.page-layout[data-view=play] .training-scene-card .training-capsule {min-height:52px;padding:5px 8px;gap:5px}
+  body.page-layout[data-view=play] .training-scene-card .legend-row,
+  body.page-layout[data-view=play] .training-scene-card .lineup-legend[data-player-count="4"] .legend-row {min-height:22px;padding:2px 4px}
+  body.page-layout[data-view=play] .training-scene-card .legend-row .legend-task {display:none}
+  body.page-layout[data-view=play] .training-scene-card .legend-heading,body.page-layout[data-view=play] .training-scene-card .legend-heading button {min-height:20px}
+}
+@media(max-width:599px) and (max-height:500px) {
+  body.page-layout[data-view=play] .training-panel.training-scene-card {grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) 54px;gap:5px 8px;padding:8px}
+  body.page-layout[data-view=play] .training-scene-card .training-header {grid-column:1/-1;grid-row:1;grid-template-rows:auto 22px}
+  body.page-layout[data-view=play] .training-scene-card .workspace-card-heading {display:none}
+  body.page-layout[data-view=play] .training-scene-card .training-title-static {grid-column:1;grid-row:1}
+  body.page-layout[data-view=play] .training-scene-card #play-header-controls {grid-column:2;grid-row:1}
+  body.page-layout[data-view=play] .training-scene-card .training-context {grid-row:2}
+  body.page-layout[data-view=play] .training-scene-card .court-stage {grid-column:1;grid-row:2;width:100%;margin:0}
+  body.page-layout[data-view=play] .training-scene-card .playback-bar {display:contents}
+  body.page-layout[data-view=play] .training-scene-card .training-detail {grid-column:2;grid-row:2;display:flex;justify-content:center;gap:4px;overflow:auto}
+  body.page-layout[data-view=play] .training-scene-card .training-capsule {grid-column:1/-1;grid-row:3}
+  body.page-layout[data-view=play] .training-scene-card #training-step-title {font-size:11px}
+  body.page-layout[data-view=play] .training-scene-card #live-step-note {display:-webkit-box;font-size:10px;-webkit-line-clamp:2;line-height:1.4;max-height:28px}
+  body.page-layout[data-view=play] .training-scene-card #open-note {min-width:28px;font-size:9px}
+  body.page-layout[data-view=play] .training-scene-card .play-note-summary {gap:3px}
+  body.page-layout[data-view=play] .training-scene-card .legend-rows,
+  body.page-layout[data-view=play] .training-scene-card .lineup-legend[data-player-count="4"] .legend-rows {grid-template-columns:repeat(2,minmax(0,1fr))}
+  body.page-layout[data-view=play] .training-scene-card .legend-name {font-size:9px}
+}

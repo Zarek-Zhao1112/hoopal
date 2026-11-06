@@ -1,6 +1,6 @@
 import { getNbaTeam } from '../data/nba-teams.js';
 import { isBodyTypeForMode } from './tactic-body-types.js';
-import { isMainRoleForMode } from './team-roles.js';
+import { isMainRoleForMode, isSecondaryRoleForMode } from './team-roles.js';
 
 export const MAX_LINEUPS = 20;
 export const SKILLS = Object.freeze([
@@ -80,7 +80,10 @@ export function validateLineup(value) {
     numbers.add(player.number);
     const mainRole = player.mainRole;
     if (mainRole !== undefined && mainRole !== '' && !isMainRoleForMode(mode, mainRole)) throw new Error('球员角色与阵容人数不符');
-    return { id, name: text(player.name, '昵称', 24, true), number: player.number, ...(mainRole ? { mainRole } : {}) };
+    const secondaryRole = player.secondaryRole;
+    if (secondaryRole !== undefined && secondaryRole !== '' && !isSecondaryRoleForMode(mode, secondaryRole)) throw new Error('球员副角色与阵容人数不符');
+    if (secondaryRole && secondaryRole === mainRole) throw new Error('主角色和副角色不能相同');
+    return { id, name: text(player.name, '昵称', 24, true), number: player.number, ...(mainRole ? { mainRole } : {}), ...(secondaryRole ? { secondaryRole } : {}) };
   });
   return { id: text(value.id, '阵容ID', 100), name: text(value.name, '阵容名称', 40), mode,
     crest: oneOf(value.crest, ['ball', 'shield', 'bolt'], '队徽'), color: oneOf(value.color, ['orange', 'blue', 'green'], '主题色'),

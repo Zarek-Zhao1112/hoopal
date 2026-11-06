@@ -2,6 +2,12 @@
 
 ## 运行方式
 
+2026-11-06，1.36.1 / code46 已保数据覆盖安装到 M2101K9C。玻璃更衣室采用浅蓝雾面和暖灯整卡场景，真实 WebView96 双外观切换、整卡横滑与当前球员编辑程序核对通过；安装前后及操作后球队/战术进度原文保持。现停在玻璃更衣室供用户体验。见 [HC-083](tasks/HC-083-glass-locker-scene.md) 和 [1.36.1 APK](../artifacts/apk/hoopal-1.36.1.apk)。
+
+2026-11-06，1.36.0 / code45 已覆盖安装到 M2101K9C。训练场玻璃与写实采用连续球场整卡、悬浮说明和胶囊节点播放栏；实际WebView96核对双外观节点/拖动/暂停/自动循环与说明联动通过。安装和操作验证后球队及进度原文保持一致，已恢复原写实外观和「手递手配合」第4步，停在训练场；用户手动观感待确认。见 [HC-082](tasks/HC-082-training-scene-release.md) 和 [1.36.0 APK](../artifacts/apk/hoopal-1.36.0.apk)。
+
+2026-11-06，1.35.0 / code44 已覆盖安装到 M2101K9C。「我的」改为本机球队中心，三个主页使用纯图标外观按钮；玻璃 / 写实实际页面、管理返回与两说明面板程序核对通过。安装前后球队和进度原文一致，用户手动体验待确认。见 [HC-080](tasks/HC-080-local-my-center-release.md) 和 [1.35.0 APK](../artifacts/apk/hoopal-1.35.0.apk)。
+
 2026-11-04，1.33.2 / code 42 已覆盖安装到 M2101K9C。通过手机实际界面核对「传切配合」与「高位挡拆」的本队号码和讲解，球队资料与战术进度原文一致。见 [HC-075](tasks/HC-075-team-role-tactic-mapping.md) 和 [1.33.2 APK](../artifacts/apk/hoopal-1.33.2.apk)。
 
 2026-11-04，1.33.1 / code 41 已覆盖安装到 M2101K9C。手机 WebView 以模拟触摸核对整卡换人与对应球员编辑，球队档案及战术进度原文一致。见 [HC-074](tasks/HC-074-locker-card-swipe-release.md) 和 [1.33.1 APK](../artifacts/apk/hoopal-1.33.1.apk)。

@@ -1,7 +1,7 @@
 import { validateLineup, validateLegacyLineup, MAX_LINEUPS } from '../../../shared/lineups.js';
 import { validateRolePlan, getRolePlanState } from '../../../shared/tactic-roles.js';
 import { isBodyTypeForMode } from '../../../shared/tactic-body-types.js';
-import { isMainRoleForMode } from '../../../shared/team-roles.js';
+import { isMainRoleForMode, isSecondaryRoleForMode } from '../../../shared/team-roles.js';
 
 export const LINEUPS_KEY = 'halfcourt-lineups-v1';
 export const emptyLineupState = () => ({ schemaVersion: 2, profiles: [], activeProfileId: null, rolePlans: {}, playbackContext: null });
@@ -47,10 +47,18 @@ export function createLineupRepository({ adapter, templates, makeBackupId = uid 
         if (tolerant && !legacy && Array.isArray(candidate?.players)) {
           let invalidRole = false;
           const players = candidate.players.map(player => {
-            if (!object(player) || !Object.hasOwn(player, 'mainRole') || player.mainRole === '' || isMainRoleForMode(candidate.mode, player.mainRole)) return player;
-            invalidRole = true;
-            const { mainRole: _invalidRole, ...identity } = player;
-            return identity;
+            if (!object(player)) return player;
+            let nextPlayer = player;
+            if (Object.hasOwn(player, 'mainRole') && player.mainRole !== '' && !isMainRoleForMode(candidate.mode, player.mainRole)) {
+              const { mainRole: _invalidRole, ...identity } = nextPlayer; nextPlayer = identity; invalidRole = true;
+            }
+            if (Object.hasOwn(nextPlayer, 'secondaryRole') && nextPlayer.secondaryRole !== '' && !isSecondaryRoleForMode(candidate.mode, nextPlayer.secondaryRole)) {
+              const { secondaryRole: _invalidRole, ...identity } = nextPlayer; nextPlayer = identity; invalidRole = true;
+            }
+            if (nextPlayer.secondaryRole && nextPlayer.secondaryRole === nextPlayer.mainRole) {
+              const { secondaryRole: _invalidRole, ...identity } = nextPlayer; nextPlayer = identity; invalidRole = true;
+            }
+            return nextPlayer;
           });
           if (invalidRole) {
             candidate = { ...candidate, players };

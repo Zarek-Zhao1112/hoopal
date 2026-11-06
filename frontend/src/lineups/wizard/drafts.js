@@ -44,13 +44,15 @@ export function createLineupDrafts() {
     setCreateMode(mode) {
       if (!store.createDraft || !['3v3', '4v4'].includes(mode)) return;
       if (store.createDraft.mode === mode) return;
-      createRolesByMode.set(store.createDraft.mode, new Map(store.createDraft.players.map(player => [player.id, player.mainRole])));
+      createRolesByMode.set(store.createDraft.mode, new Map(store.createDraft.players.map(player => [player.id, { mainRole: player.mainRole, secondaryRole: player.secondaryRole }])));
       store.createDraft.mode = mode;
       store.createDraft.players = store.createMembers.slice(0, mode === '3v3' ? 3 : 4);
       for (const player of store.createDraft.players) {
-        const role = createRolesByMode.get(mode)?.get(player.id);
-        if (role) player.mainRole = role;
+        const roles = createRolesByMode.get(mode)?.get(player.id);
+        if (roles?.mainRole) player.mainRole = roles.mainRole;
         else delete player.mainRole;
+        if (roles?.secondaryRole) player.secondaryRole = roles.secondaryRole;
+        else delete player.secondaryRole;
       }
       store.playerIndex = Math.min(store.playerIndex, store.createDraft.players.length - 1);
     },
@@ -75,9 +77,12 @@ export function createLineupDrafts() {
       const updated = saved.players.find(player => player.id === playerId);
       const retained = teamDraft.players.find(player => player.id === playerId);
       if (!previous || !updated || !retained) return;
-      const fields = ['name', 'number', 'mainRole'];
+      const fields = ['name', 'number', 'mainRole', 'secondaryRole'];
       // Keep the old revision on a conflict so an older team draft cannot overwrite the new save.
       if (fields.some(field => retained[field] !== previous[field] && updated[field] !== previous[field] && retained[field] !== updated[field])) return;
+      const mergedRole = field => retained[field] === previous[field] ? updated[field] : retained[field];
+      const mainRole = mergedRole('mainRole');
+      if (mainRole && mainRole === mergedRole('secondaryRole')) return;
       for (const field of fields) {
         if (retained[field] !== previous[field]) continue;
         if (Object.hasOwn(updated, field)) retained[field] = updated[field];

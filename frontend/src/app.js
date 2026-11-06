@@ -47,10 +47,11 @@ const svg = $('court');
 const training = createTrainingPlayer({
   frameCount: store.play.frames.length, position: store.play.frameIndex,
   requestFrame: callback => requestAnimationFrame(callback), cancelFrame: id => cancelAnimationFrame(id), now: () => performance.now(),
-  getSpeed: () => Number($('speed').value), getLoop: () => $('loop-play').checked,
+  getSpeed: () => Number($('speed').value), getLoop: () => true,
   onFrame: showPosition, onComplete: () => stop(),
 });
 const trainingView = createTrainingView({ document,
+  onScrub: scrubTraining,
   openDialog: id => workspace?.openDialog(id),
   openText: (title, text) => workspace?.openText(title, text),
   canEditTeamRoles: () => workspace?.view === 'play' && !startup.active && !switching && !lineupBusy &&
@@ -274,17 +275,15 @@ function renderTemplates() {
 function controls() {
   const busy = switching || lineupBusy || Boolean(lineupUI?.isModalOpen) || Boolean(selectionUI?.isOpen);
   const blocked = busy;
-  trainingView.render({ title: store.play.title, note: store.board.note, playing: training.playing });
+  trainingView.render({ title: store.play.title, note: store.board.note, playing: training.playing, position: training.position, frameCount: store.play.frames.length });
   $('frame-counter').textContent = `${Math.min(Math.floor(training.position) + 1, store.play.frames.length)} / ${store.play.frames.length}`;
   $('timeline-scrub').value = store.play.frames.length > 1 ? training.position / (store.play.frames.length - 1) * 1000 : 0;
   $('timeline-scrub').disabled = blocked || store.play.frames.length < 2;
   $('play-progress').textContent = store.play.frames.length > 1 ? `${Math.round(training.position / (store.play.frames.length - 1) * 100)}%` : '0%';
-  $('prev-frame').disabled = blocked || training.position <= 0;
-  $('next-frame').disabled = blocked || training.position >= store.play.frames.length - 1;
   $('play-title').disabled = training.playing || blocked;
   $('status').textContent = training.playing ? '正在演练 · 可调整播放速度或拖动进度' : '按步骤观察跑位，点击讲解查看动作分工。';
   svg.classList.toggle('is-playing', training.playing);
-  for (const node of document.querySelectorAll('[data-view-target],#open-tactic-library,#open-menu,#open-note,#play-toggle,#restart-play,#frame-list button,#speed,#loop-play,#toggle-defense')) node.disabled = blocked;
+  for (const node of document.querySelectorAll('[data-view-target],#open-tactic-library,#open-menu,#open-note,#play-toggle,#frame-list button,#speed,#toggle-defense')) node.disabled = blocked;
   $('mode').disabled = training.playing || blocked;
   $('template-picker').disabled = training.playing || blocked;
   for (const button of document.querySelectorAll('[data-kind-target]')) button.disabled = blocked;
@@ -317,18 +316,17 @@ function start() {
   renderSteps(); controls();
 }
 
-$('play-toggle').addEventListener('click', () => training.playing ? stop() : start());
+$('play-toggle').addEventListener('click', () => training.playing ? stop(false) : start());
 $('open-tactic-library').addEventListener('click', () => openSelection(activeTemplateId, { source: 'library' }));
-$('restart-play').addEventListener('click', () => { stop(); training.seek(0); store.changeFrame(0); draw(); start(); });
-$('prev-frame').addEventListener('click', () => { stop(); store.changeFrame(Math.max(0, store.play.frameIndex - 1)); training.seek(store.play.frameIndex); renderAll(); persist(); });
-$('next-frame').addEventListener('click', () => { stop(); store.changeFrame(Math.min(store.play.frames.length - 1, store.play.frameIndex + 1)); training.seek(store.play.frameIndex); renderAll(); persist(); });
-$('timeline-scrub').addEventListener('input', () => {
-  const progress = Number($('timeline-scrub').value);
+function scrubTraining(progress, commit = false) {
+  if (switching || lineupBusy || selectionUI?.isOpen || lineupUI?.isModalOpen) return;
   if (training.playing) stop(false);
   training.seek(progress / 1000 * (store.play.frames.length - 1));
   showPosition();
-});
-$('timeline-scrub').addEventListener('change', () => { training.seek(Math.round(training.position)); store.changeFrame(training.position); renderAll(); persist(); });
+  if (commit) persist();
+}
+$('timeline-scrub').addEventListener('input', () => scrubTraining(Number($('timeline-scrub').value)));
+$('timeline-scrub').addEventListener('change', () => scrubTraining(Number($('timeline-scrub').value), true));
 $('toggle-defense').addEventListener('change', event => { showDefense = event.target.checked; draw(); });
 for (const button of document.querySelectorAll('[data-kind-target]')) button.addEventListener('click', () => {
   const kind = button.dataset.kindTarget;
@@ -402,7 +400,7 @@ document.addEventListener('keydown', event => {
   if (switching || lineupBusy) return;
   if (workspace?.hasOpenDialog) return;
   if (event.target.matches('input,textarea,select,[contenteditable]')) return;
-  if (event.code === 'Space' && workspace.view === 'play') { event.preventDefault(); training.playing ? stop() : start(); }
+  if (event.code === 'Space' && workspace.view === 'play') { event.preventDefault(); training.playing ? stop(false) : start(); }
   if (event.key === 'Escape') {
     if (['lineups', 'archives'].includes(workspace.view) && lineupUI?.handleBack()) event.preventDefault();
     else if (training.playing) stop();

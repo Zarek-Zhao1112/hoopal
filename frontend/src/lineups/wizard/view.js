@@ -93,53 +93,75 @@ function singlePlayerTitle(draft) {
 
 function wizardPlayerRole(draft, player, content) {
     const options = getTeamRoleOptions(draft.mode);
-    const group = node('div', 'lineup-config-role');
-    const list = node('div', 'lineup-config-role-options');
-    list.id = 'lineup-config-role-options';
-    list.dataset.mode = draft.mode;
-    list.setAttribute('role', 'group');
-    list.setAttribute('aria-label', '战术角色选项');
-    list.hidden = true;
+    const group = node('div', 'lineup-config-role lineup-config-role-pair');
+    const note = node('p', 'lineup-config-note');
+    const pickers = [];
+    let expanded = null;
+    const isLegacy = id => draft.mode === '4v4' && id === 'space';
 
-    const label = node('span');
-    const chevron = node('span', 'lineup-config-chevron', '⌄');
-    chevron.setAttribute('aria-hidden', 'true');
-    const trigger = button('', 'lineup-player-role-toggle', () => {
-      const opening = list.hidden;
-      setExpanded(opening);
-      if (opening && content.scrollHeight > content.clientHeight) {
-        const beyond = list.getBoundingClientRect().bottom - content.getBoundingClientRect().bottom;
-        if (beyond > 0) content.scrollTop += beyond + 4;
-      }
-    }, { className: 'button lineup-config-role-trigger' });
-    trigger.append(label, chevron);
-    trigger.setAttribute('aria-controls', list.id);
-    function setExpanded(expanded) {
-      trigger.setAttribute('aria-expanded', String(expanded));
-      list.hidden = !expanded;
-    }
     function sync() {
-      const chosen = options.find(option => option.id === player.mainRole) || options.at(-1);
-      label.textContent = chosen.label;
-      trigger.setAttribute('aria-label', `战术角色，${chosen.label}`);
-      for (const option of list.children) {
-        option.setAttribute('aria-pressed', String(option.dataset.value === chosen.id));
-      }
+      for (const picker of pickers) picker();
+      note.textContent = [player.mainRole, player.secondaryRole].some(isLegacy)
+        ? '沿用旧角色，可改选「空间拉开」或「得分终结」。'
+        : '站位优先匹配主角色，再匹配副角色。';
     }
-    for (const option of options) {
-      const choice = button('', 'lineup-player-role-option', () => {
-        if (option.id) player.mainRole = option.id;
-        else delete player.mainRole;
+
+    function makePicker(field, otherField, label, action) {
+      const row = node('div', 'lineup-config-role');
+      const list = node('div', 'lineup-config-role-options');
+      list.id = `lineup-config-options-${field}`;
+      list.dataset.mode = draft.mode;
+      list.setAttribute('role', 'group');
+      list.setAttribute('aria-label', `${label}选项`);
+      const value = node('strong', 'lineup-config-role-value');
+      const chevron = node('span', 'lineup-config-chevron', '⌄');
+      chevron.setAttribute('aria-hidden', 'true');
+      const trigger = button('', action, () => {
+        expanded = expanded === field ? null : field;
         sync();
-        setExpanded(false);
-        trigger.focus({ preventScroll: true });
-      }, { className: 'button lineup-config-role-option', data: { value: option.id } });
-      choice.append(node('strong', '', option.label), node('small', '', option.description));
-      list.append(choice);
+        if (!list.hidden && content.scrollHeight > content.clientHeight) {
+          const beyond = list.getBoundingClientRect().bottom - content.getBoundingClientRect().bottom;
+          if (beyond > 0) content.scrollTop += beyond + 4;
+        }
+      }, { className: 'button lineup-config-role-trigger' });
+      trigger.append(node('span', '', label), value, chevron);
+      trigger.setAttribute('aria-controls', list.id);
+
+      const choices = options.map(option => {
+        const title = isLegacy(option.id) ? '旧空间角色' : option.label;
+        const choice = button('', 'lineup-player-role-option', () => {
+          if (option.id) player[field] = option.id;
+          else delete player[field];
+          expanded = null;
+          sync();
+          trigger.focus({ preventScroll: true });
+        }, { className: 'button lineup-config-role-option', data: { value: option.id } });
+        const description = node('small', '', option.description);
+        choice.append(node('strong', '', title), description);
+        list.append(choice);
+        return { option, choice, description };
+      });
+      pickers.push(() => {
+        const chosen = options.find(option => option.id === player[field]) || options.at(-1);
+        value.textContent = isLegacy(chosen.id) ? '旧空间角色' : chosen.label;
+        trigger.setAttribute('aria-label', `${label}，${value.textContent}`);
+        trigger.setAttribute('aria-expanded', String(expanded === field));
+        list.hidden = expanded !== field;
+        for (const { option, choice, description } of choices) {
+          choice.hidden = isLegacy(option.id) && player[field] !== option.id;
+          choice.disabled = Boolean(option.id && player[otherField] === option.id);
+          choice.setAttribute('aria-pressed', String(option.id === chosen.id));
+          description.textContent = choice.disabled ? `已设为${otherField === 'mainRole' ? '主角色' : '副角色'}` : option.description;
+        }
+      });
+      row.append(trigger, list);
+      return row;
     }
-    setExpanded(false);
+
+    group.append(node('span', 'lineup-config-role-label', '球场职责'),
+      makePicker('mainRole', 'secondaryRole', '主角色', 'lineup-player-role-toggle'),
+      makePicker('secondaryRole', 'mainRole', '副角色 · 选填', 'lineup-player-secondary-role-toggle'), note);
     sync();
-    group.append(node('span', 'lineup-config-role-label', '战术角色 · 可选'), trigger, list);
     return group;
   }
 
@@ -179,7 +201,7 @@ function wizardPlayers(draft) {
     pane.append(field('昵称 · 可选', player.name, 'lineup-player-name', value => { player.name = value; syncWizardPlayerPreview(); }, { maxLength: 24 }));
     pane.append(field('球衣号码', player.number, 'lineup-player-number', value => { player.number = value === '' ? '' : Number(value); syncWizardPlayerPreview(); }, { type: 'number', min: 0, max: 99, inputMode: 'numeric' }));
     body.append(hero, pane, wizardPlayerRole(draft, player, content));
-    content.append(body, node('p', 'lineup-config-note', '角色可重复选择，球衣号码在队内不重复。'));
+    content.append(body, node('p', 'lineup-config-note', '队友可选同一角色，球衣号码在队内不重复。'));
     return content;
   }
 

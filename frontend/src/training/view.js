@@ -1,5 +1,8 @@
+import { createTrainingScene } from './scene.js';
+
 /** Presentation only: the app owns playback, persistence and step navigation. */
-export function createTrainingView({ document, onSelectStep, openDialog, openText, canEditTeamRoles = () => true }) {
+export function createTrainingView({ document, onSelectStep, onScrub, openDialog, openText, canEditTeamRoles = () => true }) {
+  createTrainingScene({ document });
   const byId = id => document.getElementById(id);
   const node = (tag, className, value) => {
     const element = document.createElement(tag);
@@ -139,27 +142,65 @@ export function createTrainingView({ document, onSelectStep, openDialog, openTex
     sync();
     openDialog?.(swapDialog.id);
   }
+  let renderedFrames = null, renderedRoleKey = '', stepButtons = [];
   function renderSteps(frames, index) {
     const list = byId('frame-list');
     list.style.setProperty('--training-steps', String(frames.length));
-    list.replaceChildren(...frames.map((frame, i) => {
+    if (renderedFrames !== frames || renderedRoleKey !== roleKey) {
+    renderedFrames = frames; renderedRoleKey = roleKey;
+    stepButtons = frames.map((frame, i) => {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = `frame-item${i === index ? ' active' : ''}${i < index ? ' is-complete' : ''}`;
       button.dataset.frameIndex = String(i);
+      button.style.setProperty('--step-position', `${frames.length > 1 ? i / (frames.length - 1) * 100 : 0}%`);
       button.setAttribute('aria-current', i === index ? 'step' : 'false');
       const label = formatNote(frame.note).split(/[：。\n]/u)[0] || `步骤 ${i + 1}`;
       button.title = `第 ${i + 1} 步：${label}`;
       button.setAttribute('aria-label', button.title);
       const number = document.createElement('span');
       number.className = 'frame-number';
-      number.textContent = String(i + 1);
+      number.setAttribute('aria-hidden', 'true');
       button.append(number);
-      button.addEventListener('click', () => onSelectStep(i));
+      let drag = null, suppressClick = false;
+      const progressAt = event => {
+        const rect = byId('timeline-scrub').getBoundingClientRect();
+        return Math.max(0, Math.min(1000, (event.clientX - rect.left - 7) / Math.max(1, rect.width - 14) * 1000));
+      };
+      button.addEventListener('pointerdown', event => {
+        if (event.button !== 0 || button.disabled) return;
+        drag = { id: event.pointerId, x: event.clientX, moved: false };
+        button.setPointerCapture(event.pointerId);
+      });
+      button.addEventListener('pointermove', event => {
+        if (!drag || drag.id !== event.pointerId) return;
+        if (Math.abs(event.clientX - drag.x) > 3) drag.moved = true;
+        if (drag.moved) onScrub?.(progressAt(event), false);
+      });
+      const finishDrag = event => {
+        if (!drag || drag.id !== event.pointerId) return;
+        if (drag.moved) {
+          suppressClick = true;
+          onScrub?.(event.type === 'pointercancel' ? Number(byId('timeline-scrub').value) : progressAt(event), true);
+          setTimeout(() => { suppressClick = false; }, 0);
+        }
+        drag = null;
+      };
+      button.addEventListener('pointerup', finishDrag);
+      button.addEventListener('pointercancel', finishDrag);
+      button.addEventListener('lostpointercapture', () => { drag = null; });
+      button.addEventListener('click', () => { if (!suppressClick) onSelectStep(i); });
       return button;
-    }));
+    });
+    list.replaceChildren(...stepButtons);
+    }
+    for (const [i, button] of stepButtons.entries()) {
+      button.classList.toggle('active', i === index);
+      button.classList.toggle('is-complete', i < index);
+      button.setAttribute('aria-current', i === index ? 'step' : 'false');
+    }
   }
-  function render({ title, note, playing }) {
+  function render({ title, note, playing, position, frameCount }) {
     text('training-title', title);
     const renderedNote = formatNote(note);
     const heading = (renderedNote || '准备站位').split(/[，,:：.。\n]/u)[0].trim() || '准备站位';
@@ -168,6 +209,9 @@ export function createTrainingView({ document, onSelectStep, openDialog, openTex
     byId('training-step-title').title = heading;
     const characters = Array.from(renderedNote || '这一步暂无讲解。');
     text('live-step-note', characters.slice(0, 72).join('') + (characters.length > 72 ? '…' : ''));
+    const percent = frameCount > 1 ? position / (frameCount - 1) * 100 : 0;
+    document.querySelector('.training-capsule').style.setProperty('--training-progress', `${percent}%`);
+    byId('timeline-scrub').setAttribute('aria-valuetext', `第 ${Math.floor(position) + 1} 步，共 ${frameCount} 步：${heading}`);
     const button = byId('play-toggle');
     const href = playing ? '#i-pause' : '#i-play';
     const icon = button.querySelector('use');

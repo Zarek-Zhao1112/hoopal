@@ -30,6 +30,18 @@ test('invalid roster identities, numbers, metadata and bounds fail instead of si
   const zero=createLineup();zero.players[0].number=0;assert.equal(validateLineup(zero).players[0].number,0);
 });
 
+test('3v3 secondary roles round trip while legacy space IDs remain valid and unique per player',()=>{
+  const team=createLineup('3v3');team.players[0].mainRole='space';team.players[0].secondaryRole='support';
+  assert.deepEqual(validateLineup(team).players[0],team.players[0]);
+  for(const [mainRole,secondaryRole] of [['start','start'],['space','screen']]){
+    const invalid=structuredClone(team);invalid.players[0].mainRole=mainRole;invalid.players[0].secondaryRole=secondaryRole;
+    assert.throws(()=>validateLineup(invalid));
+  }
+  const four=createLineup('4v4');four.players[0].mainRole='space';four.players[0].secondaryRole='finisher';
+  assert.deepEqual(validateLineup(four).players[0],four.players[0]);
+  const invalidFour=structuredClone(four);invalidFour.players[0].secondaryRole='unknown';assert.throws(()=>validateLineup(invalidFour));
+});
+
 const legacyProfile=()=>{const p=createLineup();delete p.bodyType;for(const member of p.players)Object.assign(member,{height:'',build:'',mobility:'',strengths:[],weaknesses:[]});return p;};
 test('schema1 legacy validation remains strict for corruption isolation without changing legacy raw input',()=>{
   const p=legacyProfile(),raw=structuredClone(p);p.players[0].strengths=['passing'];

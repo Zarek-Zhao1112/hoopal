@@ -5,11 +5,17 @@ import { createLineup } from '../../shared/lineups.js';
 import {confirmedRoleArchive} from './role-fixtures.mjs';
 import { findArchiveCard } from './archive-helpers.mjs';
 
-/** Real local records and the honest unavailable-account UI, never preview data. */
+/** Real local teams, local-only information, creation and appearance controls. */
 export async function runAccountCenterFlow({ send, evaluate, wait, waitFor, folder }) {
   const key = 'halfcourt-lineups-v1', selectionKey = 'halfcourt-builtin-selection-v1', dialog = '#lineup-account-dialog';
   const context = { evaluate, waitFor }, layouts = [], dialogs = [], motions = [];
   const backup = await evaluate(`({archive:localStorage.getItem('${key}'),selection:localStorage.getItem('${selectionKey}')})`);
+  const originalAppearance = await evaluate('document.body.dataset.appearance');
+  const appearance = async theme => {
+    if (await evaluate('document.body.dataset.appearance') === theme) return;
+    await clickPoint(await evaluate(`(()=>{const n=[...document.querySelectorAll('.appearance-toggle')].find(n=>n.getClientRects().length&&!n.disabled);const r=n.getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2}})()`));
+    await waitFor(`document.body.dataset.appearance===${JSON.stringify(theme)}`);
+  };
   const visible = "n=>n.getClientRects().length&&!n.closest('[hidden]')&&getComputedStyle(n).visibility!=='hidden'";
   const snapshot = () => evaluate(`({archive:localStorage.getItem('${key}'),selection:localStorage.getItem('${selectionKey}'),source:document.body.dataset.lineupContext,template:document.querySelector('#template-picker').value,progress:document.querySelector('#timeline-scrub').value,players:document.querySelector('#players-layer').innerHTML})`);
   const storage = () => evaluate("Object.fromEntries(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)]))");
@@ -59,7 +65,7 @@ export async function runAccountCenterFlow({ send, evaluate, wait, waitFor, fold
     assert.ok(await evaluate(`[...document.querySelectorAll('[id]')].map(n=>n.id).length===new Set([...document.querySelectorAll('[id]')].map(n=>n.id)).size`), 'account and wizard IDs remain unique');
     const result = await evaluate(`(()=>{const d=document.querySelector('${dialog}'),p=d.querySelector('.lineup-account-sheet'),r=p.getBoundingClientRect(),title=d.querySelector('#lineup-account-title'),range=document.createRange();range.selectNodeContents(title);const t=range.getBoundingClientRect();return{label:${JSON.stringify(label)},kind:d.dataset.kind,title:title.textContent,text:d.textContent,inputs:d.querySelectorAll('input,textarea,select,form').length,panel:r.toJSON(),titleFits:t.top>=r.top-1&&t.bottom<=r.bottom+1,overflow:document.documentElement.scrollHeight>innerHeight+2||document.documentElement.scrollWidth>innerWidth+2,controls:[...d.querySelectorAll('button')].filter(${visible}).map(n=>{const b=n.getBoundingClientRect(),h=document.elementFromPoint(b.x+b.width/2,b.y+b.height/2);return{action:n.dataset.action,fit:b.width>0&&b.height>0&&b.x>=-1&&b.y>=-1&&b.right<=innerWidth+1&&b.bottom<=innerHeight+1,hit:h===n||n.contains(h)}})}})()`);
     assert.equal(result.inputs, 0, 'unavailable service never collects credentials');
-    if (['account', 'backup'].includes(kind)) assert.match(result.text, /尚未开放|暂未开放|尚未接入/);
+    assert.doesNotMatch(result.text, /个人账号|尚未开放|云端备份/);
     assert.equal(result.overflow, false); assert.equal(result.titleFits, true); assert.ok(result.controls.length >= 2 && result.controls.every(n => n.fit && n.hit), 'all real explanation controls fit and are hittable');
     assert.ok(await evaluate("[...document.querySelectorAll('[data-view-target]')].every(n=>n.disabled&&n.tabIndex===-1)"), 'owned account modal isolates the four navigation buttons');
     await evaluate("document.querySelector('[data-view-target=play]').click();document.querySelector('[data-action=lineup-create],[data-action=lineup-create-empty]')?.click()");
@@ -83,22 +89,28 @@ export async function runAccountCenterFlow({ send, evaluate, wait, waitFor, fold
   const make = (mode, index) => { const profile = createLineup(mode, { id: `hc046-${index}`, name: `真实页面验收球队 ${index + 1}`, nbaTeamId: index % 2 ? 'LAL' : 'BOS' }); profile.players.forEach((member, j) => Object.assign(member, { id: `hc046-${index}-member-${j}`, name: `球队${index + 1}成员${j + 1}`, number: j + 11 })); return profile; };
   const cases = [{ name: 'empty', profiles: [] }, { name: '3v3', profiles: [make('3v3', 0)] }, { name: '4v4', profiles: [make('4v4', 1)] }, { name: 'multi', profiles: Array.from({ length: 7 }, (_, index) => make(index % 2 ? '4v4' : '3v3', index)) }];
   try {
+   for (const theme of ['glass', 'realistic']) {
     for (const entry of cases) {
       const current = entry.profiles[0], templateId = current?.mode==='4v4'?'four-out-cut':'pick-roll';
 
       const archive = JSON.stringify(confirmedRoleArchive(entry.profiles,current?.id||null,templateId)), selection = JSON.stringify({ templateId, frameIndex: 1 });
       await replaceDocument(archive, selection); await nav('archives'); const original = await snapshot();
+      await appearance(theme);
       for (const [width, height] of [[360,400],[390,844],[360,640],[844,390],[1024,768],[835,340]]) {
         await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width < 1000 }); await wait(100);
         while (await evaluate("Boolean(document.querySelector('[data-action=lineup-archives-prev]:not(:disabled)'))")) await click('[data-action=lineup-archives-prev]');
         const seen = [], pages = 1; // The personal overview links to the separately tested management route.
         for (let page = 0; page < pages; page++) {
           const geometry = await evaluate(`(()=>{const p=document.querySelector('.lineup-archives-card'),r=p.getBoundingClientRect(),nav=document.querySelector('.view-nav').getBoundingClientRect(),cards=[...p.querySelectorAll('.lineup-archive-card')],titles=[...document.querySelectorAll('#primary-account-title,.lineup-account-page>.workspace-card-heading')].filter(${visible});return{state:${JSON.stringify(entry.name)},width:innerWidth,height:innerHeight,page:${page},titles:titles.map(title=>({text:title.textContent,inside:p.contains(title)})),nav:[...document.querySelectorAll('[data-view-target]')].map(n=>({id:n.dataset.viewTarget,label:n.textContent.trim()})),ids:cards.map(n=>n.dataset.profileId),names:cards.map(n=>n.querySelector('h2').textContent),current:cards.filter(n=>n.dataset.current==='true').map(n=>n.dataset.profileId),text:p.textContent,box:r.toJSON(),aboveNav:r.bottom<=nav.top+1,overflow:document.documentElement.scrollWidth>innerWidth+2||document.documentElement.scrollHeight>innerHeight+2,forms:p.querySelectorAll('input,form,textarea').length,controls:[...p.querySelectorAll('button')].filter(n=>!n.disabled&&(${visible})(n)).map(n=>{const b=n.getBoundingClientRect(),h=document.elementFromPoint(b.x+b.width/2,b.y+b.height/2);return{action:n.dataset.action,fit:b.width>0&&b.height>0&&b.x>=-1&&b.y>=-1&&b.right<=innerWidth+1&&b.bottom<=innerHeight+1,hit:h===n||n.contains(h)}})}})()`);
-          assert.deepEqual(geometry.titles, [{text:'我的',inside:width<600&&height>700}], 'one account heading appears in the expected position');
+          assert.deepEqual(geometry.titles, width<600&&height>700 ? [] : [{text:'我的',inside:false}], 'tall phones use the team heading under the brand row');
+          assert.doesNotMatch(geometry.text, /个人账号|账号说明|同步与备份|尚未开放/);
           assert.match(geometry.text, /我的球队/); assert.deepEqual(geometry.nav.map(n=>n.label), ['更衣室','训练场','我的']); assert.equal(geometry.nav.at(-1).id, 'archives');
           assert.equal(geometry.overflow, false); assert.equal(geometry.aboveNav, true); assert.equal(geometry.forms, 0); assert.ok(geometry.controls.every(n => n.fit && n.hit), `${entry.name}/${width}x${height}: all personal-page controls are actionable`);
           assert.deepEqual(geometry.names, [], 'personal overview contains no duplicated management list'); assert.ok(await evaluate("Boolean(document.querySelector('[data-action=teams-open]'))"));
-          assert.deepEqual(geometry.current, []); assert.ok(await evaluate(`document.querySelector('.lineup-teams-count').textContent===${JSON.stringify(entry.profiles.length+' / 20')}`));
+          assert.deepEqual(geometry.current, []); assert.ok(await evaluate(`document.querySelector('.lineup-teams-count').textContent===${JSON.stringify(entry.profiles.length+' 支球队')}`));
+          const controls = await evaluate(`(()=>{const a=document.querySelector('.lineup-local-actions').children;const b=[...document.querySelectorAll('.appearance-toggle')].find(n=>n.getClientRects().length);const r=b.getBoundingClientRect();const center=new DOMPoint(12,12).matrixTransform(b.querySelector('svg').getScreenCTM());return{widths:[...a].map(n=>n.getBoundingClientRect().width),heights:[...a].map(n=>n.getBoundingClientRect().height),roster:document.querySelectorAll('.lineup-local-roster>span').length,buttonText:b.textContent.trim(),label:b.getAttribute('aria-label'),offset:[center.x-r.x-r.width/2,center.y-r.y-r.height/2]}})()`);
+          assert.ok(Math.abs(controls.widths[0]-controls.widths[1])<1 && controls.heights[0]===controls.heights[1], 'team actions are equal size');
+          assert.equal(controls.roster, current?.players.length || 0); assert.equal(controls.buttonText, ''); assert.match(controls.label, /切换到/); assert.ok(controls.offset.every(n=>Math.abs(n)<0.1), 'appearance icon is centered');
           assert.equal(geometry.ids.length, 0); seen.push(...geometry.ids); layouts.push(geometry);
           if (page < pages - 1) await click('[data-action=lineup-archives-next]');
         }
@@ -106,15 +118,34 @@ export async function runAccountCenterFlow({ send, evaluate, wait, waitFor, fold
         while (await evaluate("Boolean(document.querySelector('[data-action=lineup-archives-prev]:not(:disabled)'))")) await click('[data-action=lineup-archives-prev]');
         if (entry.name === 'multi' || width === 390) {
           const label = `${entry.name}-${width}-${height}`;
-          await explain('account', width === 360 ? 'escape' : 'local', { label });
-          if (entry.name === 'multi') await explain('backup', width === 844 ? 'cancel' : 'close', { label });
+          await explain('settings', width === 360 ? 'escape' : 'local', { label });
+          if (entry.name === 'multi') await explain('about', width === 844 ? 'cancel' : 'close', { label });
         }
-        if (width === 390 || width === 360 && height === 400) await shot(`hc046-${entry.name}-${width}-${height}-my.png`);
+        if (width === 390 || width === 360 && height === 400) await shot(`hc080-${theme}-${entry.name}-${width}-${height}-my.png`);
       }
     }
+   }
     await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true }); await wait(100);
     await explain('settings', 'shade', { label: 'tools' }); await explain('about', 'cancel', { label: 'tools' });
-    await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] }); await explain('account', 'local', { reduced: true, label: 'reduced' }); await send('Emulation.setEmulatedMedia', { features: [] });
+    await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] }); await explain('settings', 'local', { reduced: true, label: 'reduced' }); await send('Emulation.setEmulatedMedia', { features: [] });
+
+    const creationBefore = await snapshot();
+    await click('[data-action=lineup-create]'); await waitFor("document.querySelector('#lineup-wizard-dialog').dataset.phase==='open'");
+    await action('lineup-wizard-close'); await action('lineup-draft-keep'); await waitFor("!document.querySelector('#lineup-wizard-dialog').open");
+    assert.match(await evaluate("document.querySelector('.lineup-local-actions').textContent"), /继续创建球队/);
+    await click('[data-action=lineup-create]'); await waitFor("document.querySelector('#lineup-wizard-dialog').dataset.phase==='open'");
+    await action('lineup-wizard-close'); await action('lineup-draft-discard'); await waitFor("!document.querySelector('#lineup-wizard-dialog').open");
+    assert.deepEqual(await snapshot(), creationBefore, 'new overview create/keep/resume/discard preserves saved records');
+
+    const appearanceBefore = await evaluate("({theme:document.body.dataset.appearance,raw:localStorage.getItem('hoopal-appearance-v1')})");
+    await evaluate("window.__hc080SetItem=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(k==='hoopal-appearance-v1')throw Error('HC080 appearance save denied');return window.__hc080SetItem.call(this,k,v)}");
+    await clickPoint(await evaluate("(()=>{const n=[...document.querySelectorAll('.appearance-toggle')].find(n=>n.getClientRects().length);const r=n.getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2}})()"));
+    await waitFor("document.querySelector('#appearance-status').classList.contains('visible')&&[...document.querySelectorAll('.appearance-toggle')].every(n=>!n.hasAttribute('aria-disabled'))");
+    assert.deepEqual(await evaluate("({theme:document.body.dataset.appearance,raw:localStorage.getItem('hoopal-appearance-v1')})"), appearanceBefore, 'failed appearance save preserves visible and stored appearance');
+    await evaluate('Storage.prototype.setItem=window.__hc080SetItem;delete window.__hc080SetItem');
+    await appearance('glass');
+    await replaceDocument((await snapshot()).archive,(await snapshot()).selection); await nav('archives');
+    assert.equal(await evaluate('document.body.dataset.appearance'), 'glass', 'appearance persists across reload after retry');
 
     const before = await snapshot(), managed = cases.at(-1).profiles[1];
     await findArchiveCard(context, managed.id); await click(`[data-action=lineup-archive-menu][data-profile-id="${managed.id}"]`); await waitFor("document.querySelector('#lineup-archive-menu').open");
@@ -128,11 +159,12 @@ export async function runAccountCenterFlow({ send, evaluate, wait, waitFor, fold
     await findArchiveCard(context, managed.id);
     await evaluate(`(()=>{window.__hc046FaultSetItem=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(k==='${key}')throw Error('HC046 selection denied');return window.__hc046FaultSetItem.call(this,k,v)}})()`);
     await click(`[data-action=lineup-select][data-profile-id="${managed.id}"]`); await waitFor("document.querySelector('#lineups-panel').getAttribute('aria-busy')==='false'&&document.querySelector('#lineups-panel').textContent.includes('HC046 selection denied')"); assert.equal(await evaluate('document.body.dataset.view'), 'archives'); assert.deepEqual(await snapshot(), before, 'failed real team selection preserves old team, source, play and both raw files');
-    await evaluate('Storage.prototype.setItem=window.__hc046FaultSetItem;delete window.__hc046FaultSetItem'); await click('[data-action=teams-back]'); await explain('account', 'local', { label: 'selection-failed' }); await findArchiveCard(context, managed.id);
+    await evaluate('Storage.prototype.setItem=window.__hc046FaultSetItem;delete window.__hc046FaultSetItem'); await click('[data-action=teams-back]'); await explain('settings', 'local', { label: 'selection-failed' }); await findArchiveCard(context, managed.id);
     await click(`[data-action=lineup-select][data-profile-id="${managed.id}"]`); await waitFor("document.body.dataset.view==='lineups'&&!document.body.dataset.pageTransition"); assert.equal(await evaluate("document.querySelector('.locker-scene').dataset.profileId"), managed.id); const selected = await evaluate(`JSON.parse(localStorage.getItem('${key}'))`); assert.equal(selected.activeProfileId, managed.id); assert.equal(selected.playbackContext, null); assert.equal(await evaluate('document.body.dataset.lineupContext'), ''); assert.equal(await evaluate(`localStorage.getItem('${selectionKey}')`), before.selection);
     await writeFile(path.join(folder, 'hc046-account-center.json'), JSON.stringify({ layouts, dialogs, motions, localOnly: true, unchangedInformationStorage: true, realSelectionFailureAndRetry: true, keptDraftAndCancel: true, nativeDialogCancelCovered: true, nativeBridgeBackNotSimulated: true }, null, 2));
   } finally {
-    await evaluate('(()=>{window.__hc046RestoreAudit?.();if(window.__hc046FaultSetItem)Storage.prototype.setItem=window.__hc046FaultSetItem;delete window.__hc046FaultSetItem})()');
+    await evaluate('(()=>{window.__hc046RestoreAudit?.();if(window.__hc046FaultSetItem)Storage.prototype.setItem=window.__hc046FaultSetItem;if(window.__hc080SetItem)Storage.prototype.setItem=window.__hc080SetItem;delete window.__hc046FaultSetItem;delete window.__hc080SetItem})()');
+    await nav('archives'); await appearance(originalAppearance);
     await replaceDocument(backup.archive, backup.selection);
     assert.deepEqual(await evaluate(`({archive:localStorage.getItem('${key}'),selection:localStorage.getItem('${selectionKey}')})`), backup, 'final restoration survives the real outgoing pagehide save');
   }

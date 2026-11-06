@@ -89,6 +89,8 @@
 #lineup-wizard-dialog .lineup-config-fields .lineup-field { gap: 5px; color: #466b83; font-weight: 650; }
 #lineup-wizard-dialog .lineup-config-fields input { color: #315770; background: #f7fcff; font-weight: 450; }
 .lineup-config-role { display: grid; gap: 5px; min-width: 0; }
+.lineup-config-role-pair { gap: 8px; }
+.lineup-config-role-value { margin-inline-start: auto; margin-inline-end: 12px; }
 .lineup-config-role-label { color: #466b83; font-size: 11px; font-weight: 650; }
 #lineup-wizard-dialog .lineup-config-role-trigger {
   display: flex;
@@ -109,6 +111,7 @@
   animation: lineup-config-role-in 160ms ease-out;
 }
 .lineup-config-role-options[hidden] { display: none; }
+#lineup-wizard-dialog .lineup-config-role-options .lineup-config-role-option[hidden] { display: none; }
 #lineup-wizard-dialog .lineup-config-role-option {
   display: grid;
   align-content: center;

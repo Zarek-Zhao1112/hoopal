@@ -3,6 +3,11 @@ import { APPEARANCE_KEY, GLASS_APPEARANCE, REALISTIC_APPEARANCE } from '../../sr
 import { emptyLineupState, LINEUPS_KEY } from '../../src/storage/lineups.js';
 
 const lockerMode = new URLSearchParams(window.location.search).get('locker');
+if (lockerMode === 'glass-scene') document.title = '球搭 · 玻璃更衣室暖灯场景';
+if (lockerMode === 'team-tactic-positions') {
+  document.title = '球搭 · 你的球队战术站位对照';
+  await import('../team-tactic-positions/preview.js');
+} else {
 if (lockerMode === 'unified') document.title = '球搭 · 三页与单人编辑原型';
 if (lockerMode === 'card-swipe') {
   document.title = '球搭 · 整张更衣室卡片滑动原型';
@@ -55,6 +60,7 @@ const preferenceKey = 'hoopal-appearance-preview';
 let storage;
 try { storage = window.localStorage; } catch { /* The preview can run without durable browser storage. */ }
 function readAppearance() {
+  if (lockerMode === 'glass-scene') return GLASS_APPEARANCE;
   try {
     return storage?.getItem(preferenceKey) === GLASS_APPEARANCE ? GLASS_APPEARANCE : REALISTIC_APPEARANCE;
   } catch {
@@ -97,3 +103,4 @@ Object.defineProperty(window, 'localStorage', {
 const { startup } = await import('../../src/startup/runtime.js');
 startup.skip();
 await import('../../src/main.js');
+}

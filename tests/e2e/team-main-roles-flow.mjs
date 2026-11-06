@@ -8,12 +8,19 @@ const progressKey = 'halfcourt-builtin-selection-v1';
 const editor = '#lineup-wizard-dialog';
 const action = name => `${editor} [data-action="lineup-${name}"]`;
 const roleToggle = action('player-role-toggle');
-const roleOption = action('player-role-option');
+const secondaryToggle = action('player-secondary-role-toggle');
+const roleOption = `${editor} .lineup-config-role-options:not([hidden]) [data-action="lineup-player-role-option"]:not([hidden])`;
 
 export async function runTeamMainRolesFlow(context) {
   const { send, evaluate, waitFor } = context;
   const { click, key, nav, open, choose, phase, teams } = libraryControls(context);
   const backup = await evaluate(`[localStorage.getItem('${archiveKey}'),localStorage.getItem('${progressKey}')]`);
+  const initialAppearance = await evaluate('document.body.dataset.appearance');
+  const setAppearance = async appearance => {
+    if (await evaluate('document.body.dataset.appearance') === appearance) return;
+    await evaluate("[...document.querySelectorAll('.appearance-toggle')].find(button => button.getClientRects().length && !button.disabled).click()");
+    await waitFor(`document.body.dataset.appearance===${JSON.stringify(appearance)}`);
+  };
   function fixture(mode, id) {
     const profile = createLineup(mode, { id, name: `通用角色 ${mode}`, nbaTeamId: 'BOS', bodyType: mode === '4v4' ? 'two-big' : 'one-big' });
     return validateLineup({ ...profile, players: profile.players.map((member, index) => ({
@@ -21,6 +28,7 @@ export async function runTeamMainRolesFlow(context) {
     })) });
   }
   const four = fixture('4v4', 'hc063-four'), three = fixture('3v3', 'hc063-three');
+  four.players[2].mainRole = 'space';
   const disk = `JSON.parse(localStorage.getItem('${archiveKey}'))`;
   const numbers = () => evaluate("[...document.querySelectorAll('#players-layer [data-player^=attack] text')].map(n=>n.textContent)");
   const profile = id => `${disk}.profiles.find(p=>p.id===${JSON.stringify(id)})`;
@@ -38,14 +46,15 @@ export async function runTeamMainRolesFlow(context) {
   })()`);
   const value = name => evaluate(`document.querySelector(${JSON.stringify(action('player-' + name))}).value`);
   const roleValues = () => evaluate(`[...document.querySelectorAll(${JSON.stringify(roleOption)})].filter(n=>n.getClientRects().length).map(n=>n.dataset.value)`);
-  const pick = async role => {
-    if (await evaluate(`document.querySelector(${JSON.stringify(roleToggle)}).getAttribute('aria-expanded')`) !== 'true') await click(roleToggle);
+  const pick = async (role, toggle = roleToggle) => {
+    if (await evaluate(`document.querySelector(${JSON.stringify(toggle)}).getAttribute('aria-expanded')`) !== 'true') await click(toggle);
     await click(`${roleOption}[data-value="${role}"]`);
   };
   await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
   await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
   try {
     await restoreFixture(context, { schemaVersion: 2, profiles: [four, three], activeProfileId: four.id, rolePlans: {}, playbackContext: null }, { templateId: 'pick-roll', frameIndex: 1 });
+    await setAppearance('realistic');
     const beforeEdit = await saved();
     await teams();
     await click(`[data-action=lineup-archive-menu][data-profile-id="${four.id}"]`);
@@ -57,10 +66,15 @@ export async function runTeamMainRolesFlow(context) {
     await input('name', '新阿杰');
     await input('number', '17');
     await click(roleToggle);
-    assert.deepEqual(await roleValues(), ['start', 'screen', 'relay', 'space', '']);
+    assert.deepEqual(await roleValues(), ['start', 'screen', 'relay', 'spacing', 'finisher', '']);
     await pick('start');
+    await click(secondaryToggle);
+    assert.equal(await evaluate(`document.querySelector(${JSON.stringify(roleOption + '[data-value=start]')}).disabled`), true);
+    await pick('spacing', secondaryToggle);
     await selectPlayer(1); await pick('relay');
-    await selectPlayer(2); await pick('space');
+    await selectPlayer(2);
+    assert.match(await evaluate(`document.querySelector(${JSON.stringify(roleToggle)}).textContent`), /旧空间角色/);
+    await pick('space');
     await selectPlayer(3); await pick('relay');
     await selectPlayer(0);
     assert.equal(await value('name'), '新阿杰');
@@ -76,6 +90,7 @@ export async function runTeamMainRolesFlow(context) {
     assert.deepEqual(savedFour.players.map(p => [p.name, p.number, p.mainRole]), [
       ['新阿杰', 17, 'start'], ['老周', 23, 'relay'], ['小林', 11, 'space'], ['阿凯', 30, 'relay'],
     ]);
+    assert.equal(savedFour.players[0].secondaryRole, 'spacing');
     await nav('lineups');
     await click('[data-action=lineup-conditions]'); await phase('open'); await choose('high-low');
     await waitFor("document.body.dataset.view==='play' && document.body.dataset.lineupContext==='main-roles' && !document.body.dataset.pageTransition");
@@ -98,6 +113,7 @@ export async function runTeamMainRolesFlow(context) {
     await waitFor("!document.body.dataset.lineupContext");
     assert.deepEqual(await numbers(), ['1','2','3','4']);
     assert.equal(await evaluate(`localStorage.getItem('${archiveKey}')`), beforeLibrary);
+    await setAppearance('glass');
     await teams();
     const openThree = async () => {
       await click(`[data-action=lineup-archive-menu][data-profile-id="${three.id}"]`);
@@ -108,26 +124,32 @@ export async function runTeamMainRolesFlow(context) {
     await openThree();
     assert.equal(await evaluate(`document.querySelectorAll(${JSON.stringify(action('player'))}).length`), 3);
     await click(roleToggle);
-    assert.deepEqual(await roleValues(), ['start', 'support', 'space', '']);
+    assert.deepEqual(await roleValues(), ['start', 'support', 'spacing', 'space', '']);
     await pick('support');
+    await pick('spacing', secondaryToggle);
     await click(action('save')); await closed();
     assert.equal(await evaluate(`${profile(three.id)}.players[0].mainRole`), 'support');
+    assert.equal(await evaluate(`${profile(three.id)}.players[0].secondaryRole`), 'spacing');
     assert.equal(await evaluate(`${disk}.activeProfileId`), four.id, 'editing a different team does not activate it');
 
     const beforeCancel = await saved();
     await openThree();
     await pick('');
+    await pick('', secondaryToggle);
     await input('name', '要放弃的昵称');
     await click(action('player-config-cancel'));
     await click(action('draft-discard')); await closed();
     assert.equal(await saved(), beforeCancel, 'cancel and discard preserve both role and nickname');
     await openThree();
     await pick('');
+    await pick('', secondaryToggle);
     await click(action('save')); await closed();
     assert.equal(await evaluate(`Object.hasOwn(${profile(three.id)}.players[0], 'mainRole')`), false);
+    assert.equal(await evaluate(`Object.hasOwn(${profile(three.id)}.players[0], 'secondaryRole')`), false);
     assert.equal(await evaluate(`${profile(three.id)}.players[0].name`), '阿杰');
   } finally {
     await restoreFixture(context, ...backup);
+    await setAppearance(initialAppearance);
     await send('Emulation.setEmulatedMedia', { features: [] });
     await nav('lineups');
   }

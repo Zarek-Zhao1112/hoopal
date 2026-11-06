@@ -18,9 +18,9 @@ export async function initializeAppearance(document) {
     body.dataset.appearance = appearance;
     themeColor.content = realistic ? '#121a23' : '#dce7ed';
     for (const control of controls) {
-      control.querySelector('span').textContent = realistic ? '外观 · 写实' : '外观 · 玻璃';
       control.setAttribute('aria-pressed', String(realistic));
       control.title = realistic ? '切换到玻璃外观' : '切换到写实外观';
+      control.setAttribute('aria-label', control.title);
     }
     void applySystemAppearance(appearance).catch(error => console.warn('系统栏外观更新失败', error));
   }

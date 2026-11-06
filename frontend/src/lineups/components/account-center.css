@@ -1,3 +1,5 @@
+@import '../views/local-center.css';
+
 /* Real local teams keep their existing actions and outer workspace frame. */
 #lineups-panel[data-section=archives]>.lineup-archives-card.lineup-account-page,
 #lineups-panel[data-section=archives]>.lineup-archives-card.lineup-account-page.has-pages{grid-template-columns:minmax(0,1fr);grid-template-rows:36px 92px minmax(0,1fr) 124px;gap:10px}
